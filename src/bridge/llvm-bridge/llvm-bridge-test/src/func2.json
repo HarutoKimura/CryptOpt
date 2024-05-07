@@ -1,0 +1,99 @@
+{
+  "operation": "@_ZN5func211custom_func17h4999def379d3faffE",
+  "arguments": [
+    "i32 %x, i32 %y"
+  ],
+  "returns": [
+    {
+      "datatype": "i32*",
+      "name": "%x0"
+    }
+  ],
+  "body": [
+    {
+      "name": [
+        "%_0.i4"
+      ],
+      "operation": "add",
+      "datatype": "i32",
+      "arguments": "%x, %y"
+    },
+    {
+      "name": [
+        "%_0.i9"
+      ],
+      "operation": "mul",
+      "datatype": "i32",
+      "arguments": "%_0.i4"
+    },
+    {
+      "name": [
+        "%_0.i3"
+      ],
+      "operation": "add",
+      "datatype": "i32",
+      "arguments": "%x, %y"
+    },
+    {
+      "name": [
+        "%_0.i8"
+      ],
+      "operation": "mul",
+      "datatype": "i32",
+      "arguments": "%_0.i3"
+    },
+    {
+      "name": [
+        "%_0.i2"
+      ],
+      "operation": "add",
+      "datatype": "i32",
+      "arguments": "%x, %y"
+    },
+    {
+      "name": [
+        "%_0.i7"
+      ],
+      "operation": "mul",
+      "datatype": "i32",
+      "arguments": "%_0.i2"
+    },
+    {
+      "name": [
+        "%_0.i1"
+      ],
+      "operation": "add",
+      "datatype": "i32",
+      "arguments": "%x, %y"
+    },
+    {
+      "name": [
+        "%_0.i6"
+      ],
+      "operation": "mul",
+      "datatype": "i32",
+      "arguments": "%_0.i1"
+    },
+    {
+      "name": [
+        "%_0.i"
+      ],
+      "operation": "add",
+      "datatype": "i32",
+      "arguments": "%x, %y"
+    },
+    {
+      "name": [
+        "%_0.i5"
+      ],
+      "operation": "mul",
+      "datatype": "i32",
+      "arguments": "%_0.i"
+    },
+    {
+      "operation": "return",
+      "datatype": "i32",
+      "value": "0"
+    }
+  ]
+}
