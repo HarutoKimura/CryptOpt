@@ -1,0 +1,163 @@
+{
+  "operation": "secp256k1_fe_mul_inner",
+  "arguments": [
+    "i64 %x, i64 %y"
+  ],
+  "returns": [
+    {
+      "datatype": "i64*",
+      "name": "%x0"
+    }
+  ],
+  "body": [
+    {
+      "name": [
+        "%_0.i8"
+      ],
+      "operation": "add",
+      "datatype": "i64",
+      "arguments": "%x, %y"
+    },
+    {
+      "name": [
+        "%_0.i17"
+      ],
+      "operation": "mul",
+      "datatype": "i64",
+      "arguments": "%_0.i8"
+    },
+    {
+      "name": [
+        "%_0.i16"
+      ],
+      "operation": "mul",
+      "datatype": "i64",
+      "arguments": "%x, %y"
+    },
+    {
+      "name": [
+        "%_0.i7"
+      ],
+      "operation": "add",
+      "datatype": "i64",
+      "arguments": "%_0.i16"
+    },
+    {
+      "name": [
+        "%_0.i6"
+      ],
+      "operation": "add",
+      "datatype": "i64",
+      "arguments": "%x, %y"
+    },
+    {
+      "name": [
+        "%_0.i15"
+      ],
+      "operation": "mul",
+      "datatype": "i64",
+      "arguments": "%_0.i6"
+    },
+    {
+      "name": [
+        "%_0.i14"
+      ],
+      "operation": "mul",
+      "datatype": "i64",
+      "arguments": "%x, %y"
+    },
+    {
+      "name": [
+        "%_0.i5"
+      ],
+      "operation": "add",
+      "datatype": "i64",
+      "arguments": "%_0.i14"
+    },
+    {
+      "name": [
+        "%_0.i4"
+      ],
+      "operation": "add",
+      "datatype": "i64",
+      "arguments": "%x, %y"
+    },
+    {
+      "name": [
+        "%_0.i13"
+      ],
+      "operation": "mul",
+      "datatype": "i64",
+      "arguments": "%_0.i4"
+    },
+    {
+      "name": [
+        "%_0.i12"
+      ],
+      "operation": "mul",
+      "datatype": "i64",
+      "arguments": "%x, %y"
+    },
+    {
+      "name": [
+        "%_0.i3"
+      ],
+      "operation": "add",
+      "datatype": "i64",
+      "arguments": "%_0.i12"
+    },
+    {
+      "name": [
+        "%_0.i2"
+      ],
+      "operation": "add",
+      "datatype": "i64",
+      "arguments": "%x, %y"
+    },
+    {
+      "name": [
+        "%_0.i11"
+      ],
+      "operation": "mul",
+      "datatype": "i64",
+      "arguments": "%_0.i2"
+    },
+    {
+      "name": [
+        "%_0.i10"
+      ],
+      "operation": "mul",
+      "datatype": "i64",
+      "arguments": "%x, %y"
+    },
+    {
+      "name": [
+        "%_0.i1"
+      ],
+      "operation": "add",
+      "datatype": "i64",
+      "arguments": "%_0.i10"
+    },
+    {
+      "name": [
+        "%_0.i"
+      ],
+      "operation": "add",
+      "datatype": "i64",
+      "arguments": "%x, %y"
+    },
+    {
+      "name": [
+        "%_0.i9"
+      ],
+      "operation": "mul",
+      "datatype": "i64",
+      "arguments": "%_0.i"
+    },
+    {
+      "operation": "return",
+      "datatype": "i64",
+      "value": "0"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+[
+  {
+    "operation": "@_ZN12func_rapping11custom_func17hd6c5e0e9e2ff1a4eE",
+    "arguments": [
+      "\"i32 %x\"",
+      "\"i32 %y\""
+    ],
+    "returns": [
+      {
+        "datatype": "i32",
+        "name": "%_0"
+      }
+    ],
+    "body": [
+      {
+        "operation": "return",
+        "value": "%_0"
+      }
+    ]
+  }
+]
