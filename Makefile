@@ -29,8 +29,8 @@ build: $(BUILT_CRYPTOPT)
 
 $(NODE):
 	mkdir -p ./bins
-	curl -L https://nodejs.org/dist/v$(NODE_VERSION)/node-v$(NODE_VERSION)-linux-amd64.tar.xz | tar --extract --xz --directory ./bins
-	mv -f ./bins/node-v$(NODE_VERSION)-linux-amd64 "$(NODE_DIR)"
+	curl -L https://nodejs.org/dist/v$(NODE_VERSION)/node-v$(NODE_VERSION)-linux-arm64.tar.xz | tar --extract --xz --directory ./bins
+	mv -f ./bins/node-v$(NODE_VERSION)-linux-arm64 "$(NODE_DIR)"
 
 node_modules: 
 	@echo "Installing dependencies"
