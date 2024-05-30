@@ -33,8 +33,8 @@ RUN curl -L https://github.com/0xADE1A1DE/AssemblyLine/releases/download/v${asml
         ldconfig
 
 # get and install CryptOpt
-RUN git clone --jobs 3 --recurse-submodules https://github.com/HarutoKimura/CryptOpt /root/CryptOpt && \
-        cd /root/CryptOpt && \
+RUN git clone --jobs 3 --recurse-submodules https://github.com/HarutoKimura/CryptOpt /root/CryptOpt
+RUN cd /root/CryptOpt && \
         git checkout --recurse-submodules feature/llvm-bridge && \
         make && \
         make install-zsh
@@ -46,5 +46,5 @@ WORKDIR /root/CryptOpt
 # /root/CryptOpt/src/bridge/fiat-bridge/data/
 
 # run the CryptOpt tests
-RUN make check -C /root/CryptOpt
+RUN cd /root/CryptOpt && make check
 
