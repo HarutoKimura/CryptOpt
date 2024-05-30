@@ -24,6 +24,8 @@ import { JasminBridge } from "@/bridge/jasmin-bridge";
 import { ManualBridge } from "@/bridge/manual-bridge";
 import { Model } from "@/model";
 import { OptimizerArgs } from "@/types";
+import { llvm_BitcoinCoreBridge } from "@/bridge/llvm-bitcoin-core-bridge";
+
 
 type needComms = Pick<OptimizerArgs, "bridge" | "seed" | "memoryConstraints">;
 interface needJasmin extends needComms {
@@ -43,8 +45,12 @@ interface needBitcoinCore extends needComms {
   bridge: "bitcoin-core";
   method: BITCOIN_CORE_METHOD_T;
 }
+interface needllvmBitcoinCore extends needComms {
+  bridge: "llvm-bitcoin-core";
+  method: BITCOIN_CORE_METHOD_T;
+}
 
-type neededArgs = needJasmin | needFiat | needManual | needBitcoinCore;
+type neededArgs = needJasmin | needFiat | needManual | needBitcoinCore | needllvmBitcoinCore;
 
 type ret = {
   argwidth: number;
@@ -140,6 +146,23 @@ function initManual(sharedObjectFilename: string, args: needManual): ret {
   return res;
 }
 
+function initllvmBitcoinCore(sharedObjectFilename: string, args: needllvmBitcoinCore): ret {
+  const bridge = new llvm_BitcoinCoreBridge();
+  Model.init({
+    memoryConstraints: args.memoryConstraints,
+    json: bridge.getCryptOptFunction(args.method),
+  });
+
+  const symbolname = bridge.machinecode(sharedObjectFilename, args.method);
+  const chunksize = 16; // only for reading the chunk breaks atm. see MS code
+  const argwidth = bridge.argwidth("", args.method);
+  const argnumin = bridge.argnumin(args.method);
+  const argnumout = bridge.argnumout(args.method);
+
+  const bounds = bridge.bounds("", args.method);
+  return { symbolname, chunksize, argwidth, argnumin, argnumout, bounds };
+}
+
 function createMS(
   { argwidth, argnumin, argnumout, chunksize, bounds, symbolname }: ret,
   libcheckfunctionFile: string,
@@ -180,6 +203,9 @@ export function init(tmpDir: string, args: neededArgs): { symbolname: string; me
       break;
     case "bitcoin-core":
       r = initBitcoinCore(sharedObjectFilename, args);
+      break;
+    case "llvm-bitcoin-core":
+      r = initllvmBitcoinCore(sharedObjectFilename, args);
       break;
     default:
       throw new Error("Bridge is specified, but not valid.");
