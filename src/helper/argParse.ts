@@ -69,6 +69,12 @@ export const parsedArgs = y
     default: "",
     describe: `The file containing the C-CODE for the method. Only used if the --bridge manual.`,
   })
+  .option("llvmFile", {
+    string: true,
+    alias: "l",
+    default: "",
+    describe: `The file containing the LLVM-IR for the method. Only used if the --bridge llvm-manual.`,
+  })
   .option("verbose", {
     boolean: true,
     alias: "v",
@@ -179,7 +185,7 @@ export const parsedArgs = y
       return Math.pow(1000, idx + 1) * Number(evals.substring(0, evals.length - 1));
     },
   })
-  .check(({ evals, bridge, cFile, jsonFile, method, curve }) => {
+  .check(({ evals, bridge, cFile, jsonFile, llvmFile, method, curve }) => {
     if (evals <= 0) {
       throw new Error("--evals must be >0");
     }
@@ -199,6 +205,14 @@ export const parsedArgs = y
       if (!BITCOIN_CORE_METHODS.includes(method as BITCOIN_CORE_METHOD_T)) {
         throw new Error(`Bridge is bitcoin-core. The specified method '${method}' not available.`);
       }
+    }
+    if (bridge == "llvm-bitcoin-core") {
+      if (!BITCOIN_CORE_METHODS.includes(method as BITCOIN_CORE_METHOD_T)) {
+        throw new Error(`Bridge is llvm-bitcoin-core. The specified method '${method}' not available.`);
+      }
+    }
+    if (bridge == "llvm-manual" && (!jsonFile || !llvmFile)) {
+      throw new Error("Bridge is set to llvm-manual, but either json or c file is not specified.");
     }
     return true;
   })

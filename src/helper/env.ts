@@ -21,6 +21,7 @@ import { fileURLToPath } from "url";
 export const env = defaults(process.env, {
   CC: "gcc",
   CFLAGS: "-march=native -mtune=native -O3",
+  LCC: "llc",
 });
 
 const me = fileURLToPath(import.meta.url);

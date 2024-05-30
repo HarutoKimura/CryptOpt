@@ -28,7 +28,11 @@ import { AVAILABLE_METHODS, METHOD_DETAILS, METHOD_T } from "./constants";
 import { BCBPreprocessor } from "./preprocess";
 import type { raw_T } from "./raw.type";
 
-const cwd = resolve(datadir, "bitcoin-core-bridge");
+const { CC, LLC } = env;
+
+const cwd = resolve(datadir, "llvm-bitcoin-core-bridge");
+
+const filepathIR = resolve(cwd, "fucn2.ll");
 
 const createExecOpts = () => {
   const c = { env, cwd, shell: "/usr/bin/bash" };
@@ -42,7 +46,7 @@ export class llvm_BitcoinCoreBridge implements Bridge {
       throw new Error(`unsupported method '${method}'. Choose from ${AVAILABLE_METHODS.join(", ")}.`);
     }
 
-    const raw = JSON.parse(readFileSync(resolve(cwd, "field.json")).toString()) as Array<raw_T>;
+    const raw = JSON.parse(readFileSync(resolve(cwd, "func2.json")).toString()) as Array<raw_T>;
 
     const found = raw.find(({ operation }) => operation == METHOD_DETAILS[method].name);
 
@@ -66,23 +70,31 @@ export class llvm_BitcoinCoreBridge implements Bridge {
     if (!filename.endsWith(".so")) {
       throw Error(`filename must end with .so, but instead is '${filename}'`);
     }
-
     const opts = createExecOpts();
-    const command = `make -C ${cwd} all`; // to get scalar.c / field.c
-    Logger.log(`cmd to generate machinecode: ${command} w opts: ${JSON.stringify(opts)}`);
 
+    // 1. Compile LLVM IR to Object File
+    const objectFile = resolve(filename, "..", "temp.o"); // Create a temporary object file
+    const compileIRCommand = `${LLC} ${filepathIR} -o ${objectFile}`;
+    Logger.log(`Compiling LLVM IR to object file: ${compileIRCommand}`);
     try {
-      // yeah.
-      // we need to all lock at the same thing.
-      // if we'd lock at the `filename` everybody locks to some temporary file
-      lockAndRunOrReturn(cwd, command, opts);
-
-      // then create the so files. we dont need locks for this.
-      execSync(`make -C ${cwd} ${filename}`, opts);
+      execSync(compileIRCommand, opts);
     } catch (e) {
-      errorOut(ERRORS.bcbMakeFail);
+      errorOut(ERRORS.llvmIRCompilationFail);
     }
 
+  
+    // 2. Link Object File into Shared Object
+    const linkCommand = `${CC} -shared -o ${filename} ${objectFile}`;
+    Logger.log(`Linking object file into shared object: ${linkCommand}`);
+    try {
+      lockAndRunOrReturn(cwd, linkCommand, opts);
+    } catch (e) {
+      errorOut(ERRORS.linkingFail);
+    }
+  
+    // Cleanup temporary files (optional)
+    execSync(`rm ${objectFile}`, opts);
+  
     return METHOD_DETAILS[method].name;
   }
 

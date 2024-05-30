@@ -31,6 +31,7 @@ export type OptimizerArgs = {
   verbose: boolean;
   bridge: BRIDGES_T;
   cFile?: string;
+  llvmFile?: string;
   jsonFile?: string;
   resultDir: string;
   xmm?: boolean;
