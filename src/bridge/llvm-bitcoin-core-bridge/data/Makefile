@@ -1,40 +1,30 @@
 CC?=gcc
+LLC?=llc
+CLANG?=clang
 tmp=./pre-
 
-all: field.c
+# Default target
+all: func.ll
 
-%.json: %.ll llvm2cryptopt.sed
-	@echo "["> $(tmp)${@}
-	sed -f llvm2cryptopt.sed -n ${<} >>$(tmp)${@}
-	@echo "]" >>$(tmp)${@}
-	tr -d '\n' <$(tmp)${@} |\
-		sed -e 's/},[\t ]*]/}]/g' |\
-		jq >${@}
-	rm $(tmp)${@}
+%.json: %.ll
+	@echo "Converting $< to $@"
+	python3 llvm2json.py $< $@
+# Generate LLVM IR from Rust source
 
-%.ll: %.c
-	clang -S ${<} -emit-llvm -O1 -o - |\
-	opt -S -enable-new-pm  -passes='default<O1>' -print-after-all \
-		-o ${@} 2>/dev/null
-	
-# preprocessed.ssa: preprocessed.c
-# gcc -S -fdump-tree-all -O1 ${?}
-# -time-passes -print-after-all
-# -fdump-tree-all-all -fdump-rtl-all-all -fdump-ipa-all-all -O1
+%.ll: func.rs
+	rustc --crate-type=lib --emit=llvm-ir -C opt-level=0 ${<} -o ${@}
 
-# from https://github.com/bitcoin-core/secp256k1/blob/423b6d19d373f1224fd671a982584d7e7900bc93/src/field_5x52_int128_impl.h
-field.c: field_5x52_int128_impl.h
-	printf "%s\n%s\n%s\n%s\n" 'typedef __int128 uint128_t;' '#define static' '#define SECP256K1_INLINE' '#define SECP256K1_RESTRICT restrict ' > $(tmp)${@}
-	sed -e '/^  VERIFY_CHECK/d' -e '/^  VERIFY_BITS/d' ${?} >> $(tmp)${@}
-	$(CC) $(CFLAGS) -E $(tmp)${@} -o ${@}
-	rm $(tmp)${@}
+# Generate object file from LLVM IR (remove specific metadata)
+%.o: %.ll
+	sed '/^!llvm\\.module\\.flags.*$$/d; /^!llvm\\.ident.*$$/d; /^!.*$$/d' ${<} > ${<}.tmp
+	$(LLC) -filetype=obj -o ${@} ${<}.tmp
+	rm -f ${<}.tmp
 
-
-%.so: field.c 
+# Compile shared object from object file
+%.so: %.o
 	$(CC) $(CFLAGS) -fPIC -shared -o ${@} ${?}
-	# $(CC) $(CFLAGS) -DUSE_ASM_X86_64 -fPIC -shared -o ${@} ${?}
 
+# Clean up generated files
 distclean:
-	rm -f *.c
 	rm -f *.ll
-	rm -f $(tmp)field.json field.json
+	rm -f $(tmp)func.json func.json

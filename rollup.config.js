@@ -49,6 +49,10 @@ export default [
             src: ["src/bridge/bitcoin-core-bridge/data/*"],
             dest: "./dist/data/bitcoin-core-bridge",
           },
+          {
+            src: ["src/bridge/llvm-bitcoin-core-bridge/data/*"],
+            dest: "./dist/data/llvm-bitcoin-core-bridge",
+          }
         ],
       }),
     ],
