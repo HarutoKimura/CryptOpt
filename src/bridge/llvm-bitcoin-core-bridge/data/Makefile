@@ -11,17 +11,17 @@ all: func.ll
 	python3 llvm2json.py $< $@
 # Generate LLVM IR from Rust source
 
-%.ll: func.rs
+func.ll: func.rs
 	rustc --crate-type=lib --emit=llvm-ir -C opt-level=0 ${<} -o ${@}
 
 # Generate object file from LLVM IR (remove specific metadata)
-%.o: %.ll
+func.o: func.ll
 	sed '/^!llvm\\.module\\.flags.*$$/d; /^!llvm\\.ident.*$$/d; /^!.*$$/d' ${<} > ${<}.tmp
 	$(LLC) -filetype=obj -o ${@} ${<}.tmp
 	rm -f ${<}.tmp
 
 # Compile shared object from object file
-%.so: %.o
+%.so: func.o
 	$(CC) $(CFLAGS) -fPIC -shared -o ${@} ${?}
 
 # Clean up generated files
