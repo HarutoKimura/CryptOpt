@@ -7,7 +7,9 @@ def parse_llvm_ir(file_path):
         llvm_ir = file.read()
 
     # Extract the function definition
-    match = re.search(r'define (\w+) (@_ZN[^(]+)\(([^)]+)\)', llvm_ir)
+    #preivous one
+    #match = re.search(r'define (\w+) (@_ZN[^(]+)\(([^)]+)\)', llvm_ir)
+    match = re.search(r'define (\w+) @(\w+)\((.*?)\)', llvm_ir)
     if not match:
         raise ValueError("Function definition not found")
 
@@ -30,12 +32,25 @@ def parse_llvm_ir(file_path):
 
     for line in llvm_ir.strip().split('\n'):
 
+        #original line 
         #print("line before", line)
-        # %N -> xN
+        #%N -> xN
+        # line = re.sub(r'%(\S+)', r'x\1', line)
+        # line = re.sub(r'_(\S+)', r'\1', line)
+
+        # %_0.iN -> xN
+        line = re.sub(r'%_0\.i(\d+)',  r'x\1', line)
+        # %_0.i -> xN
+        line = re.sub(r'%_0\.i',  r'x0', line)
+
+        # for input argument %a -> xa,  %b -> xb
         line = re.sub(r'%(\S+)', r'x\1', line)
-        line = re.sub(r'_(\S+)', r'\1', line)
 
         #print("line after % -> x", line)
+
+        # xa and xb -> x100 and x101
+        line = re.sub(r'xa', r'x100', line)
+        line = re.sub(r'xb', r'x101', line)
 
          # xNN = function_name OPT_args iNN (datatype) whatever -> JSON
         match = re.match(r'(x[\w.]+) = (\w+)(?: (inbounds))?\s*(?:\[[\d\s]*x\s*)?(\w+)[\]*\s]*(?:,?\s*(.+))?', line.strip())
@@ -91,7 +106,7 @@ def parse_llvm_ir(file_path):
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
-        print("Usage: python llvm2json.py <llvm_ir_file> <output_json_file>")
+        print("Usage: python3s llvm2json.py <llvm_ir_file> <output_json_file>")
         sys.exit(1)
 
     llvm_ir_file = sys.argv[1]
