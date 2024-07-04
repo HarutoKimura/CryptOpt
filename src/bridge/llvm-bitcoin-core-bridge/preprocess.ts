@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { cloneDeep, groupBy } from "lodash-es";
+import { groupBy } from "lodash-es";
 
 import { matchArgPrefix } from "@/helper";
 import Logger from "@/helper/Logger.class";
@@ -45,6 +45,7 @@ type B = Fiat.FiatFunction["body"];
 export class llvmBCBPreprocessor {
   public preprocessRaw(raw: Readonly<raw_T>): Fiat.FiatFunction {
     Logger.log(`BCB: preprocessRaw'ing ${raw.operation}`);
+    console.log("Raw input:", JSON.stringify(raw, null, 2));  // Debug log 
     const fixed = this.fixArguments(raw);
     console.log("Fixed:", fixed);  // Debug log
     let body = fixed.body;
@@ -57,17 +58,8 @@ export class llvmBCBPreprocessor {
     }
 
     console.log("Grouped result:", grouped);  // Debug log
+
     console.log("Grouped keys:", Object.keys(grouped));  // Debug log
-
-
-    const requiredKeys = ["getelementptr", "store", "load"];
-    const missingKeys = requiredKeys.filter(key => !(key in grouped));
-
-    if (missingKeys.length > 0) {
-      throw new Error(`Missing required keys: ${missingKeys.join(", ")}. Available keys: ${Object.keys(grouped).join(", ")}`);
-    }
-    
-    const inputArguments = fixed.args.map(arg => arg.name);
 
     const { stores, loads } = this.reduceStoreAndLoads(
       grouped as unknown as { getelementptr: SSA[]; load: SSA[]; store: SSA[] },
@@ -157,11 +149,26 @@ export class llvmBCBPreprocessor {
     // must be of type i64*. then check the name X, if that is an getelementptr-op.
     // if yes, extract the arg B and offset n and replace all occurrence of X with B[n]
     const resolveElementPtr = (needle: string): string => {
-      console.log("Resolving element pointer:", needle); // Debug log
-      const elementPointer = grouped.getelementptr.find(({ name }) => name[0] == needle);
-      console.log("Element pointer:", elementPointer);  // Debug log
-      let offset = "0"; // the '2' in the example x5=x1+2
 
+      const elementPointer = grouped.getelementptr.find(({ name }) => name[0] == needle);
+
+      // to check what causes the error
+      if (!elementPointer) {
+        const availablePointers = grouped.getelementptr.map(ep => ep.name[0]).join(', ');
+        const availableLoads = grouped.load.map(l => l.name[0]).join(', ');
+        const availableStores = grouped.store.map(s => s.name[0]).join(', ');
+        const errorMessage = `Could not find element pointer with name ${needle}. ` +
+          // 'Grouped: ' + JSON.stringify(grouped, null, 1) + '. ' +
+          `Available pointers: [${availablePointers}]. ` +
+          'Available loads: ' + availableLoads + '. ' +
+          'Available stores: ' + availableStores + '. ' +
+          `Current body: ${JSON.stringify(currentBody)}. ` +
+          `Grouped operations: ${JSON.stringify(Object.keys(grouped))}`;
+        throw new Error(errorMessage);
+      }
+      console.log("Element pointer is:", elementPointer);  // Debug log
+
+      let offset = "0"; // the '2' in the example x5=x1+2
       if (elementPointer) {
         const { pointers, imm } = getArguments(elementPointer.arguments);
         const i = imm.pop()?.imm;
@@ -178,6 +185,10 @@ export class llvmBCBPreprocessor {
         }
         // check if the name is part of the known structs.
 
+        if (pointers.length === 0) {
+          throw new Error("TSNH. no pointers found in getelementptr operation. This should not happen.");
+        }
+
         const p = pointers[0];
         needle = p.id; // x0
         console.log("Needle:", needle);  // Debug log
@@ -187,17 +198,31 @@ export class llvmBCBPreprocessor {
       const es2 = currentBody.find(({ name }) => name[0] == needle);
       console.log("Current body:", currentBody);  // Debug log
       console.log("Current element:", es2);  // Debug log
-      if (es2?.arguments.length !== 1 || typeof es2.arguments[0] !== "string") {
+      // if (es2?.arguments.length !== 1 || typeof es2.arguments[0] !== "string") {
+      //   throw Error(
+      //     `could not find expected base with one argument. TSNH.${JSON.stringify({ es2, needle, currentBody})}`,
+      //   );
+      // }
+
+      if (es2){
+        console.log("Current argument length:", es2.arguments.length);  // Debug log
+        console.log("Current element arguments:", es2.arguments);  // Debug log
+      }
+      if(es2?.arguments.length !== 1) {
         throw Error(
-          // at least as the needle, xa is returned by Haruto
-          `could not find expected base with one argument. TSNH.${JSON.stringify({ es2, needle, currentBody})}`,
+          `es2.argument.length should be 1, but got ${es2?.arguments.length} and es2 argument is ${es2?.arguments}. TSNH.${JSON.stringify({ es2, needle, currentBody})}`,
         );
+      }
+
+      if (typeof es2.arguments[0] !== "string") {
+        throw Error("TSNH. the argument of the getelementptr should be a string. T)}");
       }
       needle = es2.arguments[0]; // is now something like arg1
       return `${needle}[${offset}]`;
     };
 
     const loads = grouped.load.map((l) => {
+      Logger.log("BCB: Processing load operation for ${l.name}")
       console.log("Load operation:", l);  // Debug log
       const { pointers } = getArguments(l.arguments);
       console.log("Pointers:", pointers);  // Debug log
@@ -221,7 +246,8 @@ export class llvmBCBPreprocessor {
     // now lets to the stores.
     // the stores have one string argument 'i64* x1, i64 x2', that means, *x1=x2
     const stores = grouped.store.reduce((acc, s) => {
-      console.log("Store operation:", s);  // Debug log
+      Logger.log("BCB: Processing store operation")
+      console.log("Store operation:",JSON.stringify(s, null, 2));  // Debug log
       if (s.datatype != "i64") {
         throw Error("unsupported  yet.");
       }
@@ -266,6 +292,7 @@ export class llvmBCBPreprocessor {
       }
       // else, we will replace
       acc.splice(indexOfStoreToSameMemory, 1, assignOperation);
+      console.log("Current accL:", acc); // Debug log
       return acc;
     }, [] as Fiat.DynArgument[]);
     return { stores, loads };
@@ -276,7 +303,9 @@ export class llvmBCBPreprocessor {
     returns: R[];
     body: B;
   } {
-    const UNUSED_MODIFIERS = ["nocapture", "noundef", "writeonly", "ptr", "noalias", "readonly", "!noundef"];
+    Logger.log("BCB: Fixing arguments");
+    console.log("Raw input:", JSON.stringify(raw, null, 2));  // Debug log
+    const UNUSED_MODIFIERS = ["ptr","noalias","nocapture","noundef","readonly","align 8", "dereferenceable(40)"];
     // transform the arguments
     const args_ND = raw.arguments[0]
       .split(",")
@@ -291,6 +320,7 @@ export class llvmBCBPreprocessor {
         datatype: g.type,
       }));
       console.log("Args_ND:", args_ND);  // Debug log
+
 
     // now rename them, make x0, x1, ..xN to out1, arg1, ... argN and add the required =-operations to the body
     const body = [] as Fiat.DynArgument[];
