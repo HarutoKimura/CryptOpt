@@ -28,11 +28,7 @@ import { AVAILABLE_METHODS, METHOD_DETAILS, METHOD_T } from "./constants";
 import { llvmBCBPreprocessor } from "./preprocess";
 import type { raw_T } from "./raw.type";
 
-const { CC, LLC } = env;
-
 const cwd = resolve(datadir, "llvm-bitcoin-core-bridge");
-
-const filepathIR = resolve(cwd, "func.ll")
 
 const createExecOpts = () => {
   const c = { env, cwd, shell: "/usr/bin/bash" };
@@ -42,13 +38,19 @@ const createExecOpts = () => {
 
 export class llvm_BitcoinCoreBridge implements Bridge {
   public getCryptOptFunction(method: METHOD_T, _curve?: string): CryptOpt.Function {
+    console.log('Entering getCryptOptFunction', { method, _curve });
     if (!(method in METHOD_DETAILS)) {
       throw new Error(`unsupported method '${method}'. Choose from ${AVAILABLE_METHODS.join(", ")}.`);
     }
 
-    const raw = JSON.parse(readFileSync(resolve(cwd, "func.json")).toString()) as Array<raw_T>;
+    const raw = JSON.parse(readFileSync(resolve(cwd, "field_wrapp_test2.json")).toString()) as Array<raw_T>;
+    //const raw = JSON.parse(readFileSync("/home/harutok/CryptOpt/src/bridge/bitcoin-core-bridge/data/field.json").toString()) as Array<raw_T>;
+    console.log("Input Json file", raw);
 
+    //  "operation": "secp256k1_fe_mul_inner" would be the name of the function
+    //  if that operation is found in the raw json file, then we can proceed
     const found = raw.find(({ operation }) => operation == METHOD_DETAILS[method].name);
+    console.log("Found", found);
 
     if (!found) {
       throw new Error(
@@ -58,8 +60,11 @@ export class llvm_BitcoinCoreBridge implements Bridge {
       );
     }
 
+    console.log("before preprocessRaw", found);
     // raw preprocessing (i.e. llvm->fiat)
+    // input the raw json file to preprocessRaw and output the fiat json file.
     const fiat = new llvmBCBPreprocessor().preprocessRaw(found);
+    console.log("after preprocessRaw", fiat);
 
     // 'normal' preprocessing (fiat-> cryptopt)
     const cryptOpt = preprocessFunction(fiat);
@@ -75,10 +80,11 @@ export class llvm_BitcoinCoreBridge implements Bridge {
     const llvmFile = filename.replace(".so", ".ll");
   
     try {
+      // So far, I generated the shared object file from the LLVM-IR file direclty. I don't need to generate the LLVM-IR file.
       // Generate LLVM IR file
-      const llvmCommand = `make -C ${cwd} ${llvmFile}`;
-      Logger.log(`cmd to generate LLVM IR: ${llvmCommand} w opts: ${JSON.stringify(opts)}`);
-      lockAndRunOrReturn(cwd, llvmCommand, opts);
+      // const llvmCommand = `make -C ${cwd} ${llvmFile}`;
+      // Logger.log(`cmd to generate LLVM IR: ${llvmCommand} w opts: ${JSON.stringify(opts)}`);
+      // lockAndRunOrReturn(cwd, llvmCommand, opts);
   
       // Generate shared object file
       const soCommand = `make -C ${cwd} ${filename}`;
