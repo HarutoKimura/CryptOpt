@@ -3,9 +3,8 @@ source_filename = "field_wrapp.136388de4f22869c-cgu.0"
 target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-unknown-linux-gnu"
 
-; field_wrapp::secp256k1_fe_mul_inner
 ; Function Attrs: mustprogress nofree norecurse nosync nounwind nonlazybind willreturn memory(argmem: readwrite) uwtable
-define void @_ZN11field_wrapp22secp256k1_fe_mul_inner17hb77898895474ee53E(ptr noalias nocapture noundef writeonly align 8 dereferenceable(40) %r, ptr noalias nocapture noundef readonly align 8 dereferenceable(40) %a, ptr noalias nocapture noundef readonly align 8 dereferenceable(40) %b) unnamed_addr #0 {
+define void @secp256k1_fe_mul_inner(ptr noalias nocapture noundef writeonly align 8 dereferenceable(40) %r, ptr noalias nocapture noundef readonly align 8 dereferenceable(40) %a, ptr noalias nocapture noundef readonly align 8 dereferenceable(40) %b) unnamed_addr #0 {
 start:
   %a0 = load i64, ptr %a, align 8, !noundef !3
   %0 = getelementptr inbounds [5 x i64], ptr %a, i64 0, i64 1
@@ -133,3 +132,13 @@ start:
   store i64 %29, ptr %28, align 8
   ret void
 }
+
+attributes #0 = { mustprogress nofree norecurse nosync nounwind nonlazybind willreturn memory(argmem: readwrite) uwtable "probe-stack"="inline-asm" "target-cpu"="x86-64" }
+
+!llvm.module.flags = !{!0, !1}
+!llvm.ident = !{!2}
+
+!0 = !{i32 8, !"PIC Level", i32 2}
+!1 = !{i32 2, !"RtLibUseGOT", i32 1}
+!2 = !{!"rustc version 1.75.0 (82e1608df 2023-12-21) (built from a source tarball)"}
+!3 = !{}
