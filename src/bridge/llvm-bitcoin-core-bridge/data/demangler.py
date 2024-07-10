@@ -5,13 +5,12 @@ def extract_rust_functions(rust_file):
     functions = {}
     with open(rust_file, 'r') as f:
         content = f.read()
-        # This regular expression to capture the original function name and its parrameters
+        # This regular expression is to capture the original function name and its parrameters
         for match in re.finditer(r'fn\s+(\w+)\s*\((.*?)\)', content, re.DOTALL):
             name = match.group(1)
             params = match.group(2)
             functions[name] = params
-        print(f'Found function name: {name})')
-        print(f'Found function params: {params})')
+            
     return functions
 
 def process_llvm_ir(llvm_file, rust_functions, output_file):

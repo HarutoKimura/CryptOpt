@@ -5,32 +5,45 @@ tmp=./pre-
 
 #Specify the target file name
 #Current inputs are field_wrapp.ll or demangled_field.ll
-TARGET_NAME=demangled_field
+TARGET_NAME=field_mul
+
+#Specify the demangled target file name
+DEMANGLED_TARGET_NAME=demangled_$(TARGET_NAME)_test
 
 # Default target
-all: $(TARGET_NAME).ll
+all: $(TARGET_NAME).rs
 
 %.json: %.ll
 	@echo "Converting $< to $@"
 	python3 llvm2json.py $< $@
-# Generate LLVM IR from Rust source
 
-
+# Original commnand to generate LLVM-IR From Rust source
 # $(TARGET_NAME).ll: $(TARGET_NAME).rs
-# 	rustc --crate-type=lib --emit=llvm-ir -C opt-level=1 ${<} -o ${@}
-# 	rustc --crate-type=lib --emit=llvm-ir -C opt-level=1 -C symbol-mangling-version=v0 -o ${<} -o ${@}
+# rustc --crate-type=lib --emit=llvm-ir -C opt-level=1 ${<} -o ${@}
+
+# Generate LLVM IR from Rust source
+$(TARGET_NAME).ll: $(TARGET_NAME).rs
+	rustc --crate-type=lib --emit=llvm-ir -C opt-level=1 -C symbol-mangling-version=v0 -o ${<} -o ${@}
+
+# Demangle the LLVM-IR file
+$(DEMANGLED_TARGET_NAME).ll: $(TARGET_NAME).rs $(TARGET_NAME).ll
+	python3 demangler.py $(TARGET_NAME).rs $(TARGET_NAME).ll $(DEMANGLED_TARGET_NAME).ll
 
 # Generate object file from LLVM IR
-$(TARGET_NAME).o: $(TARGET_NAME).ll
+$(DEMANGLED_TARGET_NAME).o: $(DEMANGLED_TARGET_NAME).ll
 	cp ${<} ${<}.tmp
 	$(LLC) -filetype=obj -opaque-pointers -o ${@} ${<}.tmp
-	rm -f ${<}.tmp
+	rm -f $(DEMANGLED_TARGET_NAME).ll
 
 # Compile shared object from object file
-%.so: $(TARGET_NAME).o
-	$(CC) $(CFLAGS) -fPIC -shared -o ${@} ${?}
+%.so: $(DEMANGLED_TARGET_NAME).o
+	cp ${<} ${<}.tmp
+	$(CC) $(CFLAGS) -fPIC -shared -o ${@} ${?}.tmp
+	rm -f $(DEMANGLED_TARGET_NAME).ll.tmp
+	rm -f ${?}.tmp
+	rm -f $(DEMANGLED_TARGET_NAME).o
 
 # Clean up generated files
 distclean:
 	rm -f *.ll
-	rm -f $(tmp)$(TARGET_NAME).json
+	rm -f $(tmp)$(TARGET_NAME).json, $(DEMANGLED_TARGET_NAME).ll, $(DEMANGLED_TARGET_NAME).o

@@ -30,7 +30,8 @@ import type { raw_T } from "./raw.type";
 
 const cwd = resolve(datadir, "llvm-bitcoin-core-bridge");
 
-const target_json = "demangled_field.json";
+// so far there are only two json files: demangled_field_mul.json and demangled_field_sqr.json
+const target_json = "demangled_field_mul.json";
 
 const createExecOpts = () => {
   const c = { env, cwd, shell: "/usr/bin/bash" };
@@ -78,15 +79,12 @@ export class llvm_BitcoinCoreBridge implements Bridge {
       throw Error(`filename must end with .so, but instead is '${filename}'`);
     }
   
+
     const opts = createExecOpts();
-    const llvmFile = filename.replace(".so", ".ll");
+    const command = `make -C ${cwd} all`; // to get LLVM-IR file
+    Logger.log(`cmd to generate machinecode: ${command} w opts: ${JSON.stringify(opts)}`);
   
     try {
-      // So far, I generated the shared object file from the LLVM-IR file direclty. I don't need to generate the LLVM-IR file.
-      // Generate LLVM IR file
-      // const llvmCommand = `make -C ${cwd} ${llvmFile}`;
-      // Logger.log(`cmd to generate LLVM IR: ${llvmCommand} w opts: ${JSON.stringify(opts)}`);
-      // lockAndRunOrReturn(cwd, llvmCommand, opts);
   
       // Generate shared object file
       const soCommand = `make -C ${cwd} ${filename}`;

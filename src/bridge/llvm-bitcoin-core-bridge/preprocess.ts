@@ -45,22 +45,15 @@ type B = Fiat.FiatFunction["body"];
 export class llvmBCBPreprocessor {
   public preprocessRaw(raw: Readonly<raw_T>): Fiat.FiatFunction {
     Logger.log(`BCB: preprocessRaw'ing ${raw.operation}`);
-    console.log("Raw input:", JSON.stringify(raw, null, 2));  // Debug log 
     const fixed = this.fixArguments(raw);
-    console.log("Fixed:", fixed);  // Debug log
     let body = fixed.body;
 
     const grouped = groupBy(raw.body, "operation");
 
-
+    // for simple input test
     if (!["getelementptr", "store", "load"].every((k) => k in grouped)) {
       throw new Error("not all required keys are available. tsnh.");
     }
-
-    console.log("Grouped result:", grouped);  // Debug log
-
-    console.log("Grouped keys:", Object.keys(grouped));  // Debug log
-
     const { stores, loads } = this.reduceStoreAndLoads(
       grouped as unknown as { getelementptr: SSA[]; load: SSA[]; store: SSA[] },
       body,
@@ -69,6 +62,15 @@ export class llvmBCBPreprocessor {
     delete grouped.getelementptr;
     delete grouped.store;
     delete grouped.load;
+
+
+    //** for simple input test with pointer which has only load operation among the three operations**
+    // I need to update a lot so probalby I should not edit that part now.
+    // const loads = this.reduceStoreAndLoads(
+    //   grouped as unknown as { load: SSA[] },
+    //   body,
+    // );
+    // delete grouped.load;
 
     const otherInstrs = Object.entries({
       add: transformAdd,
@@ -109,11 +111,15 @@ export class llvmBCBPreprocessor {
     delete grouped.trunc;
     delete grouped.icmp;
 
+    //original body.concat stores, loads, otherInstrs
     body = body.concat(
       stores as unknown as Fiat.DynArgument[],
       loads as unknown as Fiat.DynArgument[],
       otherInstrs as Fiat.DynArgument[],
     );
+
+    //** for simple input test **
+    // body = body.concat(otherInstrs as Fiat.DynArgument[]);
 
     body = zextR(body);
 
@@ -149,26 +155,9 @@ export class llvmBCBPreprocessor {
     // must be of type i64*. then check the name X, if that is an getelementptr-op.
     // if yes, extract the arg B and offset n and replace all occurrence of X with B[n]
     const resolveElementPtr = (needle: string): string => {
-
       const elementPointer = grouped.getelementptr.find(({ name }) => name[0] == needle);
-
-      // to check what causes the error
-      if (!elementPointer) {
-        const availablePointers = grouped.getelementptr.map(ep => ep.name[0]).join(', ');
-        const availableLoads = grouped.load.map(l => l.name[0]).join(', ');
-        const availableStores = grouped.store.map(s => s.name[0]).join(', ');
-        const errorMessage = `Could not find element pointer with name ${needle}. ` +
-          // 'Grouped: ' + JSON.stringify(grouped, null, 1) + '. ' +
-          `Available pointers: [${availablePointers}]. ` +
-          'Available loads: ' + availableLoads + '. ' +
-          'Available stores: ' + availableStores + '. ' +
-          `Current body: ${JSON.stringify(currentBody)}. ` +
-          `Grouped operations: ${JSON.stringify(Object.keys(grouped))}`;
-        throw new Error(errorMessage);
-      }
-      console.log("Element pointer is:", elementPointer);  // Debug log
-
       let offset = "0"; // the '2' in the example x5=x1+2
+
       if (elementPointer) {
         const { pointers, imm } = getArguments(elementPointer.arguments);
         const i = imm.pop()?.imm;
@@ -185,56 +174,26 @@ export class llvmBCBPreprocessor {
         }
         // check if the name is part of the known structs.
 
-        if (pointers.length === 0) {
-          throw new Error("TSNH. no pointers found in getelementptr operation. This should not happen.");
-        }
-
         const p = pointers[0];
         needle = p.id; // x0
-        console.log("Needle:", needle);  // Debug log
       }
-
       // because I know, currently all getelementptr s are from input, I don't bother checking recursively
       const es2 = currentBody.find(({ name }) => name[0] == needle);
-      console.log("Current body:", currentBody);  // Debug log
-      console.log("Current element:", es2);  // Debug log
-      // if (es2?.arguments.length !== 1 || typeof es2.arguments[0] !== "string") {
-      //   throw Error(
-      //     `could not find expected base with one argument. TSNH.${JSON.stringify({ es2, needle, currentBody})}`,
-      //   );
-      // }
-
-      if (es2){
-        console.log("Current argument length:", es2.arguments.length);  // Debug log
-        console.log("Current element arguments:", es2.arguments);  // Debug log
-      }
-      if(es2?.arguments.length !== 1) {
+      if (es2?.arguments.length !== 1 || typeof es2.arguments[0] !== "string") {
         throw Error(
-          `es2.argument.length should be 1, but got ${es2?.arguments.length} and es2 argument is ${es2?.arguments}. TSNH.${JSON.stringify({ es2, needle, currentBody})}`,
+          `could not find expected base with one argument. TSNH.${JSON.stringify({ es2, needle })}`,
         );
-      }
-
-      if (typeof es2.arguments[0] !== "string") {
-        throw Error("TSNH. the argument of the getelementptr should be a string. T)}");
       }
       needle = es2.arguments[0]; // is now something like arg1
       return `${needle}[${offset}]`;
     };
 
     const loads = grouped.load.map((l) => {
-      Logger.log("BCB: Processing load operation for ${l.name}")
-      console.log("Load operation:", l);  // Debug log
       const { pointers } = getArguments(l.arguments);
-      console.log("Pointers:", pointers);  // Debug log
       if (l.datatype != "i64") {
         throw Error("unsupported  yet.");
       }
-      if (pointers.length === 0) {
-        console.error("TSNH. no pointers found in load operation. This should not happen.");
-        throw new Error("No pointers found for load operation");
-      }
       // now find the identifier in the getelementptrs
-      console.log("Resolving element pointer:", pointers[0].id);  // Debug log
       const a = resolveElementPtr(pointers[0].id);
       return {
         name: l.name,
@@ -246,18 +205,12 @@ export class llvmBCBPreprocessor {
     // now lets to the stores.
     // the stores have one string argument 'i64* x1, i64 x2', that means, *x1=x2
     const stores = grouped.store.reduce((acc, s) => {
-      Logger.log("BCB: Processing store operation")
-      console.log("Store operation:",JSON.stringify(s, null, 2));  // Debug log
       if (s.datatype != "i64") {
         throw Error("unsupported  yet.");
       }
       const { pointers, scalars } = getArguments(s.arguments);
-      console.log("Pointers:", pointers);  // Debug log
-      console.log("Scalars:", scalars);  // Debug log
       const currentOutNn = resolveElementPtr(pointers[0].id); // e.g. out1[0]
-      console.log("Current output:", currentOutNn);  // Debug log
       const currentXn = scalars[0].id; // e.g. x236
-      console.log("Current scalar:", currentXn);  // Debug log
 
       const assignOperation = {
         name: [currentOutNn],
@@ -265,7 +218,6 @@ export class llvmBCBPreprocessor {
         operation: "=",
         arguments: [currentXn],
       } as Fiat.DynArgument;
-      console.log("Assign operation:", assignOperation);  // Debug log
 
       // the problem is, that (in bcb-sccalar-reduce) we have
       // out1[0]=  x236
@@ -292,35 +244,33 @@ export class llvmBCBPreprocessor {
       }
       // else, we will replace
       acc.splice(indexOfStoreToSameMemory, 1, assignOperation);
-      console.log("Current accL:", acc); // Debug log
       return acc;
     }, [] as Fiat.DynArgument[]);
     return { stores, loads };
   }
+
+
 
   private fixArguments(raw: Readonly<raw_T>): {
     args: A[];
     returns: R[];
     body: B;
   } {
-    Logger.log("BCB: Fixing arguments");
-    console.log("Raw input:", JSON.stringify(raw, null, 2));  // Debug log
-    const UNUSED_MODIFIERS = ["ptr","noalias","nocapture","noundef","readonly","align 8", "dereferenceable(40)"];
+    const UNUSED_MODIFIERS = ["ptr", "noalias", "nocapture", "noundef", "readonly", "writeonly", "align\\s+\\d+", "dereferenceable\\(\\d+\\)"];
     // transform the arguments
     const args_ND = raw.arguments[0]
+      .replace(new RegExp(UNUSED_MODIFIERS.join("|"), "g"), "") // remove unused Modifiers
+      .trim() // Trim spaces
       .split(",")
       .filter((a) => a.length > 0)
-      .map((s) => s.replace(new RegExp(UNUSED_MODIFIERS.join("|"), "g"), "")) // remove unused Modifiers
       .flatMap((s) => {
-        const { pointers, scalars } = getArguments(s);
+        const { pointers, scalars } = getArguments(s.trim());
         return [...pointers, ...scalars];
       })
       .map((g) => ({
         name: g.id,
         datatype: g.type,
       }));
-      console.log("Args_ND:", args_ND);  // Debug log
-
 
     // now rename them, make x0, x1, ..xN to out1, arg1, ... argN and add the required =-operations to the body
     const body = [] as Fiat.DynArgument[];
@@ -346,7 +296,6 @@ export class llvmBCBPreprocessor {
       return acc;
     }, [] as A[]);
 
-    // return operations. it should be okay. if we have x0, we will rename it to out1
     const returns = [] as R[];
     // now here we a have the thing that we use x0 as our tmp-variable.
     if (raw.returns[0].name == "x0") {

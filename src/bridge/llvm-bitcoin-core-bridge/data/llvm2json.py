@@ -6,20 +6,28 @@ def parse_llvm_ir(file_path):
     with open(file_path, 'r') as file:
         llvm_ir = file.read()
 
-    # Extract the function definition
-    #preivous one
-    #match = re.search(r'define (\w+) (@_ZN[^(]+)\(([^)]+)\)', llvm_ir)
-    match = re.search(r'define (\w+) @(\w+)\((.*?)\)', llvm_ir)
+    # regex to capture function definition including complex names and arguments up to 'unnamed_addr #0'
+    pattern = r'define (\w+) @([^\s]+)\((.*?)\) unnamed_addr #0'
+    match = re.search(pattern, llvm_ir, re.DOTALL)
     if not match:
         raise ValueError("Function definition not found")
 
     return_type = match.group(1)
     function_name = match.group(2)
-    function_args = ", ptr noalias nocapture noundef readonly align 8 dereferenceable(40) %a, ptr noalias nocapture noundef readonly align 8 dereferenceable(40) %b"
-    function_args = re.sub(r'%(\S+)', r'x\1', function_args)
-    function_args = re.sub(r'xa', r'x1', function_args)
-    function_args = re.sub(r'xb', r'x2', function_args)
-    # print("function_args", function_args)
+    function_args = match.group(3)
+
+    # Split the arguments by "," and strip whitespace
+    args_list = [arg.strip() for arg in function_args.split(",")]
+
+    #Exclude the first argument
+    remanining_args = args_list[1:]
+
+    remaining_args_str = ', '.join(remanining_args)
+
+
+    remaining_args_str = re.sub(r'%(\S+)', r'x\1', remaining_args_str)
+    remaining_args_str = re.sub(r'xa', r'x1', remaining_args_str)
+    remaining_args_str = re.sub(r'xb', r'x2', remaining_args_str)
 
     # Extract the function body
     match = re.search(r'{([^}]+)}', llvm_ir, flags=re.DOTALL)
@@ -28,8 +36,6 @@ def parse_llvm_ir(file_path):
 
     function_body = match.group(1).strip()
 
-    # Parse the function body
-    #pattern = r'(%[\w.]+) = (\w+)(?: (inbounds))?\s*(?:\[[\d\s]*x\s*)?(\w+)[\]*\s]*(?:,?\s*(.+))?'
     entire_operations = []
     x_mapping = {}
     memory_counter = 0
@@ -44,63 +50,10 @@ def parse_llvm_ir(file_path):
 
     for line in llvm_ir.strip().split('\n'):
 
-        # #original line 
-        # #print("line before", line)
-        # #%N -> xN
-        # # line = re.sub(r'%(\S+)', r'x\1', line)
-        # # line = re.sub(r'_(\S+)', r'\1', line)
-
-        # # %_0.iN -> xN
-        # line = re.sub(r'%_0\.i(\d+)',  r'x\1', line)
-        # # %_0.i -> x0
-        # line = re.sub(r'%_0\.i',  r'x0', line)
-
-        # # %_N -> xN
-        # line = re.sub(r'%_(\d+)', r'x\1', line)
-
-        # # %{string}{number} -> x100{number}
-        # line = re.sub(r'%\{string\}\{(\d+)\}', r'x100\1', line)
-
-        # # for input argument %a -> xa,  %b -> xb
-        # line = re.sub(r'%(\S+)', r'x\1', line)
-
-        # #print("line after % -> x", line)
-
-        # # # xa and xb -> x100 and x101
-        # # line = re.sub(r'xa', r'x1', line)
-        # # line = re.sub(r'xb', r'x2', line)
-
-
-        # print("line after replace to xa and xb", line)
-
-        # # Replace variable names
-        # line = re.sub(r'x\d+', replace_var, line)
-
-        # print("line after replace_var", line)
-
-        # line = re.sub(r'xa', r'x1', line)
-        # line = re.sub(r'xb', r'x2', line)
-
-        # print("line after replace xa and xb", line)
-
         # Replace all variable names and memory locations with sequential numbers
         line = re.sub(r'%[\w.]+', replace_var, line)
         line = re.sub(r'ptr %(\w+)', lambda m: f'ptr x{x_mapping.get(m.group(1), m.group(1))}', line)
 
-
-        # #Speicfic pattern for mul
-        # mul_pattern = r'(x[\w.]+)\s*=\s*mul\s*((?:nuw|nsw)\s*(?:nuw|nsw)?)\s*(i\d+)\s*(.+)'
-        # mul_match = re.match(mul_pattern, line.strip())
-        
-        # if mul_match:
-        #     name, modifier, datatype, args = mul_match.groups()
-        #     entire_operations.append( {
-        #         'name': [name],
-        #         'operation': 'mul',
-        #         'modifier': modifier.strip(),
-        #         'datatype': datatype,
-        #         'arguments': f"{datatype}, {args.strip()}"
-        #     })
 
         #Pattern for operations that might have nuw/nsw mdofifiers
         op_pattern = r'(x[\w.]+)\s*=\s*(\w+)\s*((?:nuw|nsw)\s*(?:nuw|nsw)?)\s*(i\d+)\s*(.+)'
@@ -145,25 +98,8 @@ def parse_llvm_ir(file_path):
             if operation == "load":
                 args = re.sub(r',\s*align\s+\d+,\s*!noundef\s+!\d+', '', args)
 
-            # if operation == "mul" and modifier in ["nuw", "nsw"]:
-            #     arguments = f"{datatype}, " + args if args else ""
-            # else:
-            #     arguments = f"{datatype}, {args}" if args else ""
 
-            # if operation == "mul":
-            #     print(f"name: {name}, modifier: {modifier}, datatype: {datatype}, args: {args}")
-            #     print("\n")
-
-
-            # if operation != "mul":
-            #     entire_operations.append({
-            #         'name': [name],
-            #         'operation': operation,
-            #         'modifier': modifier or '',
-            #         'datatype': datatype,
-            #         'arguments':  f"{datatype}, {args}" if args else ""
-            #     })
-
+            # add the operations as the body
             entire_operations.append({
                     'name': [name],
                     'operation': operation,
@@ -190,10 +126,9 @@ def parse_llvm_ir(file_path):
         if line.strip() == 'ret void':
             break
 
-
     json_output = [{
-        'operation': 'secp256k1_fe_mul_inner',
-        'arguments': ["x1, x2"],
+        'operation': function_name,
+        'arguments': [remaining_args_str],
         'returns': [{'datatype': 'i64*', 'name': 'x0'}],
         'body': entire_operations
     }]
