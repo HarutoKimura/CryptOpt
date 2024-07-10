@@ -4,9 +4,9 @@ const R: u64 = 0x1000003D10;
 pub fn secp256k1_fe_mul_inner(r: &mut [u64; 5], a: &[u64; 5], b: &[u64; 5]) {
     let mut c: u128;
     let mut d: u128;
-    let mut t3: u64;
+    let  t3: u64;
     let mut t4: u64;
-    let mut tx: u64;
+    let  tx: u64;
     let mut u0: u64;
 
     let a0 = a[0];

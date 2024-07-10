@@ -40,7 +40,7 @@ export namespace Fiat {
   export type OutName = `out${number}`;
   export type OutVarName = `${OutName}[${number}]`;
   export type ArgVarName = `${ArgName}[${number}]`;
-  export type VarName = `x${number}` | `%x${number}`;
+  export type VarName = `x${number}`;
   export type HexConstant = `0x${string}`;
 
   export type FiatArgument<N extends ArgName | OutName> = {

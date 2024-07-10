@@ -30,6 +30,8 @@ import type { raw_T } from "./raw.type";
 
 const cwd = resolve(datadir, "llvm-bitcoin-core-bridge");
 
+const target_json = "demangled_field.json";
+
 const createExecOpts = () => {
   const c = { env, cwd, shell: "/usr/bin/bash" };
   c.env.CFLAGS = `-DUSE_ASM_X86_64 ${c.env.CFLAGS}`;
@@ -43,7 +45,7 @@ export class llvm_BitcoinCoreBridge implements Bridge {
       throw new Error(`unsupported method '${method}'. Choose from ${AVAILABLE_METHODS.join(", ")}.`);
     }
 
-    const raw = JSON.parse(readFileSync(resolve(cwd, "field_wrapp_test2.json")).toString()) as Array<raw_T>;
+    const raw = JSON.parse(readFileSync(resolve(cwd, target_json)).toString()) as Array<raw_T>;
     //const raw = JSON.parse(readFileSync("/home/harutok/CryptOpt/src/bridge/bitcoin-core-bridge/data/field.json").toString()) as Array<raw_T>;
     console.log("Input Json file", raw);
 

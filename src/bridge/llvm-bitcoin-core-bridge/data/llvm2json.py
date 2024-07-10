@@ -19,7 +19,7 @@ def parse_llvm_ir(file_path):
     function_args = re.sub(r'%(\S+)', r'x\1', function_args)
     function_args = re.sub(r'xa', r'x1', function_args)
     function_args = re.sub(r'xb', r'x2', function_args)
-    print("function_args", function_args)
+    # print("function_args", function_args)
 
     # Extract the function body
     match = re.search(r'{([^}]+)}', llvm_ir, flags=re.DOTALL)
@@ -32,7 +32,7 @@ def parse_llvm_ir(file_path):
     #pattern = r'(%[\w.]+) = (\w+)(?: (inbounds))?\s*(?:\[[\d\s]*x\s*)?(\w+)[\]*\s]*(?:,?\s*(.+))?'
     entire_operations = []
     x_mapping = {}
-    memory_counter = 1
+    memory_counter = 0
 
     def replace_var(match):
         nonlocal memory_counter

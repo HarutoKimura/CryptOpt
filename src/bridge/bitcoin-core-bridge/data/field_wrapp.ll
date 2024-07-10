@@ -1,0 +1,135 @@
+; ModuleID = 'field_wrapp.136388de4f22869c-cgu.0'
+source_filename = "field_wrapp.136388de4f22869c-cgu.0"
+target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-unknown-linux-gnu"
+
+; field_wrapp::secp256k1_fe_mul_inner
+; Function Attrs: mustprogress nofree norecurse nosync nounwind nonlazybind willreturn memory(argmem: readwrite) uwtable
+define void @_ZN11field_wrapp22secp256k1_fe_mul_inner17hb77898895474ee53E(ptr noalias nocapture noundef writeonly align 8 dereferenceable(40) %r, ptr noalias nocapture noundef readonly align 8 dereferenceable(40) %a, ptr noalias nocapture noundef readonly align 8 dereferenceable(40) %b) unnamed_addr #0 {
+start:
+  %a0 = load i64, ptr %a, align 8, !noundef !3
+  %0 = getelementptr inbounds [5 x i64], ptr %a, i64 0, i64 1
+  %a1 = load i64, ptr %0, align 8, !noundef !3
+  %1 = getelementptr inbounds [5 x i64], ptr %a, i64 0, i64 2
+  %a2 = load i64, ptr %1, align 8, !noundef !3
+  %2 = getelementptr inbounds [5 x i64], ptr %a, i64 0, i64 3
+  %a3 = load i64, ptr %2, align 8, !noundef !3
+  %3 = getelementptr inbounds [5 x i64], ptr %a, i64 0, i64 4
+  %a4 = load i64, ptr %3, align 8, !noundef !3
+  %_19 = zext i64 %a0 to i128
+  %4 = getelementptr inbounds [5 x i64], ptr %b, i64 0, i64 3
+  %_21 = load i64, ptr %4, align 8, !noundef !3
+  %_20 = zext i64 %_21 to i128
+  %_0.i = mul nuw i128 %_20, %_19
+  %_23 = zext i64 %a1 to i128
+  %5 = getelementptr inbounds [5 x i64], ptr %b, i64 0, i64 2
+  %_25 = load i64, ptr %5, align 8, !noundef !3
+  %_24 = zext i64 %_25 to i128
+  %_0.i38 = mul nuw i128 %_24, %_23
+  %_0.i39 = add i128 %_0.i38, %_0.i
+  %_27 = zext i64 %a2 to i128
+  %6 = getelementptr inbounds [5 x i64], ptr %b, i64 0, i64 1
+  %_29 = load i64, ptr %6, align 8, !noundef !3
+  %_28 = zext i64 %_29 to i128
+  %_0.i40 = mul nuw i128 %_28, %_27
+  %_0.i41 = add i128 %_0.i39, %_0.i40
+  %_31 = zext i64 %a3 to i128
+  %_33 = load i64, ptr %b, align 8, !noundef !3
+  %_32 = zext i64 %_33 to i128
+  %_0.i42 = mul nuw i128 %_32, %_31
+  %_0.i43 = add i128 %_0.i41, %_0.i42
+  %_35 = zext i64 %a4 to i128
+  %7 = getelementptr inbounds [5 x i64], ptr %b, i64 0, i64 4
+  %_37 = load i64, ptr %7, align 8, !noundef !3
+  %_36 = zext i64 %_37 to i128
+  %_0.i44 = mul nuw i128 %_36, %_35
+  %_41 = and i128 %_0.i44, 18446744073709551615
+  %_0.i45 = mul nuw nsw i128 %_41, 68719492368
+  %_0.i46 = add i128 %_0.i43, %_0.i45
+  %8 = lshr i128 %_0.i44, 64
+  %9 = lshr i128 %_0.i46, 52
+  %_0.i47 = mul nuw i128 %_36, %_19
+  %_0.i49 = mul nuw i128 %_20, %_23
+  %_0.i51 = mul nuw i128 %_24, %_27
+  %_0.i53 = mul nuw i128 %_28, %_31
+  %_0.i55 = mul nuw i128 %_32, %_35
+  %_0.i57 = mul nuw nsw i128 %8, 281475040739328
+  %_0.i48 = add i128 %_0.i51, %_0.i49
+  %_0.i50 = add i128 %_0.i48, %_0.i53
+  %_0.i52 = add i128 %_0.i50, %_0.i55
+  %_0.i54 = add i128 %_0.i52, %_0.i47
+  %_0.i56 = add i128 %_0.i54, %_0.i57
+  %_0.i58 = add i128 %_0.i56, %9
+  %10 = trunc i128 %_0.i58 to i64
+  %11 = lshr i128 %_0.i58, 52
+  %tx = lshr i64 %10, 48
+  %_0.i59 = mul nuw i128 %_32, %_19
+  %_0.i60 = mul nuw i128 %_36, %_23
+  %_0.i62 = mul nuw i128 %_20, %_27
+  %_0.i64 = mul nuw i128 %_24, %_31
+  %_0.i66 = mul nuw i128 %_28, %_35
+  %_0.i61 = add i128 %_0.i64, %_0.i62
+  %_0.i63 = add i128 %_0.i61, %_0.i66
+  %_0.i65 = add i128 %_0.i63, %_0.i60
+  %_0.i67 = add i128 %_0.i65, %11
+  %12 = trunc i128 %_0.i67 to i64
+  %13 = lshr i128 %_0.i67, 52
+  %_108 = shl i64 %12, 4
+  %14 = or i64 %_108, %tx
+  %_113 = zext i64 %14 to i128
+  %_0.i68 = mul nuw nsw i128 %_113, 4294968273
+  %_0.i69 = add i128 %_0.i68, %_0.i59
+  %15 = trunc i128 %_0.i69 to i64
+  store i64 %15, ptr %r, align 8
+  %16 = lshr i128 %_0.i69, 52
+  %_0.i70 = mul nuw i128 %_28, %_19
+  %_0.i72 = mul nuw i128 %_32, %_23
+  %_0.i74 = mul nuw i128 %_36, %_27
+  %_0.i76 = mul nuw i128 %_20, %_31
+  %_0.i78 = mul nuw i128 %_24, %_35
+  %_0.i75 = add i128 %_0.i78, %_0.i76
+  %_0.i77 = add i128 %_0.i75, %_0.i74
+  %_0.i79 = add i128 %_0.i77, %13
+  %_147 = and i128 %_0.i79, 18446744073709551615
+  %_0.i80 = mul nuw nsw i128 %_147, 68719492368
+  %_0.i71 = add i128 %_0.i72, %_0.i70
+  %_0.i73 = add i128 %_0.i71, %_0.i80
+  %_0.i81 = add i128 %_0.i73, %16
+  %17 = lshr i128 %_0.i79, 52
+  %18 = getelementptr inbounds [5 x i64], ptr %r, i64 0, i64 1
+  %19 = trunc i128 %_0.i81 to i64
+  store i64 %19, ptr %18, align 8
+  %20 = lshr i128 %_0.i81, 52
+  %_0.i82 = mul nuw i128 %_24, %_19
+  %_0.i84 = mul nuw i128 %_28, %_23
+  %_0.i86 = mul nuw i128 %_32, %_27
+  %_0.i88 = mul nuw i128 %_36, %_31
+  %_0.i90 = mul nuw i128 %_20, %_35
+  %_0.i89 = add i128 %_0.i88, %_0.i90
+  %_0.i91 = add i128 %_0.i89, %17
+  %_183 = and i128 %_0.i91, 18446744073709551615
+  %_0.i92 = mul nuw nsw i128 %_183, 68719492368
+  %_0.i83 = add i128 %_0.i84, %_0.i82
+  %_0.i85 = add i128 %_0.i83, %_0.i86
+  %_0.i87 = add i128 %_0.i85, %_0.i92
+  %_0.i93 = add i128 %_0.i87, %20
+  %21 = lshr i128 %_0.i91, 64
+  %22 = getelementptr inbounds [5 x i64], ptr %r, i64 0, i64 2
+  %23 = trunc i128 %_0.i93 to i64
+  store i64 %23, ptr %22, align 8
+  %24 = lshr i128 %_0.i93, 52
+  %_0.i94 = mul nuw nsw i128 %21, 281475040739328
+  %_195 = and i128 %_0.i46, 18446744073709551615
+  %_0.i95 = add nuw nsw i128 %_0.i94, %_195
+  %_0.i96 = add nuw nsw i128 %_0.i95, %24
+  %25 = getelementptr inbounds [5 x i64], ptr %r, i64 0, i64 3
+  %26 = trunc i128 %_0.i96 to i64
+  store i64 %26, ptr %25, align 8
+  %27 = lshr i128 %_0.i96, 52
+  %_200 = and i128 %_0.i58, 1152921504606846975
+  %_0.i97 = add nuw nsw i128 %27, %_200
+  %28 = getelementptr inbounds [5 x i64], ptr %r, i64 0, i64 4
+  %29 = trunc i128 %_0.i97 to i64
+  store i64 %29, ptr %28, align 8
+  ret void
+}
