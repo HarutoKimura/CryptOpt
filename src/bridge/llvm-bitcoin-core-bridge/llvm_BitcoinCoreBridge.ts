@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { execSync } from "child_process";
-import { readFileSync } from "fs";
+import { readFileSync, existsSync } from "fs";
 import { resolve } from "path";
 
 import { errorOut, ERRORS } from "@/errors";
@@ -27,6 +27,7 @@ import { Bridge } from "../bridge.interface";
 import { AVAILABLE_METHODS, METHOD_DETAILS, METHOD_T } from "./constants";
 import { llvmBCBPreprocessor } from "./preprocess";
 import type { raw_T } from "./raw.type";
+import { lock } from "proper-lockfile";
 
 const cwd = resolve(datadir, "llvm-bitcoin-core-bridge");
 
@@ -40,12 +41,45 @@ const createExecOpts = () => {
 };
 
 export class llvm_BitcoinCoreBridge implements Bridge {
+  private getTargetName(method: METHOD_T): string {
+
+    const methodToTarget = {
+      mul: 'field_mul',
+      square: 'field_sqr',
+    };
+    return methodToTarget[method];
+  }
+
+  private generateJsonFile(method: METHOD_T): void {
+    const targetName = this.getTargetName(method);
+    const jsonFileName = `demangled_${targetName}.json`;
+    const jsonFilePath = resolve(cwd, jsonFileName);
+
+    if (!existsSync(jsonFilePath)) {
+      console.log(`Generating ${jsonFileName}...`);
+      try {
+        execSync(`make -C ${cwd} TARGET_NAME=${targetName} ${jsonFileName}`, {
+          stdio: 'inherit',
+          env: { ...process.env, CFLAGS: `-DUSE_ASM_X86_64 ${process.env.CFLAGS || ''}` }
+        });
+      } catch (error) {
+        console.error(`Error generating ${jsonFileName}:`, error);
+        throw error;
+      }
+    }
+  }
+
+
   public getCryptOptFunction(method: METHOD_T, _curve?: string): CryptOpt.Function {
     console.log('Entering getCryptOptFunction', { method, _curve });
     if (!(method in METHOD_DETAILS)) {
       throw new Error(`unsupported method '${method}'. Choose from ${AVAILABLE_METHODS.join(", ")}.`);
     }
 
+    this.generateJsonFile(method);
+
+    const targetName = this.getTargetName(method);
+    const target_json = `demangled_${targetName}.json`;
     const raw = JSON.parse(readFileSync(resolve(cwd, target_json)).toString()) as Array<raw_T>;
     //const raw = JSON.parse(readFileSync("/home/harutok/CryptOpt/src/bridge/bitcoin-core-bridge/data/field.json").toString()) as Array<raw_T>;
     console.log("Input Json file", raw);
@@ -83,11 +117,12 @@ export class llvm_BitcoinCoreBridge implements Bridge {
     const opts = createExecOpts();
     const command = `make -C ${cwd} all`; // to get LLVM-IR file
     Logger.log(`cmd to generate machinecode: ${command} w opts: ${JSON.stringify(opts)}`);
-  
+    const targetName = this.getTargetName(method);
     try {
   
+      lockAndRunOrReturn(cwd, command, opts);
       // Generate shared object file
-      const soCommand = `make -C ${cwd} ${filename}`;
+      const soCommand = `make -C ${cwd} TARGET_NAME=${targetName} ${filename}`;
       Logger.log(`cmd to generate shared object file: ${soCommand} w opts: ${JSON.stringify(opts)}`);
       execSync(soCommand, opts);
     } catch (e) {
