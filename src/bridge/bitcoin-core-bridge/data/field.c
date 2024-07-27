@@ -410,3 +410,30 @@ secp256k1_fe_mul_inner(uint64_t *r, const uint64_t *a,
   r[4] = c;
 
 }
+
+
+int main() {
+    uint64_t r[5] = {0};
+    uint64_t a[5] = { 0x1111111111111111, 0x2222222222222222, 0x3333333333333333, 0x4444444444444444, 0x5555555555555555 };
+    uint64_t b[5] = { 0x6666666666666666, 0x7777777777777777, 0x8888888888888888, 0x9999999999999999, 0xAAAAAAAAAAAAAAAA };
+
+    secp256k1_fe_mul_inner(r, a, b);
+
+    printf("C result:\n");
+
+    printf("secp256k1_fe_mul_inner:\n");
+    for (int i = 0; i < 5; i++) {
+        printf("r[%d] = %016lX\n", i, r[i]);
+    }
+
+    printf("\n");
+
+    secp256k1_fe_sqr_inner(r, a);
+
+    printf("secp256k1_fe_sqr_inner:\n");
+    for (int i = 0; i < 5; i++) {
+        printf("r[%d] = %016lX\n", i, r[i]);
+    }
+
+    return 0;
+}

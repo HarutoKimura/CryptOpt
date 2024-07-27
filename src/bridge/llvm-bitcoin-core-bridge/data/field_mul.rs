@@ -1,4 +1,4 @@
-const M: u64 = 0xFFFFFFFFFFFFFFFF;
+const M: u64 = 0xFFFFFFFFFFFFF;
 const R: u64 = 0x1000003D10;
 
 pub fn secp256k1_fe_mul_inner(r: &mut [u64; 5], a: &[u64; 5], b: &[u64; 5]) {
