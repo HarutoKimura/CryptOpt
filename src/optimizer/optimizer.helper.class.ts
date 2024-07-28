@@ -25,6 +25,7 @@ import { ManualBridge } from "@/bridge/manual-bridge";
 import { Model } from "@/model";
 import { OptimizerArgs } from "@/types";
 import { llvm_BitcoinCoreBridge } from "@/bridge/llvm-bitcoin-core-bridge";
+import { RustBridge } from "@/bridge/rust-bridge";
 
 
 type needComms = Pick<OptimizerArgs, "bridge" | "seed" | "memoryConstraints">;
@@ -49,8 +50,12 @@ interface needllvmBitcoinCore extends needComms {
   bridge: "llvm-bitcoin-core";
   method: BITCOIN_CORE_METHOD_T;
 }
+interface needRust extends needComms {
+  bridge: "rust";
+  method: BITCOIN_CORE_METHOD_T;
+}
 
-type neededArgs = needJasmin | needFiat | needManual | needBitcoinCore | needllvmBitcoinCore;
+type neededArgs = needJasmin | needFiat | needManual | needBitcoinCore | needllvmBitcoinCore | needRust;
 
 type ret = {
   argwidth: number;
@@ -163,6 +168,23 @@ function initllvmBitcoinCore(sharedObjectFilename: string, args: needllvmBitcoin
   return { symbolname, chunksize, argwidth, argnumin, argnumout, bounds };
 }
 
+function initRust(sharedObjectFilename: string, args: needRust): ret {
+  const bridge = new RustBridge();
+  Model.init({
+    memoryConstraints: args.memoryConstraints,
+    json: bridge.getCryptOptFunction(args.method),
+  });
+
+  const symbolname = bridge.machinecode(sharedObjectFilename, args.method);
+  const chunksize = 16; // only for reading the chunk breaks atm. see MS code
+  const argwidth = bridge.argwidth("", args.method);
+  const argnumin = bridge.argnumin(args.method);
+  const argnumout = bridge.argnumout(args.method);
+
+  const bounds = bridge.bounds("", args.method);
+  return { symbolname, chunksize, argwidth, argnumin, argnumout, bounds };
+}
+
 function createMS(
   { argwidth, argnumin, argnumout, chunksize, bounds, symbolname }: ret,
   libcheckfunctionFile: string,
@@ -206,6 +228,9 @@ export function init(tmpDir: string, args: neededArgs): { symbolname: string; me
       break;
     case "llvm-bitcoin-core":
       r = initllvmBitcoinCore(sharedObjectFilename, args);
+      break;
+    case "rust":
+      r = initRust(sharedObjectFilename, args);
       break;
     default:
       throw new Error("Bridge is specified, but not valid.");

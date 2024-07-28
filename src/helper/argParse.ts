@@ -205,6 +205,11 @@ export const parsedArgs = y
         throw new Error(`Bridge is llvm-bitcoin-core. The specified method '${method}' not available.`);
       }
     }
+    if (bridge == "rust") {
+      if (!BITCOIN_CORE_METHODS.includes(method as BITCOIN_CORE_METHOD_T)) {
+        throw new Error(`Bridge is rust. The specified method '${method}' not available.`);
+      }
+    }
     return true;
   })
   .option("framePointer", {
