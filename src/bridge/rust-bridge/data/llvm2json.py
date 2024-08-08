@@ -24,10 +24,30 @@ def parse_llvm_ir(file_path):
 
     remaining_args_str = ', '.join(remanining_args)
 
+    # In bls12 case, there are two outputs and four inputs arguments so, just for test, I directly paste the input arguements nopw
+    remaining_args_str = "ptr noalias nocapture noundef nonnull writeonly align 8  %out0.0, i64 noundef %out0.1, ptr noalias nocapture noundef nonnull readonly align 8 %in0.0, i64 noundef %in0.1, ptr noalias nocapture noundef nonnull readonly align 8 %in1.0, i64 noundef %in1.1"
+    
+    # Replace %out0.0 with x0
+    # This is the final memory location where the result is stored
+    remaining_args_str = re.sub(r'%out0\.0', 'x0', remaining_args_str)
 
-    remaining_args_str = re.sub(r'%(\S+)', r'x\1', remaining_args_str)
-    remaining_args_str = re.sub(r'xa', r'x1', remaining_args_str)
-    remaining_args_str = re.sub(r'xb', r'x2', remaining_args_str)
+    # Replace %out0.1 with x1
+    remaining_args_str = re.sub(r'%out0\.1', 'x1', remaining_args_str)
+
+    # Replace %in0.0 with x2
+    remaining_args_str = re.sub(r'%in0\.0', 'x2', remaining_args_str)
+    # Replace %in0.1 with x3
+    remaining_args_str = re.sub(r'%in0\.1', 'x3', remaining_args_str)
+    # Replace %in1.0 with x4
+    remaining_args_str = re.sub(r'%in1\.0', 'x4', remaining_args_str)
+    # Replace %in1.1 with x5
+    remaining_args_str = re.sub(r'%in1\.1', 'x5', remaining_args_str)
+
+
+    # # these replacements are for the case of the secp256k1
+    # remaining_args_str = re.sub(r'%(\S+)', r'x\1', remaining_args_str)
+    # remaining_args_str = re.sub(r'xa', r'x1', remaining_args_str)
+    # remaining_args_str = re.sub(r'xb', r'x2', remaining_args_str)
 
     # Extract the function body
     match = re.search(r'{([^}]+)}', llvm_ir, flags=re.DOTALL)
@@ -38,7 +58,19 @@ def parse_llvm_ir(file_path):
 
     entire_operations = []
     x_mapping = {}
+    #when I used for the secop256k1, the memory counter starts from 0
+    #when I use for the bls12, the memory counter starts from ???
     memory_counter = 0
+    panic_skip_flag = False
+    i64_count = 0
+
+    def remove_second_i64(arg):
+        nonlocal i64_count
+        if "i64" in arg:
+            i64_count += 1
+            if i64_count == 2:
+                return arg.remove("i64")
+        return arg
 
     def replace_var(match):
         nonlocal memory_counter
@@ -50,13 +82,34 @@ def parse_llvm_ir(file_path):
 
     for line in llvm_ir.strip().split('\n'):
 
+        #Skip and bb{number} lines
+        if line.startswith('bb') or line.startswith('br'):
+            continue
+
+        # # Skip sext commands since I can integrate the operation to icmp operation
+        # if 'sext' in line:
+        #     continue
+
+        # Skip panic calls until panic blocks finish with unreachable
+        if 'panic' in line:
+            panic_skip_flag = True
+            continue
+    
+        if 'unreachable' in line:
+            panic_skip_flag = False
+            continue
+
+        #skip while panic_skip_flag is True
+        if panic_skip_flag:
+            continue
+
         # Replace all variable names and memory locations with sequential numbers
         line = re.sub(r'%[\w.]+', replace_var, line)
         line = re.sub(r'ptr %(\w+)', lambda m: f'ptr x{x_mapping.get(m.group(1), m.group(1))}', line)
 
 
         #Pattern for operations that might have nuw/nsw mdofifiers
-        op_pattern = r'(x[\w.]+)\s*=\s*(\w+)\s*((?:nuw|nsw)\s*(?:nuw|nsw)?)\s*(i\d+)\s*(.+)'
+        op_pattern = r'(x[\w.]+)\s*=\s*(\w+)\s*((?:nuw|nsw|ult|ugt|eq|ne)\s*(?:nuw|ns|ult|ugt|eq|ne)?)\s*(i\d+)\s*(.+)'
         op_match = re.match(op_pattern, line.strip())
         
         if op_match:
@@ -70,6 +123,7 @@ def parse_llvm_ir(file_path):
             })
             #skip the below code in this line
             continue
+
 
         # # xNN = function_name OPT_args iNN (datatype) whatever -> JSON
         # general mathing pattern
@@ -85,6 +139,13 @@ def parse_llvm_ir(file_path):
             # Remove trailing comma from datatype if present
             datatype = datatype.rstrip(',')
 
+            # if operation == "icmp":
+            #     print("datatype:", datatype)
+            #     print("args:", args)
+            #     # args_list = args.split(", ")
+            #     # print("args_list", args_list)
+
+
             if operation == "getelementptr":
                 # ignore the first i64 0
                 args_list = args.split(", ")
@@ -98,13 +159,36 @@ def parse_llvm_ir(file_path):
             if operation == "load":
                 args = re.sub(r',\s*align\s+\d+,\s*!noundef\s+!\d+', '', args)
 
+            
+            # now I treat select as the special case
+            if operation == "select":
+                args_list = args.split(" ")
+                args_list.remove('i64')
+                args_list.remove('i64')
+                args_list.insert(1, 'i64')
+                print("args_list:", args_list)
 
+                #arg_list = [remove_second_i64(arg) for arg in args_list]
+                args = " ".join(args_list)
+                print ("args:", args)
+
+
+                #print(args)
+                entire_operations.append({
+                    'name': [name],
+                    'operation': operation,
+                    'modifiers': "",
+                    'datatype':  "i64",
+                    'arguments':  f"{datatype} {args.strip()}"
+                })
+                i64_count = 0
+                continue
             # add the operations as the body
             entire_operations.append({
                     'name': [name],
                     'operation': operation,
                     'modifiers': modifier or '' if operation != 'getelementptr' else "inbounds ", #to follow the original json file
-                    'datatype': datatype,
+                    'datatype':  datatype,
                     'arguments':  f"{datatype}, {args.strip()}" if "ptr" in args.strip() else f"{datatype} {args.strip()}"
                 })
         
