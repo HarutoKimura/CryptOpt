@@ -32,7 +32,8 @@ export type OP =
   | "store"
   | "trunc"
   | "xor"
-  | "zext"; //raw types
+  | "zext"
+  | "sub" ; //raw types
 export type varName_T = `x${number}`;
 
 export type SSA = {

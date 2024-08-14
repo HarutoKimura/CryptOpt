@@ -32,18 +32,19 @@ export function zextR(body: FiatDynArgWCryptoptOperations[]): Fiat.DynArgument[]
   const r = groupBy(body, ({ operation }) =>
     // the check for the datatype is to not include i1->64bit in the reducers
     // operation === "zext" && datatype === "u128" ? E.zextOpt : E.otherOp,
-    operation === "zext" ? E.zextOpt : E.otherOp,
+    operation === "zext" ? E.zextOpt : E.otherOp, // if operaiton is "zext", then the output is E.zextOpt otherwise E.otherOp
   );
+  // now we have all zext in r[E.zextOpt] and all other ops in r[E.otherOp], we have two groups
   // if there is no zext-ops, just return all
   if (r[E.zextOpt]) {
     r[E.zextOpt].forEach((zextOp) => {
       r[E.otherOp].forEach((otherOp) => {
         otherOp.arguments = otherOp.arguments.map((arg) =>
-          arg === zextOp.name[0] ? zextOp.arguments[0] : arg,
+          arg === zextOp.name[0] ? zextOp.arguments[0] : arg, // if the argument is the same as the name of the zextOp, replace it with the argument of the zextOp otherwise keep it as it is
         ) as Fiat.ConstArgument[];
       });
     });
   }
 
-  return r[E.otherOp] as Fiat.DynArgument[];
+  return r[E.otherOp] as Fiat.DynArgument[]; // return all the other operations which means all the operations except zext
 }

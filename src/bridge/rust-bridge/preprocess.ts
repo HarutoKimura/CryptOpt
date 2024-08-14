@@ -34,8 +34,10 @@ import {
   transformTrunc,
   transformXor,
   transformZext,
+  transformSub,
 } from "./transformations";
 import type { Intermediate } from "./transformations/intermediate.type";
+// import { zextR, sextR } from "./transformations/reducers";
 import { zextR } from "./transformations/reducers";
 // type fixedArgs = Omit<raw_T, "arguments"> & { arguments: Fiat.FuncArgument };
 
@@ -72,6 +74,7 @@ export class RustPreprocessor {
     // );
     // delete grouped.load;
 
+    // applying the apporiate transformations to the grouped instructions
     const otherInstrs = Object.entries({
       add: transformAdd,
       and: transformAnd,
@@ -84,6 +87,7 @@ export class RustPreprocessor {
       trunc: transformTrunc,
       zext: transformZext,
       icmp: transformIcmp,
+      sub: transformSub,
     }).reduce((acc, [op, func]) => {
       if (grouped[op]) {
         acc.push(
@@ -110,6 +114,7 @@ export class RustPreprocessor {
     delete grouped.zext;
     delete grouped.trunc;
     delete grouped.icmp;
+    delete grouped.sub;
 
     //original body.concat stores, loads, otherInstrs
     body = body.concat(
@@ -120,6 +125,14 @@ export class RustPreprocessor {
 
     //** for simple input test **
     // body = body.concat(otherInstrs as Fiat.DynArgument[]);
+
+    //  what zextR is example,
+    // before zextR:
+    // zext: x2 = zext(x1)
+    // add: x3 = x2 + x4
+
+    // after zextR:
+    // add: x3 = zext(x1) + x4
 
     body = zextR(body);
 
@@ -256,7 +269,7 @@ export class RustPreprocessor {
     returns: R[];
     body: B;
   } {
-    const UNUSED_MODIFIERS = ["ptr", "noalias", "nocapture", "noundef", "readonly", "writeonly", "align\\s+\\d+", "dereferenceable\\(\\d+\\)"];
+    const UNUSED_MODIFIERS = ["ptr", "noalias", "nocapture", "noundef", "readonly", "writeonly", "align\\s+\\d+", "dereferenceable\\(\\d+\\)", "nonnull", "x0", "i64"];
     // transform the arguments
     const args_ND = raw.arguments[0]
       .replace(new RegExp(UNUSED_MODIFIERS.join("|"), "g"), "") // remove unused Modifiers

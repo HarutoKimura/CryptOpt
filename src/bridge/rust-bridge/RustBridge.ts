@@ -32,7 +32,7 @@ import { lock } from "proper-lockfile";
 const cwd = resolve(datadir, "rust-bridge");
 
 // so far there are only two json files: demangled_field_mul.json and demangled_field_sqr.json
-const target_json = "demangled_field_mul.json";
+const target_json = "demangled_bls12_mul.json";
 
 const createExecOpts = () => {
   const c = { env, cwd, shell: "/usr/bin/bash" };
@@ -44,8 +44,8 @@ export class RustBridge implements Bridge {
   private getTargetName(method: METHOD_T): string {
 
     const methodToTarget = {
-      mul: 'field_mul',
-      square: 'field_sqr',
+      mul: 'bls12_mul',
+      square: 'bls12_square',
     };
     return methodToTarget[method];
   }
@@ -150,8 +150,9 @@ export class RustBridge implements Bridge {
   public argwidth(_c: string, m: METHOD_T): number {
     switch (m) {
       case "mul":
+        return 6;
       case "square":
-        return 5;
+        return 6;
 
       // case "scmul": // more like out:8, in0:8
       // case "reduce": // more like out:8, in0:4, in1:4
@@ -163,7 +164,7 @@ export class RustBridge implements Bridge {
 
     let bits = [] as number[]; // for field's
     if (m == "mul" || m == "square") {
-      bits = [56, 56, 56, 56, 52]; // for field's
+      bits = [64,64,64,64,64,64]; // for field's
     }
 
     return bits.map((bitwidth) => {

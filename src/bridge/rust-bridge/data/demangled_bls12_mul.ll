@@ -26,103 +26,35 @@ target triple = "x86_64-unknown-linux-gnu"
 define void @bls12_mul(ptr noalias nocapture noundef nonnull writeonly align 8 %out0.0, i64 noundef %out0.1, ptr noalias nocapture noundef nonnull readonly align 8 %in0.0, i64 noundef %in0.1, ptr noalias nocapture noundef nonnull readonly align 8 %in1.0, i64 noundef %in1.1) unnamed_addr #0 {
 start:
   %_353.not = icmp eq i64 %in0.1, 0
-  br i1 %_353.not, label %panic, label %bb1, !prof !3
-bb1:                                              ; preds = %start
   %x0 = load i64, ptr %in0.0, align 8, !noundef !4
   %_356.not = icmp eq i64 %in0.1, 1
-  br i1 %_356.not, label %panic1, label %bb2, !prof !3
-panic:                                            ; preds = %start
-; call core::panicking::panic_bounds_check
-  tail call void @_ZN4core9panicking18panic_bounds_check17h6879eeb39abdf99dE(i64 noundef 0, i64 noundef 0, ptr noalias noundef nonnull readonly align 8 dereferenceable(24) @alloc_e9bd63dd98e94b31ccf7d08f66ec79a5) #2
-  unreachable
-bb2:                                              ; preds = %bb1
   %0 = getelementptr inbounds [0 x i64], ptr %in0.0, i64 0, i64 1
   %x1 = load i64, ptr %0, align 8, !noundef !4
   %_359 = icmp ugt i64 %in0.1, 2
-  br i1 %_359, label %bb3, label %panic2, !prof !5
-panic1:                                           ; preds = %bb1
-; call core::panicking::panic_bounds_check
-  tail call void @_ZN4core9panicking18panic_bounds_check17h6879eeb39abdf99dE(i64 noundef 1, i64 noundef 1, ptr noalias noundef nonnull readonly align 8 dereferenceable(24) @alloc_8f289943c5dfd7b314c24d06c8f083ca) #2
-  unreachable
-bb3:                                              ; preds = %bb2
   %1 = getelementptr inbounds [0 x i64], ptr %in0.0, i64 0, i64 2
   %x2 = load i64, ptr %1, align 8, !noundef !4
   %_362.not = icmp eq i64 %in0.1, 3
-  br i1 %_362.not, label %panic3, label %bb4, !prof !3
-panic2:                                           ; preds = %bb2
-; call core::panicking::panic_bounds_check
-  tail call void @_ZN4core9panicking18panic_bounds_check17h6879eeb39abdf99dE(i64 noundef 2, i64 noundef 2, ptr noalias noundef nonnull readonly align 8 dereferenceable(24) @alloc_71c53652abca8a51eb60ebd3631eb768) #2
-  unreachable
-bb4:                                              ; preds = %bb3
   %2 = getelementptr inbounds [0 x i64], ptr %in0.0, i64 0, i64 3
   %x3 = load i64, ptr %2, align 8, !noundef !4
   %_365 = icmp ugt i64 %in0.1, 4
-  br i1 %_365, label %bb5, label %panic4, !prof !5
-panic3:                                           ; preds = %bb3
-; call core::panicking::panic_bounds_check
-  tail call void @_ZN4core9panicking18panic_bounds_check17h6879eeb39abdf99dE(i64 noundef 3, i64 noundef 3, ptr noalias noundef nonnull readonly align 8 dereferenceable(24) @alloc_1852ddabd7a7e545aeef1de9b485fe67) #2
-  unreachable
-bb5:                                              ; preds = %bb4
   %3 = getelementptr inbounds [0 x i64], ptr %in0.0, i64 0, i64 4
   %x4 = load i64, ptr %3, align 8, !noundef !4
   %_368.not = icmp eq i64 %in0.1, 5
-  br i1 %_368.not, label %panic5, label %bb6, !prof !3
-panic4:                                           ; preds = %bb4
-; call core::panicking::panic_bounds_check
-  tail call void @_ZN4core9panicking18panic_bounds_check17h6879eeb39abdf99dE(i64 noundef 4, i64 noundef 4, ptr noalias noundef nonnull readonly align 8 dereferenceable(24) @alloc_932ab575725f35df0960868ec086384e) #2
-  unreachable
-bb6:                                              ; preds = %bb5
   %4 = getelementptr inbounds [0 x i64], ptr %in0.0, i64 0, i64 5
   %x5 = load i64, ptr %4, align 8, !noundef !4
   %_371.not = icmp eq i64 %in1.1, 0
-  br i1 %_371.not, label %panic6, label %bb7, !prof !3
-panic5:                                           ; preds = %bb5
-; call core::panicking::panic_bounds_check
-  tail call void @_ZN4core9panicking18panic_bounds_check17h6879eeb39abdf99dE(i64 noundef 5, i64 noundef 5, ptr noalias noundef nonnull readonly align 8 dereferenceable(24) @alloc_60574b00e2fff1f9c05e4d546e000c83) #2
-  unreachable
-bb7:                                              ; preds = %bb6
   %x6 = load i64, ptr %in1.0, align 8, !noundef !4
   %_374.not = icmp eq i64 %in1.1, 1
-  br i1 %_374.not, label %panic7, label %bb8, !prof !3
-panic6:                                           ; preds = %bb6
-; call core::panicking::panic_bounds_check
-  tail call void @_ZN4core9panicking18panic_bounds_check17h6879eeb39abdf99dE(i64 noundef 0, i64 noundef 0, ptr noalias noundef nonnull readonly align 8 dereferenceable(24) @alloc_2c68f43360b35bda9eb427728e788b4b) #2
-  unreachable
-bb8:                                              ; preds = %bb7
   %5 = getelementptr inbounds [0 x i64], ptr %in1.0, i64 0, i64 1
   %x7 = load i64, ptr %5, align 8, !noundef !4
   %_377 = icmp ugt i64 %in1.1, 2
-  br i1 %_377, label %bb9, label %panic8, !prof !5
-panic7:                                           ; preds = %bb7
-; call core::panicking::panic_bounds_check
-  tail call void @_ZN4core9panicking18panic_bounds_check17h6879eeb39abdf99dE(i64 noundef 1, i64 noundef 1, ptr noalias noundef nonnull readonly align 8 dereferenceable(24) @alloc_fb947b470f1d012f353fe867ddfc52e5) #2
-  unreachable
-bb9:                                              ; preds = %bb8
   %6 = getelementptr inbounds [0 x i64], ptr %in1.0, i64 0, i64 2
   %x8 = load i64, ptr %6, align 8, !noundef !4
   %_380.not = icmp eq i64 %in1.1, 3
-  br i1 %_380.not, label %panic9, label %bb10, !prof !3
-panic8:                                           ; preds = %bb8
-; call core::panicking::panic_bounds_check
-  tail call void @_ZN4core9panicking18panic_bounds_check17h6879eeb39abdf99dE(i64 noundef 2, i64 noundef 2, ptr noalias noundef nonnull readonly align 8 dereferenceable(24) @alloc_2513605e7e8ad7c4f4d2ef03df4c2730) #2
-  unreachable
-bb10:                                             ; preds = %bb9
   %7 = getelementptr inbounds [0 x i64], ptr %in1.0, i64 0, i64 3
   %x9 = load i64, ptr %7, align 8, !noundef !4
   %_383 = icmp ugt i64 %in1.1, 4
-  br i1 %_383, label %bb11, label %panic10, !prof !5
-panic9:                                           ; preds = %bb9
-; call core::panicking::panic_bounds_check
-  tail call void @_ZN4core9panicking18panic_bounds_check17h6879eeb39abdf99dE(i64 noundef 3, i64 noundef 3, ptr noalias noundef nonnull readonly align 8 dereferenceable(24) @alloc_9abc5c5a3719caea0b6c1509c834d06a) #2
-  unreachable
-bb11:                                             ; preds = %bb10
   %_386.not = icmp eq i64 %in1.1, 5
-  br i1 %_386.not, label %panic11, label %bb12, !prof !3
-panic10:                                          ; preds = %bb10
-; call core::panicking::panic_bounds_check
-  tail call void @_ZN4core9panicking18panic_bounds_check17h6879eeb39abdf99dE(i64 noundef 4, i64 noundef 4, ptr noalias noundef nonnull readonly align 8 dereferenceable(24) @alloc_0985a57f7ced15affe9dcab2ce37865d) #2
-  unreachable
-bb12:                                             ; preds = %bb11
   %8 = getelementptr inbounds [0 x i64], ptr %in1.0, i64 0, i64 4
   %x10 = load i64, ptr %8, align 8, !noundef !4
   %9 = getelementptr inbounds [0 x i64], ptr %in1.0, i64 0, i64 5
@@ -1207,128 +1139,179 @@ bb12:                                             ; preds = %bb11
   %_0.i547 = add nuw nsw i64 %x796, %x730
   %_0.i548 = add nuw nsw i64 %_0.i547, %x798
   %_1351 = icmp ult i64 %_0.i531, -5044313057631688021
-  %x802.neg = sext i1 %_1351 to i64
+  %x802.neg_zext = zext i1 %_1351 to i64
+  %x802.neg_0 = sub i64 %x802.neg_zext, 1
+  %x802.neg_1 = and i64 %x802.neg_zext, %x802.neg_0
+  %x802.neg_2 = xor i64 %x802.neg_zext, 18446744073709551614
+  %x802.neg_3 = and i64 %x802.neg_2, 18446744073709551615
+  %x802.neg = xor i64 %x802.neg_1, %x802.neg_3
   %_0.i550 = add i64 %_0.i534, -2210141511517208575
   %_1353 = icmp ult i64 %_0.i534, 2210141511517208575
-  %x804.neg = sext i1 %_1353 to i64
+  %x804.neg_zext = zext i1 %_1353 to i64
+  %x804.neg_0 = sub i64 %x804.neg_zext, 1
+  %x804.neg_1 = and i64 %x804.neg_zext, %x804.neg_0
+  %x804.neg_2 = xor i64 %x804.neg_zext, 18446744073709551614
+  %x804.neg_3 = and i64 %x804.neg_2, 18446744073709551615
+  %x804.neg = xor i64 %x804.neg_1, %x804.neg_3
   %_0.i551 = add i64 %_0.i550, %x802.neg
   %_1355 = icmp ult i64 %_0.i550, %_0.i551
-  %x806.neg = sext i1 %_1355 to i64
+  %x806.neg_zext = zext i1 %_1355 to i64
+  %x806.neg_0 = sub i64 %x806.neg_zext, 1
+  %x806.neg_1 = and i64 %x806.neg_zext, %x806.neg_0
+  %x806.neg_2 = xor i64 %x806.neg_zext, 18446744073709551614
+  %x806.neg_3 = and i64 %x806.neg_2, 18446744073709551615
+  %x806.neg = xor i64 %x806.neg_1, %x806.neg_3
   %_0.i552.neg = add nsw i64 %x806.neg, %x804.neg
   %_0.i553 = add i64 %_0.i537, -7435674573564081700
   %_1358 = icmp ult i64 %_0.i537, 7435674573564081700
-  %x809.neg = sext i1 %_1358 to i64
+  %x809.neg_zext = zext i1 %_1358 to i64
+  %x809.neg_0 = sub i64 %x809.neg_zext, 1
+  %x809.neg_1 = and i64 %x809.neg_zext, %x809.neg_0
+  %x809.neg_2 = xor i64 %x809.neg_zext, 18446744073709551614
+  %x809.neg_3 = and i64 %x809.neg_2, 18446744073709551615
+  %x809.neg = xor i64 %x809.neg_1, %x809.neg_3
   %_0.i554 = add i64 %_0.i552.neg, %_0.i553
   %_1360 = icmp ult i64 %_0.i553, %_0.i554
-  %x811.neg = sext i1 %_1360 to i64
+  %x811.neg_zext = zext i1 %_1360 to i64
+  %x811.neg_0 = sub i64 %x811.neg_zext, 1
+  %x811.neg_1 = and i64 %x811.neg_zext, %x811.neg_0
+  %x811.neg_2 = xor i64 %x811.neg_zext, 18446744073709551614
+  %x811.neg_3 = and i64 %x811.neg_2, 18446744073709551615
+  %x811.neg = xor i64 %x811.neg_1, %x811.neg_3
   %_0.i555.neg = add nsw i64 %x811.neg, %x809.neg
   %_0.i556 = add i64 %_0.i540, -7239337960414712511
   %_1363 = icmp ult i64 %_0.i540, 7239337960414712511
-  %x814.neg = sext i1 %_1363 to i64
+  %x814.neg_zext = zext i1 %_1363 to i64
+  %x814.neg_0 = sub i64 %x814.neg_zext, 1
+  %x814.neg_1 = and i64 %x814.neg_zext, %x814.neg_0
+  %x814.neg_2 = xor i64 %x814.neg_zext, 18446744073709551614
+  %x814.neg_3 = and i64 %x814.neg_2, 18446744073709551615
+  %x814.neg = xor i64 %x814.neg_1, %x814.neg_3
   %_0.i557 = add i64 %_0.i555.neg, %_0.i556
   %_1365 = icmp ult i64 %_0.i556, %_0.i557
-  %x816.neg = sext i1 %_1365 to i64
+  %x816.neg_zext = zext i1 %_1365 to i64
+  %x816.neg_0 = sub i64 %x816.neg_zext, 1
+  %x816.neg_1 = and i64 %x816.neg_zext, %x816.neg_0
+  %x816.neg_2 = xor i64 %x816.neg_zext, 18446744073709551614
+  %x816.neg_3 = and i64 %x816.neg_2, 18446744073709551615
+  %x816.neg = xor i64 %x816.neg_1, %x816.neg_3
   %_0.i558.neg = add nsw i64 %x816.neg, %x814.neg
   %_0.i559 = add i64 %_0.i543, -5412103778470702295
   %_1368 = icmp ult i64 %_0.i543, 5412103778470702295
-  %x819.neg = sext i1 %_1368 to i64
+  %x819.neg_zext = zext i1 %_1368 to i64
+  %x819.neg_0 = sub i64 %x819.neg_zext, 1
+  %x819.neg_1 = and i64 %x819.neg_zext, %x819.neg_0
+  %x819.neg_2 = xor i64 %x819.neg_zext, 18446744073709551614
+  %x819.neg_3 = and i64 %x819.neg_2, 18446744073709551615
+  %x819.neg = xor i64 %x819.neg_1, %x819.neg_3
   %_0.i560 = add i64 %_0.i558.neg, %_0.i559
   %_1370 = icmp ult i64 %_0.i559, %_0.i560
-  %x821.neg = sext i1 %_1370 to i64
+  %x821.neg_zext = zext i1 %_1370 to i64
+  %x821.neg_0 = sub i64 %x821.neg_zext, 1
+  %x821.neg_1 = and i64 %x821.neg_zext, %x821.neg_0
+  %x821.neg_2 = xor i64 %x821.neg_zext, 18446744073709551614
+  %x821.neg_3 = and i64 %x821.neg_2, 18446744073709551615
+  %x821.neg = xor i64 %x821.neg_1, %x821.neg_3
   %_0.i561.neg = add nsw i64 %x821.neg, %x819.neg
   %_0.i562 = add i64 %_0.i546, -1873798617647539866
   %_1373 = icmp ult i64 %_0.i546, 1873798617647539866
-  %x824.neg = sext i1 %_1373 to i64
+  %x824.neg_zext = zext i1 %_1373 to i64
+  %x824.neg_0 = sub i64 %x824.neg_zext, 1
+  %x824.neg_1 = and i64 %x824.neg_zext, %x824.neg_0
+  %x824.neg_2 = xor i64 %x824.neg_zext, 18446744073709551614
+  %x824.neg_3 = and i64 %x824.neg_2, 18446744073709551615
+  %x824.neg = xor i64 %x824.neg_1, %x824.neg_3
   %_0.i563 = add i64 %_0.i561.neg, %_0.i562
   %_1375 = icmp ult i64 %_0.i562, %_0.i563
-  %x826.neg = sext i1 %_1375 to i64
+  %x826.neg_zext = zext i1 %_1375 to i64
+  %x826.neg_0 = sub i64 %x826.neg_zext, 1
+  %x826.neg_1 = and i64 %x826.neg_zext, %x826.neg_0
+  %x826.neg_2 = xor i64 %x826.neg_zext, 18446744073709551614
+  %x826.neg_3 = and i64 %x826.neg_2, 18446744073709551615
+  %x826.neg = xor i64 %x826.neg_1, %x826.neg_3
   %_0.i564.neg = add nsw i64 %x826.neg, %x824.neg
   %_0.i565 = add nsw i64 %_0.i564.neg, %_0.i548
   %_1378.not = icmp ult i64 %_0.i548, %_0.i565
-  %_0.i566 = sext i1 %_1378.not to i64
+  %_0.i566_zext = zext i1 %_1378.not to i64
+  %_0.i566_0 = sub i64 %_0.i566_zext, 1
+  %_0.i566_1 = and i64 %_0.i566_zext, %_0.i566_0
+  %_0.i566_2 = xor i64 %_0.i566_zext, 18446744073709551614
+  %_0.i566_3 = and i64 %_0.i566_2, 18446744073709551615
+  %_0.i566 = xor i64 %_0.i566_1, %_0.i566_3
   %_1387 = and i64 %_0.i534, %_0.i566
-  %_1388 = select i1 %_1378.not, i64 0, i64 %_0.i551
+  %_1388_condition_zext = zext i1 %_1378.not to i64
+ %_1388_condtion = add i64 %_1388_condition_zext, 0
+  %_1388_start = add i64 %_0.i551, 0
+  %_1388_0 = sub i64 1, %_1388_condtion
+  %_1388_1 = mul i64 %_1388_start, %_1388_0
+  %_1388_2 = mul i64 0, %_1388_condtion
+  %_1388 = add i64 %_1388_1, %_1388_2
   %x835 = or i64 %_1387, %_1388
   %_1392 = and i64 %_0.i537, %_0.i566
-  %_1393 = select i1 %_1378.not, i64 0, i64 %_0.i554
+  %_1393_condition_zext = zext i1 %_1378.not to i64
+ %_1393_condtion = add i64 %_1393_condition_zext, 0
+  %_1393_start = add i64 %_0.i554, 0
+  %_1393_0 = sub i64 1, %_1393_condtion
+  %_1393_1 = mul i64 %_1393_start, %_1393_0
+  %_1393_2 = mul i64 0, %_1393_condtion
+  %_1393 = add i64 %_1393_1, %_1393_2
   %x838 = or i64 %_1392, %_1393
   %_1397 = and i64 %_0.i540, %_0.i566
-  %_1398 = select i1 %_1378.not, i64 0, i64 %_0.i557
+  %_1398_condition_zext = zext i1 %_1378.not to i64
+ %_1398_condtion = add i64 %_1398_condition_zext, 0
+  %_1398_start = add i64 %_0.i557, 0
+  %_1398_0 = sub i64 1, %_1398_condtion
+  %_1398_1 = mul i64 %_1398_start, %_1398_0
+  %_1398_2 = mul i64 0, %_1398_condtion
+  %_1398 = add i64 %_1398_1, %_1398_2
   %x841 = or i64 %_1397, %_1398
   %_1402 = and i64 %_0.i543, %_0.i566
-  %_1403 = select i1 %_1378.not, i64 0, i64 %_0.i560
+  %_1403_condition_zext = zext i1 %_1378.not to i64
+ %_1403_condtion = add i64 %_1403_condition_zext, 0
+  %_1403_start = add i64 %_0.i560, 0
+  %_1403_0 = sub i64 1, %_1403_condtion
+  %_1403_1 = mul i64 %_1403_start, %_1403_0
+  %_1403_2 = mul i64 0, %_1403_condtion
+  %_1403 = add i64 %_1403_1, %_1403_2
   %x844 = or i64 %_1402, %_1403
   %_1410.not = icmp eq i64 %out0.1, 0
-  br i1 %_1410.not, label %panic12, label %bb568, !prof !3
-panic11:                                          ; preds = %bb11
-; call core::panicking::panic_bounds_check
-  tail call void @_ZN4core9panicking18panic_bounds_check17h6879eeb39abdf99dE(i64 noundef 5, i64 noundef 5, ptr noalias noundef nonnull readonly align 8 dereferenceable(24) @alloc_e7e3feff08307baee212ddc5ca323a79) #2
-  unreachable
-bb568:                                            ; preds = %bb12
   %_0.i549 = add i64 %_0.i531, 5044313057631688021
   %_1382 = and i64 %_0.i531, %_0.i566
-  %_1383 = select i1 %_1378.not, i64 0, i64 %_0.i549
+  %_1383_condition_zext = zext i1 %_1378.not to i64
+ %_1383_condtion = add i64 %_1383_condition_zext, 0
+  %_1383_start = add i64 %_0.i549, 0
+  %_1383_0 = sub i64 1, %_1383_condtion
+  %_1383_1 = mul i64 %_1383_start, %_1383_0
+  %_1383_2 = mul i64 0, %_1383_condtion
+  %_1383 = add i64 %_1383_1, %_1383_2
   %x832 = or i64 %_1382, %_1383
   store i64 %x832, ptr %out0.0, align 8
   %_1412.not = icmp eq i64 %out0.1, 1
-  br i1 %_1412.not, label %panic13, label %bb569, !prof !3
-panic12:                                          ; preds = %bb12
-; call core::panicking::panic_bounds_check
-  tail call void @_ZN4core9panicking18panic_bounds_check17h6879eeb39abdf99dE(i64 noundef 0, i64 noundef 0, ptr noalias noundef nonnull readonly align 8 dereferenceable(24) @alloc_54a0420761e120886671384eafca676e) #2
-  unreachable
-bb569:                                            ; preds = %bb568
   %10 = getelementptr inbounds [0 x i64], ptr %out0.0, i64 0, i64 1
   store i64 %x835, ptr %10, align 8
   %_1414 = icmp ugt i64 %out0.1, 2
-  br i1 %_1414, label %bb570, label %panic14, !prof !5
-panic13:                                          ; preds = %bb568
-; call core::panicking::panic_bounds_check
-  tail call void @_ZN4core9panicking18panic_bounds_check17h6879eeb39abdf99dE(i64 noundef 1, i64 noundef 1, ptr noalias noundef nonnull readonly align 8 dereferenceable(24) @alloc_e71d16686660edf0ac4635f24d7ef080) #2
-  unreachable
-bb570:                                            ; preds = %bb569
   %11 = getelementptr inbounds [0 x i64], ptr %out0.0, i64 0, i64 2
   store i64 %x838, ptr %11, align 8
   %_1416.not = icmp eq i64 %out0.1, 3
-  br i1 %_1416.not, label %panic15, label %bb571, !prof !3
-panic14:                                          ; preds = %bb569
-; call core::panicking::panic_bounds_check
-  tail call void @_ZN4core9panicking18panic_bounds_check17h6879eeb39abdf99dE(i64 noundef 2, i64 noundef 2, ptr noalias noundef nonnull readonly align 8 dereferenceable(24) @alloc_c4a1da9892a9328aeb0c7ce56c96cc0f) #2
-  unreachable
-bb571:                                            ; preds = %bb570
   %12 = getelementptr inbounds [0 x i64], ptr %out0.0, i64 0, i64 3
   store i64 %x841, ptr %12, align 8
   %_1418 = icmp ugt i64 %out0.1, 4
-  br i1 %_1418, label %bb572, label %panic16, !prof !5
-panic15:                                          ; preds = %bb570
-; call core::panicking::panic_bounds_check
-  tail call void @_ZN4core9panicking18panic_bounds_check17h6879eeb39abdf99dE(i64 noundef 3, i64 noundef 3, ptr noalias noundef nonnull readonly align 8 dereferenceable(24) @alloc_e4cb97ff5e3f19b11cae213b2805ff31) #2
-  unreachable
-bb572:                                            ; preds = %bb571
   %13 = getelementptr inbounds [0 x i64], ptr %out0.0, i64 0, i64 4
   store i64 %x844, ptr %13, align 8
   %_1420.not = icmp eq i64 %out0.1, 5
-  br i1 %_1420.not, label %panic17, label %bb573, !prof !3
-panic16:                                          ; preds = %bb571
-; call core::panicking::panic_bounds_check
-  tail call void @_ZN4core9panicking18panic_bounds_check17h6879eeb39abdf99dE(i64 noundef 4, i64 noundef 4, ptr noalias noundef nonnull readonly align 8 dereferenceable(24) @alloc_fe3a2b043de24dcbb1347ea6a56848d6) #2
-  unreachable
-bb573:                                            ; preds = %bb572
   %_1407 = and i64 %_0.i546, %_0.i566
-  %_1408 = select i1 %_1378.not, i64 0, i64 %_0.i563
+  %_1408_condition_zext = zext i1 %_1378.not to i64
+ %_1408_condtion = add i64 %_1408_condition_zext, 0
+  %_1408_start = add i64 %_0.i563, 0
+  %_1408_0 = sub i64 1, %_1408_condtion
+  %_1408_1 = mul i64 %_1408_start, %_1408_0
+  %_1408_2 = mul i64 0, %_1408_condtion
+  %_1408 = add i64 %_1408_1, %_1408_2
   %x847 = or i64 %_1407, %_1408
   %14 = getelementptr inbounds [0 x i64], ptr %out0.0, i64 0, i64 5
   store i64 %x847, ptr %14, align 8
   ret void
-panic17:                                          ; preds = %bb572
-; call core::panicking::panic_bounds_check
-  tail call void @_ZN4core9panicking18panic_bounds_check17h6879eeb39abdf99dE(i64 noundef 5, i64 noundef 5, ptr noalias noundef nonnull readonly align 8 dereferenceable(24) @alloc_d960939cb83710d4cbb4de88fa25717c) #2
-  unreachable
 }
-; core::panicking::panic_bounds_check
-; Function Attrs: cold noinline noreturn nonlazybind uwtable
-declare void @_ZN4core9panicking18panic_bounds_check17h6879eeb39abdf99dE(i64 noundef, i64 noundef, ptr noalias noundef readonly align 8 dereferenceable(24)) unnamed_addr #1
-attributes #1 = { cold noinline noreturn nonlazybind uwtable "probe-stack"="inline-asm" "target-cpu"="x86-64" }
-attributes #2 = { noreturn }
 
 !3 = !{!"branch_weights", i32 1, i32 2000}
 !4 = !{}

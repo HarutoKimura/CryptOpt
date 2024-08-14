@@ -80,7 +80,8 @@ export namespace Fiat {
     | ArgVarName /*arg1[2]*/
     | VarName /*x34*/
     | `${number}` /*"1" stringified number(eg. shift ops )*/;
-
+// DynArgument is used for arguments that require computation
+// ConstArgument is used for fixed vlaues or simple references
   export type Argument = DynArgument | ConstArgument;
   export interface FiatFunction {
     operation: string;

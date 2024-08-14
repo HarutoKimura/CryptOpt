@@ -247,7 +247,7 @@ export function writeString(filename: string, asmString: string): void {
 }
 
 export function limbify(
-  arg:
+  arg: // various types of arguments as input
     | CryptOpt.DynArgument["name"]
     | CryptOpt.DynArgument["name"][number]
     | CryptOpt.ArgumentWithStringArguments["arguments"]
@@ -258,11 +258,11 @@ export function limbify(
     if (arg.length > 1) {
       throw new Error("Are you sure you want to limbify this ?");
     }
-    xdd = arg[0];
+    xdd = arg[0]; // if it's an array, we take the first element
   } else {
-    xdd = arg;
+    xdd = arg; // if it's not an array, we take the element itself
   }
-  const match = matchXD(xdd);
+  const match = matchXD(xdd); 
   if (match && !match?.[2]) {
     // if there is a match, but no _d
     return [`${xdd}_0`, `${xdd}_1`] as [CryptOpt.VarnameL, CryptOpt.VarnameL];

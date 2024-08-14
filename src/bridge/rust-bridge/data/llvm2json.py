@@ -62,21 +62,14 @@ def parse_llvm_ir(file_path):
     #when I use for the bls12, the memory counter starts from ???
     memory_counter = 0
     panic_skip_flag = False
-    i64_count = 0
-
-    def remove_second_i64(arg):
-        nonlocal i64_count
-        if "i64" in arg:
-            i64_count += 1
-            if i64_count == 2:
-                return arg.remove("i64")
-        return arg
 
     def replace_var(match):
         nonlocal memory_counter
         var = match.group(0)
         if var not in x_mapping:
             x_mapping[var] = f'x{memory_counter}'
+            # if memory_counter == 1133 or memory_counter == 1141 or memory_counter == 1150 or memory_counter == 1158 or memory_counter == 1167 or memory_counter == 1175 or memory_counter == 1184 or memory_counter == 1192:
+            #     print(f"var: {var}, x_mapping[var]: {x_mapping[var]}")
             memory_counter += 1
         return x_mapping[var]
 
@@ -85,10 +78,6 @@ def parse_llvm_ir(file_path):
         #Skip and bb{number} lines
         if line.startswith('bb') or line.startswith('br'):
             continue
-
-        # # Skip sext commands since I can integrate the operation to icmp operation
-        # if 'sext' in line:
-        #     continue
 
         # Skip panic calls until panic blocks finish with unreachable
         if 'panic' in line:
@@ -109,11 +98,17 @@ def parse_llvm_ir(file_path):
 
 
         #Pattern for operations that might have nuw/nsw mdofifiers
-        op_pattern = r'(x[\w.]+)\s*=\s*(\w+)\s*((?:nuw|nsw|ult|ugt|eq|ne)\s*(?:nuw|ns|ult|ugt|eq|ne)?)\s*(i\d+)\s*(.+)'
+        op_pattern = r'(x[\w.]+)\s*=\s*(\w+)\s*((?:nuw|nsw|ult|ugt|eq|ne)\s*(?:nuw|nsw|ns|ult|ugt|eq|ne)?)\s*(i\d+)\s*(.+)'
+        #op_pattern = r'(x[\w.]+)\s*=\s*(\w+)\s*((?:nuw|nsw|ult|ugt|eq|ne)\s*)*\s*(i\d+)\s*(.+)'
         op_match = re.match(op_pattern, line.strip())
         
         if op_match:
             name, operation, modifier, datatype, args = op_match.groups()
+
+
+            # print(f"name:{name}", f"operation:{operation}", f"modifier:{modifier}", f"datatype:{datatype}", f"args:{args}")
+            # print('\n')
+
             entire_operations.append( {
                 'name': [name],
                 'operation': operation,
@@ -159,18 +154,20 @@ def parse_llvm_ir(file_path):
             if operation == "load":
                 args = re.sub(r',\s*align\s+\d+,\s*!noundef\s+!\d+', '', args)
 
-            
-            # now I treat select as the special case
-            if operation == "select":
-                args_list = args.split(" ")
-                args_list.remove('i64')
-                args_list.remove('i64')
-                args_list.insert(1, 'i64')
-                print("args_list:", args_list)
+            # if operation == "sext":
+            #     line = decompose_sext(line.strip())
 
-                #arg_list = [remove_second_i64(arg) for arg in args_list]
-                args = " ".join(args_list)
-                print ("args:", args)
+            # if operation == "select":
+            #     # args_list = args.split(" ")
+            #     # args_list.remove('i64')
+            #     # args_list.remove('i64')
+            #     # args_list.insert(1, 'i64')
+            #     # print("args_list:", args_list)
+
+            #     #arg_list = [remove_second_i64(arg) for arg in args_list]
+            #     # args = " ".join(args_list)
+            #     # print ("args:", args)
+            #     line = decompose_select(line.strip())
 
 
                 #print(args)

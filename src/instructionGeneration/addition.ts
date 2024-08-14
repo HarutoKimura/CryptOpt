@@ -199,7 +199,16 @@ function add64(c: CryptOpt.StringOperation): asm[] {
 
   let a_arg1 = allocations[c.arguments[1]] as ValueAllocation;
   if (!a_arg1) {
-    throw new Error(`cannot find arg1 ${c.arguments[1]} in allocations.`);
+    if (isImm(c.arguments[1])) {
+      // Load immediate to register
+      const reg = ra.loadImmToReg64(c.arguments[1]);
+      a_arg1 = {
+        datatype: "u64",
+        store: reg,
+      };
+    } else {
+      throw new Error(`cannot find arg1 ${c.arguments[1]} in allocations.`);
+    }
   }
   if (c.operation === "addcarryx") {
     // a_arg2 may be undefined, if c.arguments[2] is an immediate which is currently in no reg

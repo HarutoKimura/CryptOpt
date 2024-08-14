@@ -25,7 +25,7 @@ import { ManualBridge } from "@/bridge/manual-bridge";
 import { Model } from "@/model";
 import { OptimizerArgs } from "@/types";
 import { llvm_BitcoinCoreBridge } from "@/bridge/llvm-bitcoin-core-bridge";
-import { RustBridge } from "@/bridge/rust-bridge";
+import { RustBridge, METHOD_T as RUST_METHOD_T } from "@/bridge/rust-bridge";
 
 
 type needComms = Pick<OptimizerArgs, "bridge" | "seed" | "memoryConstraints">;
@@ -52,7 +52,7 @@ interface needllvmBitcoinCore extends needComms {
 }
 interface needRust extends needComms {
   bridge: "rust";
-  method: BITCOIN_CORE_METHOD_T;
+  method: RUST_METHOD_T;
 }
 
 type neededArgs = needJasmin | needFiat | needManual | needBitcoinCore | needllvmBitcoinCore | needRust;
@@ -177,7 +177,7 @@ function initRust(sharedObjectFilename: string, args: needRust): ret {
 
   const symbolname = bridge.machinecode(sharedObjectFilename, args.method);
   const chunksize = 16; // only for reading the chunk breaks atm. see MS code
-  const argwidth = bridge.argwidth("", args.method);
+  const argwidth = bridge.argwidth("",args.method);
   const argnumin = bridge.argnumin(args.method);
   const argnumout = bridge.argnumout(args.method);
 

@@ -28,6 +28,10 @@ import {
   type CURVE_T as FIAT_CURVE_T,
   type METHOD_T as FIAT_METHOD_T,
 } from "@/bridge/fiat-bridge/constants";
+import {
+  METHOD_T,
+  AVAILABLE_METHODS as RUST_METHODS,
+} from "@/bridge/rust-bridge/constants";
 import { errorOut, ERRORS } from "@/errors";
 
 import { FRAME_POINTER_OPTIONS, MEMORY_CONSTRAINTS_OPTIONS, ParsedArgsT } from "../types";
@@ -206,7 +210,7 @@ export const parsedArgs = y
       }
     }
     if (bridge == "rust") {
-      if (!BITCOIN_CORE_METHODS.includes(method as BITCOIN_CORE_METHOD_T)) {
+      if (!RUST_METHODS.includes(method as METHOD_T)) {
         throw new Error(`Bridge is rust. The specified method '${method}' not available.`);
       }
     }

@@ -68,6 +68,11 @@ export function cmp(c: CryptOpt.StringOperation): asm[] {
     ra.setCC(set, c.name[0]);
   }
   const afterPres = ra.pres; //now contains the setcc instruction, allocations, spills....
+  // if set ! = setb, we don't need to care about afterPres
 
   return [...pres, compare, ...afterPres];
+  // output format would be e.g. mov rax, [rsp+10]
+  // in general case, cmp output would be cmp rax, [rsp+10]
+  // shared object case, it was written like following:
+  // cmp %rdi, % rax
 }

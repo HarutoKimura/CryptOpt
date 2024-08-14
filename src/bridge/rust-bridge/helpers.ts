@@ -21,8 +21,8 @@ import type { PT } from "./raw.type";
 export type argMatch = {
   casts: Array<{ type: `i${number}` }>;
   pointers: Array<{ type: PT; id: `x${number}` }>;
-  scalars: Array<{ type?: `i${number}`; id: `x${number}` }>;
-  imm: Array<{ type: `i${number}`; imm: string }>;
+  scalars: Array<{ type?: `i${number}`; id: `x${number}` }>; // i64 x1, or just x2
+  imm: Array<{ type: `i${number}`; imm: string }>; // imm represents immediate value e.g. i64 42, or just 5
 };
 export const pointerRegEx = /(?<type>((i\d+)\*)|(ptr))\s+(?<id>x\d+)/;
 export function getArguments(s: string): argMatch {
@@ -67,8 +67,8 @@ export function getArguments(s: string): argMatch {
 }
 export function getScalarsAndImmMappedAsConstArg(s: string): CryptOpt.ConstArgument[] {
   const { scalars, imm } = getArguments(s);
-  const scalarsAsConstArg = scalars.map(({ id }) => id as CryptOpt.ConstArgument);
-  const immsAsConstArg = imm.map(({ imm }) => {
+  const scalarsAsConstArg = scalars.map(({ id }) => id as CryptOpt.ConstArgument); // simply extracts the id like x1, x2
+  const immsAsConstArg = imm.map(({ imm }) => { // it converts the immediate value to a hex string
     const bi = BigInt(imm);
     const isNeg = bi < 0n;
     return `${isNeg ? "-" : ""}0x${(isNeg ? bi * -1n : bi).toString(16)}` as CryptOpt.ConstArgument;

@@ -35,7 +35,7 @@ export function transformIcmp(input: SSA): Intermediate {
 
   return {
     name: input.name,
-    datatype: "i1",
+    datatype: "i1", // opriginal one is i1 however, when i checked the LLVM-IR after icmp, in Rust's LLVM-IR, it always uses sext to expand the result to i64 so I can specify the datatype as i64 directly.
     operation: "cmp",
     arguments: [
       comparisonString as CryptOpt.ConstArgument /* liitle bit of a cheat. The correct way would be to create types for all ops, then put that as 'modifier'/'parameter' to cmp. Or to have many many cmp-ops ... And we chose the ~lazy~ straigt forward way.*/,

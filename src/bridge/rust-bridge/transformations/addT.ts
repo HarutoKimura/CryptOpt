@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { getArguments } from "../helpers";
+import { getScalarsAndImmMappedAsConstArg } from "../helpers";
 import type { SSA } from "../raw.type";
 import type { Intermediate } from "./intermediate.type";
 
@@ -26,12 +26,12 @@ export function transformAdd(input: SSA): Intermediate {
     throw new Error("unsupported datatype while transform add.");
   }
 
-  const { scalars } = getArguments(input.arguments);
+  const args = getScalarsAndImmMappedAsConstArg(input.arguments);
 
   return {
     name: input.name,
     datatype: input.datatype == "i128" ? "u128" : "u64",
     operation: "+",
-    arguments: scalars.map(({ id }) => id),
+    arguments: args,
   };
 }

@@ -21,7 +21,7 @@ export type BRIDGES_T = (typeof BRIDGES)[number];
 
 // currently used only in src/CountCycle
 export const KNOWN_SYMBOLS: {
-  [symbol: string]: { bridge: "fiat" | "bitcoin-core" | "llvm-bitcoin-core" | "rust"; method: METHOD_T; curve: CURVE_T };
+  [symbol: string]: { bridge: "fiat" | "bitcoin-core" | "llvm-bitcoin-core" | "rust"; method: METHOD_T; curve: CURVE_T};
 } = {
   // fiat generated bls curves
   fiat_bls12_381_p_mul: { bridge: "fiat", method: "mul", curve: "bls12_381_p" },
@@ -59,4 +59,10 @@ export const KNOWN_SYMBOLS: {
   // bitcoin curve for bitcoin-core, llvm-bitcoin-corem and rust
   secp256k1_fe_mul_inner: { bridge: "bitcoin-core" || "llvm-bitcoin-core" || "rust", method: "mul", curve: "secp256k1_dettman" },
   secp256k1_fe_sqr_inner: { bridge: "bitcoin-core" || "llvm-bitcoin-core" || "rust", method: "square", curve: "secp256k1_dettman" },
+
+  // rust generated bls curves
+  bls12_mul: { bridge: "rust", method: "mul", curve: "bls12_381_p"},
+  bls12_square: { bridge: "rust", method: "square", curve: "bls12_381_p"},
+  // rust_bls12_381_q_mul: {bridge: "rust", method: "mul", curve: "bls12_381_q"},
+  // rust_bls12_381_q_square: {bridge: "rust", method: "square", curve: "bls12_381_q"},
 };

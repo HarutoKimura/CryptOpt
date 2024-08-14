@@ -24,3 +24,4 @@ export * from "./shrT";
 export * from "./truncT";
 export * from "./xorT";
 export * from "./zextT";
+export * from "./subT";

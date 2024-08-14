@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 export type METHOD_T = (typeof AVAILABLE_METHODS)[number];
 
 export const AVAILABLE_METHODS = ["square", "mul"] as const;
@@ -26,15 +25,12 @@ export const METHOD_DETAILS: {
 } = {
   mul: {
     // the operation 'multiply' is called fe_mul_inner in the library
-    name: "secp256k1_fe_mul_inner",
+    name: "bls12_mul",
   },
   square: {
-    name: "secp256k1_fe_sqr_inner",
+    name: "bls12_square",
   },
 };
-
-
-// import { BINS } from "./enums";
 
 // export type CURVE_T = (typeof AVAILABLE_CURVES)[number];
 // export type METHOD_T = (typeof AVAILABLE_METHODS)[number];
@@ -49,33 +45,22 @@ export const METHOD_DETAILS: {
 
 // export const METHOD_DETAILS: {
 //   [f in METHOD_T]: {
-//     name: {
-//       [k in BINS]: string;
-//     };
+//     name: string;
 //   };
 // } = {
 //   mul: {
-//     // the operation 'multiply' is called carry_mul if the bin is unsaturated; mul if it is wbw_montgomery
-//     name: {
-//       [BINS.wbw_montgomery]: "mul",
-//       [BINS.dettman]: "mul",
-//     },
+//     name: "mul",
 //   },
-  
 //   square: {
-//     name: {
-//       [BINS.wbw_montgomery]: "square",
-//       [BINS.dettman]: "square",
-//     },
-//   },
+//     name: "square",
+//   }
 // };
 
-// export const CURVE_DETAILS: {
+// export const RUST_CURVE_DETAILS: {
 //   [curve in CURVE_T]: {
 //     bitwidth: number;
 //     argwidth: number;
 //     prime: string;
-//     binary: BINS;
 //     bounds: string[];
 //     last_limbwidth?: number; // only used in dettman
 //     last_reduction?: number; // only used in dettman
@@ -89,7 +74,6 @@ export const METHOD_DETAILS: {
 //       // z = -0xd201000000010000
 //       // p = (z - 1)^2 (z^4 - z^2 + 1) / 3 + z
 //       "(-0xd201000000010000 -1)^2 * ((-0xd201000000010000)^4 - (-0xd201000000010000)^2 + 1)/3 + (-0xd201000000010000)",
-//     binary: BINS.wbw_montgomery,
 //     bounds: [
 //       "0xffffffffffffffff",
 //       "0xffffffffffffffff",
@@ -105,7 +89,6 @@ export const METHOD_DETAILS: {
 //     // z = -0xd201000000010000
 //     // q = z^4 - z^2 + 1
 //     prime: "(-0xd201000000010000)^4 -(-0xd201000000010000)^2 + 1",
-//     binary: BINS.wbw_montgomery,
 //     bounds: ["0xffffffffffffffff", "0xffffffffffffffff", "0xffffffffffffffff", "0xffffffffffffffff"],
 //   },
 
@@ -116,7 +99,6 @@ export const METHOD_DETAILS: {
 //     last_limbwidth: 48,
 //     last_reduction: 2,
 //     prime: "2^256 - 4294968273",
-//     binary: BINS.dettman,
 //     bounds: [
 //       "0x1ffffffffffffe",
 //       "0x1ffffffffffffe",
@@ -126,4 +108,3 @@ export const METHOD_DETAILS: {
 //     ],
 //   },
 // };
-
