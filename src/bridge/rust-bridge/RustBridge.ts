@@ -32,7 +32,14 @@ import { lock } from "proper-lockfile";
 const cwd = resolve(datadir, "rust-bridge");
 
 // so far there are only two json files: demangled_field_mul.json and demangled_field_sqr.json
-const target_json = "demangled_bls12_mul.json";
+const TARGET_JSON = "demangled_bls12_mul.json";
+
+const WORKING_JSON = 'wrong_but_working/wrong_but_working_bls12_mul.json';
+
+const TEST_JSON = "sext_transformer.json";
+
+const INPUT_JSON = TARGET_JSON; 
+// const INPUT_JSON = WORKING_JSON;
 
 const createExecOpts = () => {
   const c = { env, cwd, shell: "/usr/bin/bash" };
@@ -52,7 +59,8 @@ export class RustBridge implements Bridge {
 
   private generateJsonFile(method: METHOD_T): void {
     const targetName = this.getTargetName(method);
-    const jsonFileName = `demangled_${targetName}.json`;
+    // const jsonFileName = `demangled_${targetName}.json`;
+    const jsonFileName = INPUT_JSON;  // target json or WORKING_JSON
     const jsonFilePath = resolve(cwd, jsonFileName);
 
     if (!existsSync(jsonFilePath)) {
@@ -79,7 +87,8 @@ export class RustBridge implements Bridge {
     this.generateJsonFile(method);
 
     const targetName = this.getTargetName(method);
-    const target_json = `demangled_${targetName}.json`;
+    // const target_json = `demangled_${targetName}.json`; // default
+    const target_json = INPUT_JSON;  // as the test using wrong but working file
     const raw = JSON.parse(readFileSync(resolve(cwd, target_json)).toString()) as Array<raw_T>;
     //const raw = JSON.parse(readFileSync("/home/harutok/CryptOpt/src/bridge/bitcoin-core-bridge/data/field.json").toString()) as Array<raw_T>;
     console.log("Input Json file", raw);

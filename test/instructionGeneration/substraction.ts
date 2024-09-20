@@ -28,6 +28,8 @@ const allocs = {
   "arg4[3]": { datatype: "u64", store: "[ r8 + 0x18 ]" },
   "arg5[3]": { datatype: "u64", store: "[ r9 + 0x18 ]" },
 
+  x1120: { datatype: "u64", store: "r10" }, // Heruto substruction test
+
   x910: { datatype: "u1", store: "OF" },
   x1000: { datatype: "u1", store: "CF" },
   x48: { datatype: "u1", store: "r12b" },
@@ -479,4 +481,40 @@ describe("instructionGeneration:sub", () => {
     expect(spillFlag).toBeCalledWith(Flags.CF);
     expect(spillFlag).toBeCalledWith(Flags.OF);
   });
+
+  // Haruto substruction test
+  it("imm 0 minus scalar", () => {
+    getCurrentAllocations.mockClear();
+    backupIfVarHasDependencies.mockClear().mockImplementation(() => Register.rax);
+    declareHavoc.mockClear();
+    addToPreInstructions.mockClear();
+    spillFlag.mockClear();
+  
+    const c: CryptOpt.StringOperation = {
+      operation: "-",
+      datatype: "u64",
+      name: ["x1003"],
+      arguments: ["0x0", "x1120"],
+      decisions: {
+        di_choose_arg: [0, ["0x0", "x1120"]],
+        [DECISION_IDENTIFIER.DI_SPILL_LOCATION]: [
+          0,
+          [C_DI_SPILL_LOCATION.C_DI_MEM, C_DI_SPILL_LOCATION.C_DI_XMM_REG],
+        ],
+      },
+      decisionsHot: [],
+    };
+  
+    const code = sub(c).filter((a) => !a.startsWith(";"));
+    expect(code).toHaveLength(1);
+    expect(backupIfVarHasDependencies).toBeCalledWith("0x0", "x1003");
+  
+    expect(addToPreInstructions).not.toHaveBeenCalled(); 
+  
+    expect(declareHavoc).not.toHaveBeenCalledWith();
+    expect(code[0]).toBe("sub rax, r10"); // because x1120 is in r10
+    expect(spillFlag).toBeCalledWith(Flags.CF);
+    expect(spillFlag).toBeCalledWith(Flags.OF);
+  });
+
 });

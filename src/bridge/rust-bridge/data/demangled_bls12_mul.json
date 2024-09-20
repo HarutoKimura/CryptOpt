@@ -10053,20 +10053,11 @@
         "operation": "sub",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1120, 1"
+        "arguments": "i64 0, x1120"
       },
       {
         "name": [
           "x1122"
-        ],
-        "operation": "and",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1120, x1121"
-      },
-      {
-        "name": [
-          "x1123"
         ],
         "operation": "xor",
         "modifiers": "",
@@ -10075,25 +10066,16 @@
       },
       {
         "name": [
-          "x1124"
+          "x1123"
         ],
         "operation": "and",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1123, 18446744073709551615"
+        "arguments": "i64 x1121, x1122"
       },
       {
         "name": [
-          "x1125"
-        ],
-        "operation": "xor",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1122, x1124"
-      },
-      {
-        "name": [
-          "x1126"
+          "x1124"
         ],
         "operation": "add",
         "modifiers": "",
@@ -10102,7 +10084,7 @@
       },
       {
         "name": [
-          "x1127"
+          "x1125"
         ],
         "operation": "icmp",
         "modifiers": "ult",
@@ -10111,142 +10093,106 @@
       },
       {
         "name": [
-          "x1128"
+          "x1126"
         ],
         "operation": "zext",
         "modifiers": "",
         "datatype": "i1",
-        "arguments": "i1 x1127 to i64"
+        "arguments": "i1 x1125 to i64"
+      },
+      {
+        "name": [
+          "x1127"
+        ],
+        "operation": "sub",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 0, x1126"
+      },
+      {
+        "name": [
+          "x1128"
+        ],
+        "operation": "xor",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x1126, 18446744073709551614"
       },
       {
         "name": [
           "x1129"
         ],
-        "operation": "sub",
+        "operation": "and",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1128, 1"
+        "arguments": "i64 x1127, x1128"
       },
       {
         "name": [
           "x1130"
         ],
-        "operation": "and",
+        "operation": "add",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1128, x1129"
+        "arguments": "i64 x1124, x1123"
       },
       {
         "name": [
           "x1131"
         ],
-        "operation": "xor",
-        "modifiers": "",
+        "operation": "icmp",
+        "modifiers": "ult",
         "datatype": "i64",
-        "arguments": "i64 x1128, 18446744073709551614"
+        "arguments": "i64 x1124, x1130"
       },
       {
         "name": [
           "x1132"
         ],
-        "operation": "and",
+        "operation": "zext",
         "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1131, 18446744073709551615"
+        "datatype": "i1",
+        "arguments": "i1 x1131 to i64"
       },
       {
         "name": [
           "x1133"
         ],
-        "operation": "xor",
+        "operation": "sub",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1130, x1132"
+        "arguments": "i64 0, x1132"
       },
       {
         "name": [
           "x1134"
         ],
-        "operation": "add",
+        "operation": "xor",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1126, x1125"
+        "arguments": "i64 x1132, 18446744073709551614"
       },
       {
         "name": [
           "x1135"
         ],
-        "operation": "icmp",
-        "modifiers": "ult",
+        "operation": "and",
+        "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1126, x1134"
+        "arguments": "i64 x1133, x1134"
       },
       {
         "name": [
           "x1136"
         ],
-        "operation": "zext",
-        "modifiers": "",
-        "datatype": "i1",
-        "arguments": "i1 x1135 to i64"
+        "operation": "add",
+        "modifiers": "nsw",
+        "datatype": "i64",
+        "arguments": "i64 x1135, x1129"
       },
       {
         "name": [
           "x1137"
-        ],
-        "operation": "sub",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1136, 1"
-      },
-      {
-        "name": [
-          "x1138"
-        ],
-        "operation": "and",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1136, x1137"
-      },
-      {
-        "name": [
-          "x1139"
-        ],
-        "operation": "xor",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1136, 18446744073709551614"
-      },
-      {
-        "name": [
-          "x1140"
-        ],
-        "operation": "and",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1139, 18446744073709551615"
-      },
-      {
-        "name": [
-          "x1141"
-        ],
-        "operation": "xor",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1138, x1140"
-      },
-      {
-        "name": [
-          "x1142"
-        ],
-        "operation": "add",
-        "modifiers": "nsw",
-        "datatype": "i64",
-        "arguments": "i64 x1141, x1133"
-      },
-      {
-        "name": [
-          "x1143"
         ],
         "operation": "add",
         "modifiers": "",
@@ -10255,12 +10201,66 @@
       },
       {
         "name": [
-          "x1144"
+          "x1138"
         ],
         "operation": "icmp",
         "modifiers": "ult",
         "datatype": "i64",
         "arguments": "i64 x1093, 7435674573564081700"
+      },
+      {
+        "name": [
+          "x1139"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i1",
+        "arguments": "i1 x1138 to i64"
+      },
+      {
+        "name": [
+          "x1140"
+        ],
+        "operation": "sub",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 0, x1139"
+      },
+      {
+        "name": [
+          "x1141"
+        ],
+        "operation": "xor",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x1139, 18446744073709551614"
+      },
+      {
+        "name": [
+          "x1142"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x1140, x1141"
+      },
+      {
+        "name": [
+          "x1143"
+        ],
+        "operation": "add",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x1136, x1137"
+      },
+      {
+        "name": [
+          "x1144"
+        ],
+        "operation": "icmp",
+        "modifiers": "ult",
+        "datatype": "i64",
+        "arguments": "i64 x1137, x1143"
       },
       {
         "name": [
@@ -10278,20 +10278,11 @@
         "operation": "sub",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1145, 1"
+        "arguments": "i64 0, x1145"
       },
       {
         "name": [
           "x1147"
-        ],
-        "operation": "and",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1145, x1146"
-      },
-      {
-        "name": [
-          "x1148"
         ],
         "operation": "xor",
         "modifiers": "",
@@ -10300,57 +10291,66 @@
       },
       {
         "name": [
-          "x1149"
+          "x1148"
         ],
         "operation": "and",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1148, 18446744073709551615"
+        "arguments": "i64 x1146, x1147"
+      },
+      {
+        "name": [
+          "x1149"
+        ],
+        "operation": "add",
+        "modifiers": "nsw",
+        "datatype": "i64",
+        "arguments": "i64 x1148, x1142"
       },
       {
         "name": [
           "x1150"
         ],
-        "operation": "xor",
+        "operation": "add",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1147, x1149"
+        "arguments": "i64 x1100, -7239337960414712511"
       },
       {
         "name": [
           "x1151"
         ],
-        "operation": "add",
-        "modifiers": "",
+        "operation": "icmp",
+        "modifiers": "ult",
         "datatype": "i64",
-        "arguments": "i64 x1142, x1143"
+        "arguments": "i64 x1100, 7239337960414712511"
       },
       {
         "name": [
           "x1152"
         ],
-        "operation": "icmp",
-        "modifiers": "ult",
-        "datatype": "i64",
-        "arguments": "i64 x1143, x1151"
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i1",
+        "arguments": "i1 x1151 to i64"
       },
       {
         "name": [
           "x1153"
         ],
-        "operation": "zext",
+        "operation": "sub",
         "modifiers": "",
-        "datatype": "i1",
-        "arguments": "i1 x1152 to i64"
+        "datatype": "i64",
+        "arguments": "i64 0, x1152"
       },
       {
         "name": [
           "x1154"
         ],
-        "operation": "sub",
+        "operation": "xor",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1153, 1"
+        "arguments": "i64 x1152, 18446744073709551614"
       },
       {
         "name": [
@@ -10365,194 +10365,68 @@
         "name": [
           "x1156"
         ],
-        "operation": "xor",
+        "operation": "add",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1153, 18446744073709551614"
+        "arguments": "i64 x1149, x1150"
       },
       {
         "name": [
           "x1157"
         ],
-        "operation": "and",
-        "modifiers": "",
+        "operation": "icmp",
+        "modifiers": "ult",
         "datatype": "i64",
-        "arguments": "i64 x1156, 18446744073709551615"
+        "arguments": "i64 x1150, x1156"
       },
       {
         "name": [
           "x1158"
         ],
-        "operation": "xor",
+        "operation": "zext",
         "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1155, x1157"
+        "datatype": "i1",
+        "arguments": "i1 x1157 to i64"
       },
       {
         "name": [
           "x1159"
         ],
-        "operation": "add",
-        "modifiers": "nsw",
+        "operation": "sub",
+        "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1158, x1150"
+        "arguments": "i64 0, x1158"
       },
       {
         "name": [
           "x1160"
         ],
-        "operation": "add",
+        "operation": "xor",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1100, -7239337960414712511"
+        "arguments": "i64 x1158, 18446744073709551614"
       },
       {
         "name": [
           "x1161"
         ],
-        "operation": "icmp",
-        "modifiers": "ult",
-        "datatype": "i64",
-        "arguments": "i64 x1100, 7239337960414712511"
-      },
-      {
-        "name": [
-          "x1162"
-        ],
-        "operation": "zext",
-        "modifiers": "",
-        "datatype": "i1",
-        "arguments": "i1 x1161 to i64"
-      },
-      {
-        "name": [
-          "x1163"
-        ],
-        "operation": "sub",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1162, 1"
-      },
-      {
-        "name": [
-          "x1164"
-        ],
         "operation": "and",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1162, x1163"
-      },
-      {
-        "name": [
-          "x1165"
-        ],
-        "operation": "xor",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1162, 18446744073709551614"
-      },
-      {
-        "name": [
-          "x1166"
-        ],
-        "operation": "and",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1165, 18446744073709551615"
-      },
-      {
-        "name": [
-          "x1167"
-        ],
-        "operation": "xor",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1164, x1166"
-      },
-      {
-        "name": [
-          "x1168"
-        ],
-        "operation": "add",
         "modifiers": "",
         "datatype": "i64",
         "arguments": "i64 x1159, x1160"
       },
       {
         "name": [
-          "x1169"
-        ],
-        "operation": "icmp",
-        "modifiers": "ult",
-        "datatype": "i64",
-        "arguments": "i64 x1160, x1168"
-      },
-      {
-        "name": [
-          "x1170"
-        ],
-        "operation": "zext",
-        "modifiers": "",
-        "datatype": "i1",
-        "arguments": "i1 x1169 to i64"
-      },
-      {
-        "name": [
-          "x1171"
-        ],
-        "operation": "sub",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1170, 1"
-      },
-      {
-        "name": [
-          "x1172"
-        ],
-        "operation": "and",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1170, x1171"
-      },
-      {
-        "name": [
-          "x1173"
-        ],
-        "operation": "xor",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1170, 18446744073709551614"
-      },
-      {
-        "name": [
-          "x1174"
-        ],
-        "operation": "and",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1173, 18446744073709551615"
-      },
-      {
-        "name": [
-          "x1175"
-        ],
-        "operation": "xor",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1172, x1174"
-      },
-      {
-        "name": [
-          "x1176"
+          "x1162"
         ],
         "operation": "add",
         "modifiers": "nsw",
         "datatype": "i64",
-        "arguments": "i64 x1175, x1167"
+        "arguments": "i64 x1161, x1155"
       },
       {
         "name": [
-          "x1177"
+          "x1163"
         ],
         "operation": "add",
         "modifiers": "",
@@ -10561,7 +10435,7 @@
       },
       {
         "name": [
-          "x1178"
+          "x1164"
         ],
         "operation": "icmp",
         "modifiers": "ult",
@@ -10570,21 +10444,147 @@
       },
       {
         "name": [
-          "x1179"
+          "x1165"
         ],
         "operation": "zext",
         "modifiers": "",
         "datatype": "i1",
-        "arguments": "i1 x1178 to i64"
+        "arguments": "i1 x1164 to i64"
+      },
+      {
+        "name": [
+          "x1166"
+        ],
+        "operation": "sub",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 0, x1165"
+      },
+      {
+        "name": [
+          "x1167"
+        ],
+        "operation": "xor",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x1165, 18446744073709551614"
+      },
+      {
+        "name": [
+          "x1168"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x1166, x1167"
+      },
+      {
+        "name": [
+          "x1169"
+        ],
+        "operation": "add",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x1162, x1163"
+      },
+      {
+        "name": [
+          "x1170"
+        ],
+        "operation": "icmp",
+        "modifiers": "ult",
+        "datatype": "i64",
+        "arguments": "i64 x1163, x1169"
+      },
+      {
+        "name": [
+          "x1171"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i1",
+        "arguments": "i1 x1170 to i64"
+      },
+      {
+        "name": [
+          "x1172"
+        ],
+        "operation": "sub",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 0, x1171"
+      },
+      {
+        "name": [
+          "x1173"
+        ],
+        "operation": "xor",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x1171, 18446744073709551614"
+      },
+      {
+        "name": [
+          "x1174"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x1172, x1173"
+      },
+      {
+        "name": [
+          "x1175"
+        ],
+        "operation": "add",
+        "modifiers": "nsw",
+        "datatype": "i64",
+        "arguments": "i64 x1174, x1168"
+      },
+      {
+        "name": [
+          "x1176"
+        ],
+        "operation": "add",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x1114, -1873798617647539866"
+      },
+      {
+        "name": [
+          "x1177"
+        ],
+        "operation": "icmp",
+        "modifiers": "ult",
+        "datatype": "i64",
+        "arguments": "i64 x1114, 1873798617647539866"
+      },
+      {
+        "name": [
+          "x1178"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i1",
+        "arguments": "i1 x1177 to i64"
+      },
+      {
+        "name": [
+          "x1179"
+        ],
+        "operation": "sub",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 0, x1178"
       },
       {
         "name": [
           "x1180"
         ],
-        "operation": "sub",
+        "operation": "xor",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1179, 1"
+        "arguments": "i64 x1178, 18446744073709551614"
       },
       {
         "name": [
@@ -10599,127 +10599,127 @@
         "name": [
           "x1182"
         ],
-        "operation": "xor",
+        "operation": "add",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1179, 18446744073709551614"
+        "arguments": "i64 x1175, x1176"
       },
       {
         "name": [
           "x1183"
         ],
-        "operation": "and",
-        "modifiers": "",
+        "operation": "icmp",
+        "modifiers": "ult",
         "datatype": "i64",
-        "arguments": "i64 x1182, 18446744073709551615"
+        "arguments": "i64 x1176, x1182"
       },
       {
         "name": [
           "x1184"
         ],
-        "operation": "xor",
+        "operation": "zext",
         "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1181, x1183"
+        "datatype": "i1",
+        "arguments": "i1 x1183 to i64"
       },
       {
         "name": [
           "x1185"
         ],
-        "operation": "add",
+        "operation": "sub",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1176, x1177"
+        "arguments": "i64 0, x1184"
       },
       {
         "name": [
           "x1186"
         ],
-        "operation": "icmp",
-        "modifiers": "ult",
+        "operation": "xor",
+        "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1177, x1185"
+        "arguments": "i64 x1184, 18446744073709551614"
       },
       {
         "name": [
           "x1187"
         ],
-        "operation": "zext",
+        "operation": "and",
         "modifiers": "",
-        "datatype": "i1",
-        "arguments": "i1 x1186 to i64"
+        "datatype": "i64",
+        "arguments": "i64 x1185, x1186"
       },
       {
         "name": [
           "x1188"
         ],
-        "operation": "sub",
-        "modifiers": "",
+        "operation": "add",
+        "modifiers": "nsw",
         "datatype": "i64",
-        "arguments": "i64 x1187, 1"
+        "arguments": "i64 x1187, x1181"
       },
       {
         "name": [
           "x1189"
         ],
-        "operation": "and",
-        "modifiers": "",
+        "operation": "add",
+        "modifiers": "nsw",
         "datatype": "i64",
-        "arguments": "i64 x1187, x1188"
+        "arguments": "i64 x1188, x1118"
       },
       {
         "name": [
           "x1190"
         ],
-        "operation": "xor",
-        "modifiers": "",
+        "operation": "icmp",
+        "modifiers": "ult",
         "datatype": "i64",
-        "arguments": "i64 x1187, 18446744073709551614"
+        "arguments": "i64 x1118, x1189"
       },
       {
         "name": [
           "x1191"
         ],
-        "operation": "and",
+        "operation": "zext",
         "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1190, 18446744073709551615"
+        "datatype": "i1",
+        "arguments": "i1 x1190 to i64"
       },
       {
         "name": [
           "x1192"
         ],
-        "operation": "xor",
+        "operation": "sub",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1189, x1191"
+        "arguments": "i64 0, x1191"
       },
       {
         "name": [
           "x1193"
         ],
-        "operation": "add",
-        "modifiers": "nsw",
+        "operation": "xor",
+        "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1192, x1184"
+        "arguments": "i64 x1191, 18446744073709551614"
       },
       {
         "name": [
           "x1194"
         ],
-        "operation": "add",
+        "operation": "and",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1114, -1873798617647539866"
+        "arguments": "i64 x1192, x1193"
       },
       {
         "name": [
           "x1195"
         ],
-        "operation": "icmp",
-        "modifiers": "ult",
+        "operation": "and",
+        "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1114, 1873798617647539866"
+        "arguments": "i64 x1086, x1194"
       },
       {
         "name": [
@@ -10728,52 +10728,52 @@
         "operation": "zext",
         "modifiers": "",
         "datatype": "i1",
-        "arguments": "i1 x1195 to i64"
+        "arguments": "i1 x1190 to i64"
       },
       {
         "name": [
           "x1197"
         ],
-        "operation": "sub",
+        "operation": "add",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1196, 1"
+        "arguments": "i64 x1196, 0"
       },
       {
         "name": [
           "x1198"
         ],
-        "operation": "and",
+        "operation": "add",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1196, x1197"
+        "arguments": "i64 x1130, 0"
       },
       {
         "name": [
           "x1199"
         ],
-        "operation": "xor",
+        "operation": "sub",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1196, 18446744073709551614"
+        "arguments": "i64 1, x1197"
       },
       {
         "name": [
           "x1200"
         ],
-        "operation": "and",
+        "operation": "mul",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1199, 18446744073709551615"
+        "arguments": "i64 x1198, x1199"
       },
       {
         "name": [
           "x1201"
         ],
-        "operation": "xor",
+        "operation": "mul",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1198, x1200"
+        "arguments": "i64 0, x1197"
       },
       {
         "name": [
@@ -10782,479 +10782,263 @@
         "operation": "add",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1193, x1194"
+        "arguments": "i64 x1200, x1201"
       },
       {
         "name": [
           "x1203"
         ],
-        "operation": "icmp",
-        "modifiers": "ult",
+        "operation": "or",
+        "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1194, x1202"
+        "arguments": "i64 x1195, x1202"
       },
       {
         "name": [
           "x1204"
         ],
-        "operation": "zext",
+        "operation": "and",
         "modifiers": "",
-        "datatype": "i1",
-        "arguments": "i1 x1203 to i64"
+        "datatype": "i64",
+        "arguments": "i64 x1093, x1194"
       },
       {
         "name": [
           "x1205"
         ],
-        "operation": "sub",
+        "operation": "zext",
         "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1204, 1"
+        "datatype": "i1",
+        "arguments": "i1 x1190 to i64"
       },
       {
         "name": [
           "x1206"
         ],
-        "operation": "and",
+        "operation": "add",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1204, x1205"
+        "arguments": "i64 x1205, 0"
       },
       {
         "name": [
           "x1207"
         ],
-        "operation": "xor",
+        "operation": "add",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1204, 18446744073709551614"
+        "arguments": "i64 x1143, 0"
       },
       {
         "name": [
           "x1208"
         ],
-        "operation": "and",
+        "operation": "sub",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1207, 18446744073709551615"
+        "arguments": "i64 1, x1206"
       },
       {
         "name": [
           "x1209"
         ],
-        "operation": "xor",
+        "operation": "mul",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1206, x1208"
+        "arguments": "i64 x1207, x1208"
       },
       {
         "name": [
           "x1210"
         ],
-        "operation": "add",
-        "modifiers": "nsw",
+        "operation": "mul",
+        "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1209, x1201"
+        "arguments": "i64 0, x1206"
       },
       {
         "name": [
           "x1211"
         ],
         "operation": "add",
-        "modifiers": "nsw",
+        "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1210, x1118"
+        "arguments": "i64 x1209, x1210"
       },
       {
         "name": [
           "x1212"
         ],
-        "operation": "icmp",
-        "modifiers": "ult",
+        "operation": "or",
+        "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1118, x1211"
+        "arguments": "i64 x1204, x1211"
       },
       {
         "name": [
           "x1213"
         ],
-        "operation": "zext",
+        "operation": "and",
         "modifiers": "",
-        "datatype": "i1",
-        "arguments": "i1 x1212 to i64"
+        "datatype": "i64",
+        "arguments": "i64 x1100, x1194"
       },
       {
         "name": [
           "x1214"
         ],
-        "operation": "sub",
+        "operation": "zext",
         "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1213, 1"
+        "datatype": "i1",
+        "arguments": "i1 x1190 to i64"
       },
       {
         "name": [
           "x1215"
         ],
-        "operation": "and",
+        "operation": "add",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1213, x1214"
+        "arguments": "i64 x1214, 0"
       },
       {
         "name": [
           "x1216"
         ],
-        "operation": "xor",
+        "operation": "add",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1213, 18446744073709551614"
+        "arguments": "i64 x1156, 0"
       },
       {
         "name": [
           "x1217"
         ],
-        "operation": "and",
+        "operation": "sub",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1216, 18446744073709551615"
+        "arguments": "i64 1, x1215"
       },
       {
         "name": [
           "x1218"
         ],
-        "operation": "xor",
+        "operation": "mul",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1215, x1217"
+        "arguments": "i64 x1216, x1217"
       },
       {
         "name": [
           "x1219"
         ],
-        "operation": "and",
+        "operation": "mul",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1086, x1218"
+        "arguments": "i64 0, x1215"
       },
       {
         "name": [
           "x1220"
         ],
-        "operation": "zext",
+        "operation": "add",
         "modifiers": "",
-        "datatype": "i1",
-        "arguments": "i1 x1212 to i64"
+        "datatype": "i64",
+        "arguments": "i64 x1218, x1219"
       },
       {
         "name": [
           "x1221"
         ],
-        "operation": "add",
+        "operation": "or",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1220, 0"
+        "arguments": "i64 x1213, x1220"
       },
       {
         "name": [
           "x1222"
         ],
-        "operation": "add",
+        "operation": "and",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1134, 0"
+        "arguments": "i64 x1107, x1194"
       },
       {
         "name": [
           "x1223"
         ],
-        "operation": "sub",
+        "operation": "zext",
         "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 1, x1221"
+        "datatype": "i1",
+        "arguments": "i1 x1190 to i64"
       },
       {
         "name": [
           "x1224"
         ],
-        "operation": "mul",
+        "operation": "add",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1222, x1223"
+        "arguments": "i64 x1223, 0"
       },
       {
         "name": [
           "x1225"
         ],
-        "operation": "mul",
+        "operation": "add",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 0, x1221"
+        "arguments": "i64 x1169, 0"
       },
       {
         "name": [
           "x1226"
         ],
-        "operation": "add",
+        "operation": "sub",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1224, x1225"
+        "arguments": "i64 1, x1224"
       },
       {
         "name": [
           "x1227"
         ],
-        "operation": "or",
+        "operation": "mul",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1219, x1226"
+        "arguments": "i64 x1225, x1226"
       },
       {
         "name": [
           "x1228"
         ],
-        "operation": "and",
+        "operation": "mul",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1093, x1218"
+        "arguments": "i64 0, x1224"
       },
       {
         "name": [
           "x1229"
         ],
-        "operation": "zext",
+        "operation": "add",
         "modifiers": "",
-        "datatype": "i1",
-        "arguments": "i1 x1212 to i64"
+        "datatype": "i64",
+        "arguments": "i64 x1227, x1228"
       },
       {
         "name": [
           "x1230"
         ],
-        "operation": "add",
+        "operation": "or",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1229, 0"
+        "arguments": "i64 x1222, x1229"
       },
       {
         "name": [
           "x1231"
-        ],
-        "operation": "add",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1151, 0"
-      },
-      {
-        "name": [
-          "x1232"
-        ],
-        "operation": "sub",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 1, x1230"
-      },
-      {
-        "name": [
-          "x1233"
-        ],
-        "operation": "mul",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1231, x1232"
-      },
-      {
-        "name": [
-          "x1234"
-        ],
-        "operation": "mul",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 0, x1230"
-      },
-      {
-        "name": [
-          "x1235"
-        ],
-        "operation": "add",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1233, x1234"
-      },
-      {
-        "name": [
-          "x1236"
-        ],
-        "operation": "or",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1228, x1235"
-      },
-      {
-        "name": [
-          "x1237"
-        ],
-        "operation": "and",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1100, x1218"
-      },
-      {
-        "name": [
-          "x1238"
-        ],
-        "operation": "zext",
-        "modifiers": "",
-        "datatype": "i1",
-        "arguments": "i1 x1212 to i64"
-      },
-      {
-        "name": [
-          "x1239"
-        ],
-        "operation": "add",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1238, 0"
-      },
-      {
-        "name": [
-          "x1240"
-        ],
-        "operation": "add",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1168, 0"
-      },
-      {
-        "name": [
-          "x1241"
-        ],
-        "operation": "sub",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 1, x1239"
-      },
-      {
-        "name": [
-          "x1242"
-        ],
-        "operation": "mul",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1240, x1241"
-      },
-      {
-        "name": [
-          "x1243"
-        ],
-        "operation": "mul",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 0, x1239"
-      },
-      {
-        "name": [
-          "x1244"
-        ],
-        "operation": "add",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1242, x1243"
-      },
-      {
-        "name": [
-          "x1245"
-        ],
-        "operation": "or",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1237, x1244"
-      },
-      {
-        "name": [
-          "x1246"
-        ],
-        "operation": "and",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1107, x1218"
-      },
-      {
-        "name": [
-          "x1247"
-        ],
-        "operation": "zext",
-        "modifiers": "",
-        "datatype": "i1",
-        "arguments": "i1 x1212 to i64"
-      },
-      {
-        "name": [
-          "x1248"
-        ],
-        "operation": "add",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1247, 0"
-      },
-      {
-        "name": [
-          "x1249"
-        ],
-        "operation": "add",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1185, 0"
-      },
-      {
-        "name": [
-          "x1250"
-        ],
-        "operation": "sub",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 1, x1248"
-      },
-      {
-        "name": [
-          "x1251"
-        ],
-        "operation": "mul",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1249, x1250"
-      },
-      {
-        "name": [
-          "x1252"
-        ],
-        "operation": "mul",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 0, x1248"
-      },
-      {
-        "name": [
-          "x1253"
-        ],
-        "operation": "add",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1251, x1252"
-      },
-      {
-        "name": [
-          "x1254"
-        ],
-        "operation": "or",
-        "modifiers": "",
-        "datatype": "i64",
-        "arguments": "i64 x1246, x1253"
-      },
-      {
-        "name": [
-          "x1255"
         ],
         "operation": "icmp",
         "modifiers": "eq",
@@ -11263,7 +11047,7 @@
       },
       {
         "name": [
-          "x1256"
+          "x1232"
         ],
         "operation": "add",
         "modifiers": "",
@@ -11272,84 +11056,84 @@
       },
       {
         "name": [
-          "x1257"
+          "x1233"
         ],
         "operation": "and",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1079, x1218"
+        "arguments": "i64 x1079, x1194"
       },
       {
         "name": [
-          "x1258"
+          "x1234"
         ],
         "operation": "zext",
         "modifiers": "",
         "datatype": "i1",
-        "arguments": "i1 x1212 to i64"
+        "arguments": "i1 x1190 to i64"
       },
       {
         "name": [
-          "x1259"
+          "x1235"
         ],
         "operation": "add",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1258, 0"
+        "arguments": "i64 x1234, 0"
       },
       {
         "name": [
-          "x1260"
+          "x1236"
         ],
         "operation": "add",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1256, 0"
+        "arguments": "i64 x1232, 0"
       },
       {
         "name": [
-          "x1261"
+          "x1237"
         ],
         "operation": "sub",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 1, x1259"
+        "arguments": "i64 1, x1235"
       },
       {
         "name": [
-          "x1262"
+          "x1238"
         ],
         "operation": "mul",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1260, x1261"
+        "arguments": "i64 x1236, x1237"
       },
       {
         "name": [
-          "x1263"
+          "x1239"
         ],
         "operation": "mul",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 0, x1259"
+        "arguments": "i64 0, x1235"
       },
       {
         "name": [
-          "x1264"
+          "x1240"
         ],
         "operation": "add",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1262, x1263"
+        "arguments": "i64 x1238, x1239"
       },
       {
         "name": [
-          "x1265"
+          "x1241"
         ],
         "operation": "or",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1257, x1264"
+        "arguments": "i64 x1233, x1240"
       },
       {
         "name": [
@@ -11357,12 +11141,12 @@
         ],
         "operation": "store",
         "datatype": "i64",
-        "arguments": "i64 x1265, ptr x0",
+        "arguments": "i64 x1241, ptr x0",
         "modifiers": "align 8"
       },
       {
         "name": [
-          "x1266"
+          "x1242"
         ],
         "operation": "icmp",
         "modifiers": "eq",
@@ -11371,7 +11155,7 @@
       },
       {
         "name": [
-          "x1267"
+          "x1243"
         ],
         "operation": "getelementptr",
         "modifiers": "inbounds ",
@@ -11384,12 +11168,12 @@
         ],
         "operation": "store",
         "datatype": "i64",
-        "arguments": "i64 x1227, ptr x1267",
+        "arguments": "i64 x1203, ptr x1243",
         "modifiers": "align 8"
       },
       {
         "name": [
-          "x1268"
+          "x1244"
         ],
         "operation": "icmp",
         "modifiers": "ugt",
@@ -11398,7 +11182,7 @@
       },
       {
         "name": [
-          "x1269"
+          "x1245"
         ],
         "operation": "getelementptr",
         "modifiers": "inbounds ",
@@ -11411,12 +11195,12 @@
         ],
         "operation": "store",
         "datatype": "i64",
-        "arguments": "i64 x1236, ptr x1269",
+        "arguments": "i64 x1212, ptr x1245",
         "modifiers": "align 8"
       },
       {
         "name": [
-          "x1270"
+          "x1246"
         ],
         "operation": "icmp",
         "modifiers": "eq",
@@ -11425,7 +11209,7 @@
       },
       {
         "name": [
-          "x1271"
+          "x1247"
         ],
         "operation": "getelementptr",
         "modifiers": "inbounds ",
@@ -11438,12 +11222,12 @@
         ],
         "operation": "store",
         "datatype": "i64",
-        "arguments": "i64 x1245, ptr x1271",
+        "arguments": "i64 x1221, ptr x1247",
         "modifiers": "align 8"
       },
       {
         "name": [
-          "x1272"
+          "x1248"
         ],
         "operation": "icmp",
         "modifiers": "ugt",
@@ -11452,7 +11236,7 @@
       },
       {
         "name": [
-          "x1273"
+          "x1249"
         ],
         "operation": "getelementptr",
         "modifiers": "inbounds ",
@@ -11465,12 +11249,12 @@
         ],
         "operation": "store",
         "datatype": "i64",
-        "arguments": "i64 x1254, ptr x1273",
+        "arguments": "i64 x1230, ptr x1249",
         "modifiers": "align 8"
       },
       {
         "name": [
-          "x1274"
+          "x1250"
         ],
         "operation": "icmp",
         "modifiers": "eq",
@@ -11479,88 +11263,88 @@
       },
       {
         "name": [
-          "x1275"
+          "x1251"
         ],
         "operation": "and",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1114, x1218"
+        "arguments": "i64 x1114, x1194"
       },
       {
         "name": [
-          "x1276"
+          "x1252"
         ],
         "operation": "zext",
         "modifiers": "",
         "datatype": "i1",
-        "arguments": "i1 x1212 to i64"
+        "arguments": "i1 x1190 to i64"
       },
       {
         "name": [
-          "x1277"
+          "x1253"
         ],
         "operation": "add",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1276, 0"
+        "arguments": "i64 x1252, 0"
       },
       {
         "name": [
-          "x1278"
+          "x1254"
         ],
         "operation": "add",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1202, 0"
+        "arguments": "i64 x1182, 0"
       },
       {
         "name": [
-          "x1279"
+          "x1255"
         ],
         "operation": "sub",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 1, x1277"
+        "arguments": "i64 1, x1253"
       },
       {
         "name": [
-          "x1280"
+          "x1256"
         ],
         "operation": "mul",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1278, x1279"
+        "arguments": "i64 x1254, x1255"
       },
       {
         "name": [
-          "x1281"
+          "x1257"
         ],
         "operation": "mul",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 0, x1277"
+        "arguments": "i64 0, x1253"
       },
       {
         "name": [
-          "x1282"
+          "x1258"
         ],
         "operation": "add",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1280, x1281"
+        "arguments": "i64 x1256, x1257"
       },
       {
         "name": [
-          "x1283"
+          "x1259"
         ],
         "operation": "or",
         "modifiers": "",
         "datatype": "i64",
-        "arguments": "i64 x1275, x1282"
+        "arguments": "i64 x1251, x1258"
       },
       {
         "name": [
-          "x1284"
+          "x1260"
         ],
         "operation": "getelementptr",
         "modifiers": "inbounds ",
@@ -11573,7 +11357,7 @@
         ],
         "operation": "store",
         "datatype": "i64",
-        "arguments": "i64 x1283, ptr x1284",
+        "arguments": "i64 x1259, ptr x1260",
         "modifiers": "align 8"
       }
     ]

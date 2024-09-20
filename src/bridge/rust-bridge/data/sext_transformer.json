@@ -1,0 +1,71 @@
+[
+    {
+        "operation": "bls12_mul",
+        "arguments": [
+            "x1"
+        ],
+        "returns": [
+            {
+                "datatype": "i64*",
+                "name": "x0"
+            }
+        ],
+       "body": [
+      {
+        "name": [
+          "x2"
+        ],
+        "operation": "load",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 ptr x1"
+      },
+      {
+        "name": [
+          "x3"
+        ],
+        "operation": "sub",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 0, x2"
+      },
+      {
+        "name": [
+          "x4"
+        ],
+        "operation": "xor",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x2, 18446744073709551614"
+      },
+      {
+        "name": [
+          "x5"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x3, x4"
+      },
+      {
+        "name": [
+          "x6"
+        ],
+        "operation": "getelementptr",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64, ptr x0, i64 0"
+      },
+      {
+        "name": [
+          "_"
+        ],
+        "operation": "store",
+        "datatype": "i64",
+        "arguments": "i64 x5, ptr x6",
+        "modifiers": "align 8"
+      }
+        ]
+
+    }
+]

@@ -1,4 +1,4 @@
-import { getScalarsAndImmMappedAsConstArg } from "../helpers";
+import { getScalarsAndImmMappedAsConstArgForSub } from "../helpers";
 import type { SSA } from "../raw.type";
 import type { Intermediate } from "./intermediate.type";
 
@@ -10,7 +10,7 @@ export function transformSub(input: SSA): Intermediate {
     throw new Error("unsupported datatype while transform sub.");
   }
 
-  const args = getScalarsAndImmMappedAsConstArg(input.arguments);
+  const args = getScalarsAndImmMappedAsConstArgForSub(input.arguments);
 
   return {
     name: input.name,

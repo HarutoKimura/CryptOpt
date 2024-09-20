@@ -33,7 +33,8 @@ export type OP =
   | "trunc"
   | "xor"
   | "zext"
-  | "sub" ; //raw types
+  | "sub"
+  | "cmovznz" ; //raw types
 export type varName_T = `x${number}`;
 
 export type SSA = {

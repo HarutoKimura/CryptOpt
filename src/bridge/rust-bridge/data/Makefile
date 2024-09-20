@@ -6,12 +6,18 @@ tmp=./pre-
 #Specify the target file name
 #Current inputs are field_wrapp.ll or demangled_field.ll
 TARGET_NAME?=bls12_mul
+TEST_TARGET_NAME?=sext_transformer
 
 #Specify the demangled target file name
 DEMANGLED_TARGET_NAME=demangled_$(TARGET_NAME)
 
+CLEAN_TARGET_NAME = clean_$(TARGET_NAME)
+HALF_CLEAN_TARGET_NAME = half_clean_$(TARGET_NAME)
+
+WRONG_BUT_WORKING_TARGET_NAME = wrong_but_working/wrong_but_working_$(TARGET_NAME)
+
 # Default target
-all: $(DEMANGLED_TARGET_NAME).json $(TARGET_NAME).rs
+all: $(DEMANGLED_TARGET_NAME).json original_rust_and_llvm/$(TARGET_NAME).rs
 
 # %.json: %.ll
 # 	@echo "Converting $< to $@"
@@ -30,10 +36,34 @@ all: $(DEMANGLED_TARGET_NAME).json $(TARGET_NAME).rs
 # 	python3 demangler.py $(TARGET_NAME).rs $(TARGET_NAME).ll $(DEMANGLED_TARGET_NAME).ll
 
 # Gnerate JSON format from demangled LLVM-IR
-$(DEMANGLED_TARGET_NAME).json: $(DEMANGLED_TARGET_NAME).ll
-	@echo "Converting $< to $@"
-	python3 llvm2json.py $< $@
+# $(DEMANGLED_TARGET_NAME).json: $(DEMANGLED_TARGET_NAME).ll
+# 	@echo "Converting $< to $@"
+# 	python3 llvm2json.py $< $@
 
+
+
+# # This part is using the wrong but working version of teh JSON and shared obect file from the LLVM-IR'
+# # Generate object file from LLVM-IR
+# $(WRONG_BUT_WORKING_TARGET_NAME).o: $(WRONG_BUT_WORKING_TARGET_NAME).ll
+# 	cp ${<} ${<}.tmp
+# 	$(LLC) -filetype=obj -opaque-pointers -relocation-model=pic -o ${@} ${<}.tmp
+
+# # Compile shared object from object file
+# %.so: $(WRONG_BUT_WORKING_TARGET_NAME).o
+# 	cp ${<} ${<}.tmp
+# 	$(CC) -fPIC -shared -o ${@} ${?}.tmp
+# 	rm -f $(WRONG_BUT_WORKING_TARGET_NAME).ll.tmp
+# 	rm -f ${?}.tmp
+# 	rm -f $(WRONG_BUT_WORKING_TARGET_NAME).o
+
+# # Clean up generated files
+# distclean:
+# 	rm -f *.ll
+# 	rm -f $(tmp)$(TARGET_NAME).json, $(WRONG_BUT_WORKING_TARGET_NAME).ll, $(WRONG_BUT_WORKING_TARGET_NAME).o
+
+
+
+# Testing to run with the correct JSON and shared object file from the LLVM-IR"
 # Generate object file from LLVM-IR
 $(DEMANGLED_TARGET_NAME).o: $(DEMANGLED_TARGET_NAME).ll
 	cp ${<} ${<}.tmp
@@ -44,10 +74,31 @@ $(DEMANGLED_TARGET_NAME).o: $(DEMANGLED_TARGET_NAME).ll
 	cp ${<} ${<}.tmp
 	$(CC) -fPIC -shared -o ${@} ${?}.tmp
 	rm -f $(DEMANGLED_TARGET_NAME).ll.tmp
-	rm -f ${?}.tmp
+	rm -f ${?}.tmpg
 	rm -f $(DEMANGLED_TARGET_NAME).o
 
 # Clean up generated files
 distclean:
 	rm -f *.ll
 	rm -f $(tmp)$(TARGET_NAME).json, $(DEMANGLED_TARGET_NAME).ll, $(DEMANGLED_TARGET_NAME).o
+
+
+
+# # Testing to run with the correct JSON and shared object file from the LLVM-IR"
+# # Generate object file from LLVM-IR
+# $(TEST_TARGET_NAME).o: $(TEST_TARGET_NAME).ll
+# 	cp ${<} ${<}.tmp
+# 	$(LLC) -filetype=obj -opaque-pointers -relocation-model=pic -o ${@} ${<}.tmp
+
+# # Compile shared object from object file
+# %.so: $(TEST_TARGET_NAME).o
+# 	cp ${<} ${<}.tmp
+# 	$(CC) -fPIC -shared -o ${@} ${?}.tmp
+# 	rm -f $(TEST_TARGET_NAME).ll.tmp
+# 	rm -f ${?}.tmpg
+# 	rm -f $(TEST_TARGET_NAME).o
+
+# # Clean up generated files
+# distclean:
+# 	rm -f *.ll
+# 	rm -f $(tmp)$(TARGET_NAME).json, $(TEST_TARGET_NAME).ll, $(TEST_TARGET_NAME).o

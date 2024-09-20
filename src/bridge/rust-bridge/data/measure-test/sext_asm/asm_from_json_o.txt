@@ -1,0 +1,15 @@
+
+asm_from_json.o:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000000000 <asm_from_json>:
+   0:	b8 00 00 00 00       	mov    $0x0,%eax
+   5:	48 2b 06             	sub    (%rsi),%rax
+   8:	49 c7 c2 fe ff ff ff 	mov    $0xfffffffffffffffe,%r10
+   f:	4c 8b 1e             	mov    (%rsi),%r11
+  12:	4d 31 d3             	xor    %r10,%r11
+  15:	4c 21 d8             	and    %r11,%rax
+  18:	48 89 07             	mov    %rax,(%rdi)
+  1b:	c3                   	ret    

@@ -75,3 +75,15 @@ export function getScalarsAndImmMappedAsConstArg(s: string): CryptOpt.ConstArgum
   });
   return scalarsAsConstArg.concat(immsAsConstArg);
 }
+
+// For transoformation Sub, change the order of imm and scalar to represent -%x1 => 0 - x1120 => 0x0, x1120
+export function getScalarsAndImmMappedAsConstArgForSub(s: string): CryptOpt.ConstArgument[] {
+  const { scalars, imm } = getArguments(s);
+  const scalarsAsConstArg = scalars.map(({ id }) => id as CryptOpt.ConstArgument); // simply extracts the id like x1, x2
+  const immsAsConstArg = imm.map(({ imm }) => { // it converts the immediate value to a hex string
+    const bi = BigInt(imm);
+    const isNeg = bi < 0n;
+    return `${isNeg ? "-" : ""}0x${(isNeg ? bi * -1n : bi).toString(16)}` as CryptOpt.ConstArgument;
+  });
+  return immsAsConstArg.concat(scalarsAsConstArg);
+}

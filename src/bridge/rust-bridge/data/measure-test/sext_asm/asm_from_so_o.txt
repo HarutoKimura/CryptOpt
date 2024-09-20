@@ -1,0 +1,15 @@
+
+asm_from_so.o:     file format elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000000000 <asm_from_so>:
+   0:	48 c7 c0 fe ff ff ff 	mov    $0xfffffffffffffffe,%rax
+   7:	4c 8b 16             	mov    (%rsi),%r10
+   a:	49 31 c2             	xor    %rax,%r10
+   d:	41 bb 00 00 00 00    	mov    $0x0,%r11d
+  13:	4c 2b 1e             	sub    (%rsi),%r11
+  16:	4d 21 d3             	and    %r10,%r11
+  19:	4c 89 1f             	mov    %r11,(%rdi)
+  1c:	c3                   	ret    

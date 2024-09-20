@@ -35,6 +35,7 @@ import {
   transformXor,
   transformZext,
   transformSub,
+  transformCmovznz,
 } from "./transformations";
 import type { Intermediate } from "./transformations/intermediate.type";
 // import { zextR, sextR } from "./transformations/reducers";
@@ -52,10 +53,12 @@ export class RustPreprocessor {
 
     const grouped = groupBy(raw.body, "operation");
 
-    // for simple input test
+    // original one
     if (!["getelementptr", "store", "load"].every((k) => k in grouped)) {
       throw new Error("not all required keys are available. tsnh.");
     }
+
+     
     const { stores, loads } = this.reduceStoreAndLoads(
       grouped as unknown as { getelementptr: SSA[]; load: SSA[]; store: SSA[] },
       body,
@@ -88,6 +91,7 @@ export class RustPreprocessor {
       zext: transformZext,
       icmp: transformIcmp,
       sub: transformSub,
+      cmovznz: transformCmovznz,
     }).reduce((acc, [op, func]) => {
       if (grouped[op]) {
         acc.push(
@@ -115,6 +119,7 @@ export class RustPreprocessor {
     delete grouped.trunc;
     delete grouped.icmp;
     delete grouped.sub;
+    delete grouped.cmovznz;
 
     //original body.concat stores, loads, otherInstrs
     body = body.concat(
