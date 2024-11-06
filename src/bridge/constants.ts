@@ -57,12 +57,14 @@ export const KNOWN_SYMBOLS: {
   fiat_secp256k1_dettman_square: { bridge: "fiat", method: "square", curve: "secp256k1_dettman" },
 
   // bitcoin curve for bitcoin-core, llvm-bitcoin-corem and rust
-  secp256k1_fe_mul_inner: { bridge: "bitcoin-core" || "llvm-bitcoin-core" || "rust", method: "mul", curve: "secp256k1_dettman" },
-  secp256k1_fe_sqr_inner: { bridge: "bitcoin-core" || "llvm-bitcoin-core" || "rust", method: "square", curve: "secp256k1_dettman" },
+  secp256k1_fe_mul_inner: { bridge: "bitcoin-core" , method: "mul", curve: "secp256k1_dettman" },
+  secp256k1_fe_sqr_inner: { bridge: "bitcoin-core" , method: "square", curve: "secp256k1_dettman" },
 
   // rust generated bls curves
   bls12_mul: { bridge: "rust", method: "mul", curve: "bls12_381_p"},
   bls12_square: { bridge: "rust", method: "square", curve: "bls12_381_p"},
+  rust_fiat_curve25519_mul: { bridge: "rust", method: "mul", curve: "curve25519"},
+  rust_fiat_curve25519_square: { bridge: "rust", method: "square", curve: "curve25519"},
   // rust_bls12_381_q_mul: {bridge: "rust", method: "mul", curve: "bls12_381_q"},
   // rust_bls12_381_q_square: {bridge: "rust", method: "square", curve: "bls12_381_q"},
 };

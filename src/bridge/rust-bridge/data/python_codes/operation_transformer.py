@@ -52,13 +52,25 @@ def decompose_sext(sext_instruction):
     # ]
 
 
-    # new transformation for sext operation and it is already tested, sensei formula version 2
+    # # new transformation for sext operation and it is already tested, sensei formula version 2
+    # operations = [
+    #     f"  %{dest}_zext = zext {src_type} %{src} to {dest_type}", # %x2 = zext i1 %x1 to i64
+    #     f"  %{dest}_0 = sub i64 0, %{dest}_zext", # (-%x1)
+    #     f"  %{dest}_1 = xor {dest_type} %{dest}_zext, {2**dest_width - 2}", # %x2 XOR 111,,,,,,1110 (2 ** 64 - 2)
+    #     f"  %{dest} = and {dest_type} %{dest}_0, %{dest}_1", #  (%x2 XOR 111,,,,,,1110) AND (-%x1) 
+    # ]
+
+    # operations = [
+    #     f"  {dest} = cmovznz {condition_data_type} {condition}, {false_value_data_type} {false_value}, {true_value_data_type} {true_value}"
+    # ]
+
+    ## conditional move version
+
+    ## i64 -1 = u64 18446744073709551615
     operations = [
-        f"  %{dest}_zext = zext {src_type} %{src} to {dest_type}", # %x2 = zext i1 %x1 to i64
-        f"  %{dest}_0 = sub i64 0, %{dest}_zext", # (-%x1)
-        f"  %{dest}_1 = xor {dest_type} %{dest}_zext, {2**dest_width - 2}", # %x2 XOR 111,,,,,,1110 (2 ** 64 - 2)
-        f"  %{dest} = and {dest_type} %{dest}_0, %{dest}_1", #  (%x2 XOR 111,,,,,,1110) AND (-%x1) 
+        f" %{dest} = cmovznz {src_type} %{src}, i64 0, i64 18446744073709551615"
     ]
+
 
     # since sub operation maight cause the error, I changed the sub part by using xor and add
 
@@ -89,21 +101,21 @@ def decompose_select(select_instruction):
     result_type = type_parts[1]
     
     # Generate the decomposed operations
-    # previous one using sensei formula
-    operations = [
-        f"  {dest}_condition_zext = zext {condition_data_type} {condition} to i64",
-        f"  {dest}_condtion = add i64 {dest}_condition_zext, 0",
-        f"  {dest}_start = add i64 {false_value}, 0",
-        f"  {dest}_0 = sub i64 1, {dest}_condtion",
-        f"  {dest}_1 = mul i64 {dest}_start, {dest}_0",
-        f"  {dest}_2 = mul i64 {true_value}, {dest}_condtion",
-        f"  {dest} = add i64 {dest}_1, {dest}_2"
-    ]
-
-    # # current one using cmovznz operation
+    # # previous one using sensei formula
     # operations = [
-    #     f"  {dest} = cmovznz {condition_data_type} {condition}, {false_value_data_type} {false_value}, {true_value_data_type} {true_value}"
+    #     f"  {dest}_condition_zext = zext {condition_data_type} {condition} to i64",
+    #     f"  {dest}_condtion = add i64 {dest}_condition_zext, 0",
+    #     f"  {dest}_start = add i64 {false_value}, 0",
+    #     f"  {dest}_0 = sub i64 1, {dest}_condtion",
+    #     f"  {dest}_1 = mul i64 {dest}_start, {dest}_0",
+    #     f"  {dest}_2 = mul i64 {true_value}, {dest}_condtion",
+    #     f"  {dest} = add i64 {dest}_1, {dest}_2"
     # ]
+
+    # current one using cmovznz operation
+    operations = [
+        f"  {dest} = cmovznz {condition_data_type} {condition}, {true_value_data_type} {true_value}, {false_value_data_type} {false_value}"
+    ]
 
     return '\n'.join(operations)
 

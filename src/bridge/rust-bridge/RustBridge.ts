@@ -32,7 +32,8 @@ import { lock } from "proper-lockfile";
 const cwd = resolve(datadir, "rust-bridge");
 
 // so far there are only two json files: demangled_field_mul.json and demangled_field_sqr.json
-const TARGET_JSON = "demangled_bls12_mul.json";
+// const TARGET_JSON = "bls12_mul.json";
+const TARGET_JSON = 'rust_fiat_curve25519_carry_mul.json';
 
 const WORKING_JSON = 'wrong_but_working/wrong_but_working_bls12_mul.json';
 
@@ -43,17 +44,23 @@ const INPUT_JSON = TARGET_JSON;
 
 const createExecOpts = () => {
   const c = { env, cwd, shell: "/usr/bin/bash" };
-  c.env.CFLAGS = `-DUSE_ASM_X86_64 ${c.env.CFLAGS}`;
+  c.env.RUSTC = `-DUSE_ASM_X86_64 ${c.env.RUSTC}`;
   return c;
 };
 
 export class RustBridge implements Bridge {
   private getTargetName(method: METHOD_T): string {
 
+    // const methodToTarget = {
+    //   mul: 'bls12_mul',
+    //   square: 'bls12_square',
+    // };
+
     const methodToTarget = {
-      mul: 'bls12_mul',
-      square: 'bls12_square',
+      mul: 'rust_fiat_curve25519_carry_mul',
+      square: 'rust_fiat_curve25519_carry_square',
     };
+
     return methodToTarget[method];
   }
 
@@ -156,12 +163,13 @@ export class RustBridge implements Bridge {
     return 1;
   }
 
+  // For fiat_curve25519_carry_mul's argwidth and bounds
   public argwidth(_c: string, m: METHOD_T): number {
     switch (m) {
       case "mul":
-        return 6;
+        return 5;
       case "square":
-        return 6;
+        return 5;
 
       // case "scmul": // more like out:8, in0:8
       // case "reduce": // more like out:8, in0:4, in1:4
@@ -169,21 +177,46 @@ export class RustBridge implements Bridge {
     }
   }
   public bounds(_c: string, m: METHOD_T): CryptOpt.HexConstant[] {
-    // from https://github.com/bitcoin-core/secp256k1/blob/423b6d19d373f1224fd671a982584d7e7900bc93/src/field_5x52_int128_impl.h#L162
 
     let bits = [] as number[]; // for field's
     if (m == "mul" || m == "square") {
-      bits = [64,64,64,64,64,64]; // for field's
+      bits = [64,64,64,64,64]; // for field's
     }
 
-    return bits.map((bitwidth) => {
-      if (bitwidth % 4 !== 0) {
-        throw new Error("unsuppoted bitwidth");
-      }
-      bitwidth /= 4;
-      return `0x${Array(bitwidth).fill("f").join("")}` as CryptOpt.HexConstant;
+    return bits.map(() => {
+      
+      return `0x18000000000000` as CryptOpt.HexConstant;
     });
   }
+
+  // For bls12_mul.rs's argwidth and bounds
+  // public argwidth(_c: string, m: METHOD_T): number {
+  //   switch (m) {
+  //     case "mul":
+  //       return 6;
+  //     case "square":
+  //       return 6;
+
+  //     // case "scmul": // more like out:8, in0:8
+  //     // case "reduce": // more like out:8, in0:4, in1:4
+  //     // return 8;
+  //   }
+  // }
+  // public bounds(_c: string, m: METHOD_T): CryptOpt.HexConstant[] {
+
+  //   let bits = [] as number[]; // for field's
+  //   if (m == "mul" || m == "square") {
+  //     bits = [64,64,64,64,64,64]; // for field's
+  //   }
+
+  //   return bits.map((bitwidth) => {
+  //     if (bitwidth % 4 !== 0) {
+  //       throw new Error("unsuppoted bitwidth");
+  //     }
+  //     bitwidth /= 4;
+  //     return `0x${Array(bitwidth).fill("f").join("")}` as CryptOpt.HexConstant;
+  //   });
+  // }
 }
 
 // new BitcoinCoreBridge().getFiatFunction("square");

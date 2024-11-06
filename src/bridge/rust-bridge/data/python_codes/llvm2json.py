@@ -24,16 +24,19 @@ def parse_llvm_ir(file_path):
 
     remaining_args_str = ', '.join(remanining_args)
 
+
+    ######### future work ######### 
+    ## automatically extract the remaining arguments and allocate the memory representation
+    ######## 
+    # this is the only for bls12_mul, very specific case
     # In bls12 case, there are two outputs and four inputs arguments so, just for test, I directly paste the input arguements nopw
     remaining_args_str = "ptr noalias nocapture noundef nonnull writeonly align 8  %out0.0, i64 noundef %out0.1, ptr noalias nocapture noundef nonnull readonly align 8 %in0.0, i64 noundef %in0.1, ptr noalias nocapture noundef nonnull readonly align 8 %in1.0, i64 noundef %in1.1"
     
     # Replace %out0.0 with x0
     # This is the final memory location where the result is stored
     remaining_args_str = re.sub(r'%out0\.0', 'x0', remaining_args_str)
-
     # Replace %out0.1 with x1
     remaining_args_str = re.sub(r'%out0\.1', 'x1', remaining_args_str)
-
     # Replace %in0.0 with x2
     remaining_args_str = re.sub(r'%in0\.0', 'x2', remaining_args_str)
     # Replace %in0.1 with x3
@@ -43,6 +46,11 @@ def parse_llvm_ir(file_path):
     # Replace %in1.1 with x5
     remaining_args_str = re.sub(r'%in1\.1', 'x5', remaining_args_str)
 
+
+    remaining_args_str_fiat = "ptr noalias nocapture noundef writeonly align 8 dereferenceable(40) %out1, ptr noalias nocapture noundef readonly align 8 dereferenceable(40) %arg1, ptr noalias nocapture noundef readonly align 8 dereferenceable(40) %arg2"
+    remaining_args_str_fiat = re.sub(r'%out1', 'x0', remaining_args_str_fiat)
+    remaining_args_str_fiat = re.sub(r'%arg1', 'x1', remaining_args_str_fiat)
+    remaining_args_str_fiat = re.sub(r'%arg2', 'x2', remaining_args_str_fiat)
 
     # # these replacements are for the case of the secp256k1
     # remaining_args_str = re.sub(r'%(\S+)', r'x\1', remaining_args_str)

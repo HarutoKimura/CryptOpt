@@ -5,7 +5,7 @@ tmp=./pre-
 
 #Specify the target file name
 #Current inputs are field_wrapp.ll or demangled_field.ll
-TARGET_NAME?=bls12_mul
+TARGET_NAME?=rust_fiat_curve25519_carry_mul
 TEST_TARGET_NAME?=sext_transformer
 
 #Specify the demangled target file name
@@ -17,7 +17,8 @@ HALF_CLEAN_TARGET_NAME = half_clean_$(TARGET_NAME)
 WRONG_BUT_WORKING_TARGET_NAME = wrong_but_working/wrong_but_working_$(TARGET_NAME)
 
 # Default target
-all: $(DEMANGLED_TARGET_NAME).json original_rust_and_llvm/$(TARGET_NAME).rs
+# all: $(DEMANGLED_TARGET_NAME).json original_rust_and_llvm/$(TARGET_NAME).rs
+all: lib.rs
 
 # %.json: %.ll
 # 	@echo "Converting $< to $@"
@@ -63,25 +64,24 @@ all: $(DEMANGLED_TARGET_NAME).json original_rust_and_llvm/$(TARGET_NAME).rs
 
 
 
-# Testing to run with the correct JSON and shared object file from the LLVM-IR"
-# Generate object file from LLVM-IR
-$(DEMANGLED_TARGET_NAME).o: $(DEMANGLED_TARGET_NAME).ll
-	cp ${<} ${<}.tmp
-	$(LLC) -filetype=obj -opaque-pointers -relocation-model=pic -o ${@} ${<}.tmp
+# # Testing to run with the correct JSON and shared object file from the LLVM-IR"
+# # Generate object file from LLVM-IR
+# $(CLEAN_TARGET_NAME).o: $(CLEAN_TARGET_NAME).ll
+# 	cp ${<} ${<}.tmp
+# 	$(LLC) -filetype=obj -opaque-pointers -relocation-model=pic -o ${@} ${<}.tmp
 
-# Compile shared object from object file
-%.so: $(DEMANGLED_TARGET_NAME).o
-	cp ${<} ${<}.tmp
-	$(CC) -fPIC -shared -o ${@} ${?}.tmp
-	rm -f $(DEMANGLED_TARGET_NAME).ll.tmp
-	rm -f ${?}.tmpg
-	rm -f $(DEMANGLED_TARGET_NAME).o
+# # Compile shared object from object file
+# %.so: $(CLEAN_TARGET_NAME).o
+# 	cp ${<} ${<}.tmp
+# 	$(CC) -fPIC -shared -o ${@} ${?}.tmp
+# 	rm -f $(CLEAN_TARGET_NAME).ll.tmp
+# 	rm -f ${?}.tmpg
+# 	rm -f $(CLEAN_TARGET_NAME).o
 
-# Clean up generated files
-distclean:
-	rm -f *.ll
-	rm -f $(tmp)$(TARGET_NAME).json, $(DEMANGLED_TARGET_NAME).ll, $(DEMANGLED_TARGET_NAME).o
-
+# # Clean up generated files
+# distclean:
+# 	rm -f *.ll
+# 	rm -f $(tmp)$(TARGET_NAME).json, $(CLEAN_TARGET_NAME).ll, $(CLEAN_TARGET_NAME).o
 
 
 # # Testing to run with the correct JSON and shared object file from the LLVM-IR"
@@ -102,3 +102,28 @@ distclean:
 # distclean:
 # 	rm -f *.ll
 # 	rm -f $(tmp)$(TARGET_NAME).json, $(TEST_TARGET_NAME).ll, $(TEST_TARGET_NAME).o
+
+
+
+
+##### New version I can firecly shared object file from Rust file.
+
+# # Compile shared object from object file
+# %.so:  original_rust_and_llvm/lib.rs
+# 	cp ${<} ${<}.tmp
+# 	rustc --crate-type=cdylib ${@} ${?}.tmp
+# 	rm -f ${?}.tmp
+
+
+# # Compile shared object from object file
+# %.so: $(TARGET_NAME).rs
+# 	rustc -v --crate-type=cdylib -o ${@} ${<} 
+
+# Compile shared object from object file with opt-level=1
+%.so: $(TARGET_NAME).rs
+	rustc -C opt-level=1 --crate-type=cdylib -o ${@} ${<} 
+
+# Clean up generated files
+distclean:
+	rm -f *.ll
+	rm -f $(tmp)$(TARGET_NAME).json, $(CLEAN_TARGET_NAME).ll, $(CLEAN_TARGET_NAME).o

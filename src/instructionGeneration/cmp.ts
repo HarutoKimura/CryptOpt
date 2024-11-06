@@ -59,7 +59,28 @@ export function cmp(c: CryptOpt.StringOperation): asm[] {
     throw new Error("cannot compare byte w qword or so.");
   }
   const pres = ra.pres; // include stuff like mov BIG to in1, or save CF's
-  const compare = `cmp ${in0}, ${in1}`;
+
+  ////////addtitional part
+  // Determine the size specifier
+  let sizeSpecifier = '';
+  if (isImm(compareVar)) {
+    // Determine the size based on the register or memory location
+    if (in0.startsWith('r') || in0.includes('rsp') || in0.includes('rbp')) {
+      sizeSpecifier = 'qword ';
+    } else if (in0.startsWith('e')) {
+      sizeSpecifier = 'dword ';
+    } else if (isByteRegister(in0)) {
+      sizeSpecifier = 'byte ';
+    } else {
+      sizeSpecifier = 'word '; // Default to word 
+    }
+  }
+
+  const compare = `cmp ${sizeSpecifier}${in0}, ${in1}`;
+  ///////////
+
+
+  // const compare = `cmp ${in0}, ${in1}`;
   const set = llvm2CC[condition as unknown as keyof typeof llvm2CC];
   if (set == "setb") {
     ra.declareFlagState(Flags.OF, FlagState.KILLED);

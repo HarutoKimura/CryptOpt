@@ -25,7 +25,7 @@ export * from "./const/mul_di_mapping";
 export * from "./const/RegisterConstants";
 export { LSB_MAPPING };
 
-export const COMPILERS = ["gcc", "clang"];
+export const COMPILERS = ["gcc", "clang", "rustc"];
 
 export const ARG_PREFIX = "arg"; // prefix as in arg1[3]
 export const OUT_PREFIX = "out"; // prefix as in out2[2]

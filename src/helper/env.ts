@@ -22,6 +22,7 @@ export const env = defaults(process.env, {
   CC: "gcc",
   CFLAGS: "-march=native -mtune=native -O3",
   LLC: "llc",
+  RUSTC: "rustc",
 });
 
 const me = fileURLToPath(import.meta.url);
