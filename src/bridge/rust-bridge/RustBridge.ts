@@ -24,23 +24,12 @@ import type { CryptOpt } from "@/types";
 
 import { lockAndRunOrReturn } from "../bridge.helper";
 import { Bridge } from "../bridge.interface";
-import { AVAILABLE_METHODS, METHOD_DETAILS, METHOD_T } from "./constants";
+import { RUST_AVAILABLE_METHODS, RUST_AVAILABLE_CURVES, METHOD_T, CURVE_T, RUST_CURVE_DETAILS, RUST_SYMBOLS} from "./constants";
 import { RustPreprocessor } from "./preprocess";
 import type { raw_T } from "./raw.type";
 import { lock } from "proper-lockfile";
 
 const cwd = resolve(datadir, "rust-bridge");
-
-// so far there are only two json files: demangled_field_mul.json and demangled_field_sqr.json
-// const TARGET_JSON = "bls12_mul.json";
-const TARGET_JSON = 'rust_fiat_curve25519_carry_mul.json';
-
-const WORKING_JSON = 'wrong_but_working/wrong_but_working_bls12_mul.json';
-
-const TEST_JSON = "sext_transformer.json";
-
-const INPUT_JSON = TARGET_JSON; 
-// const INPUT_JSON = WORKING_JSON;
 
 const createExecOpts = () => {
   const c = { env, cwd, shell: "/usr/bin/bash" };
@@ -49,174 +38,100 @@ const createExecOpts = () => {
 };
 
 export class RustBridge implements Bridge {
-  private getTargetName(method: METHOD_T): string {
 
-    // const methodToTarget = {
-    //   mul: 'bls12_mul',
-    //   square: 'bls12_square',
-    // };
-
-    const methodToTarget = {
-      mul: 'rust_fiat_curve25519_carry_mul',
-      square: 'rust_fiat_curve25519_carry_square',
-    };
-
-    return methodToTarget[method];
-  }
-
-  private generateJsonFile(method: METHOD_T): void {
-    const targetName = this.getTargetName(method);
-    // const jsonFileName = `demangled_${targetName}.json`;
-    const jsonFileName = INPUT_JSON;  // target json or WORKING_JSON
-    const jsonFilePath = resolve(cwd, jsonFileName);
-
-    if (!existsSync(jsonFilePath)) {
-      console.log(`Generating ${jsonFileName}...`);
-      try {
-        execSync(`make -C ${cwd} TARGET_NAME=${targetName} ${jsonFileName}`, {
-          stdio: 'inherit',
-          env: { ...process.env, CFLAGS: `-DUSE_ASM_X86_64 ${process.env.CFLAGS || ''}` }
-        });
-      } catch (error) {
-        console.error(`Error generating ${jsonFileName}:`, error);
-        throw error;
-      }
+  public getCryptOptFunction(method: METHOD_T, curve: CURVE_T): CryptOpt.Function {
+    // Some basic checks
+    if (!RUST_AVAILABLE_METHODS.includes(method)) {
+      throw new Error(`unsupported method '${method}'. Choose from ${RUST_AVAILABLE_METHODS.join(", ")}.`);
     }
-  }
-
-
-  public getCryptOptFunction(method: METHOD_T, _curve?: string): CryptOpt.Function {
-    console.log('Entering getCryptOptFunction', { method, _curve });
-    if (!(method in METHOD_DETAILS)) {
-      throw new Error(`unsupported method '${method}'. Choose from ${AVAILABLE_METHODS.join(", ")}.`);
+    if (!RUST_AVAILABLE_CURVES.includes(curve)) {
+      throw new Error(`unsupported curve '${curve}'. Choose from ${RUST_AVAILABLE_CURVES.join(", ")}`);
     }
 
-    this.generateJsonFile(method);
+    // 1) figure out which JSON file to read
+    const { rustFnName, jsonFile } = RUST_SYMBOLS[curve][method];
+    const fullPath = resolve(cwd, jsonFile);
 
-    const targetName = this.getTargetName(method);
-    // const target_json = `demangled_${targetName}.json`; // default
-    const target_json = INPUT_JSON;  // as the test using wrong but working file
-    const raw = JSON.parse(readFileSync(resolve(cwd, target_json)).toString()) as Array<raw_T>;
-    //const raw = JSON.parse(readFileSync("/home/harutok/CryptOpt/src/bridge/bitcoin-core-bridge/data/field.json").toString()) as Array<raw_T>;
-    console.log("Input Json file", raw);
+    // 2) Possibly generate the .json file if it doesn't exist:
+    if (!existsSync(fullPath)) {
+      // call `make -C ...` or whatever we do to generate it
+      const makeCmd = `make -C ${cwd} CURVE=${curve} METHOD=${method} JSON=${jsonFile}`;
+      Logger.log(`Generating JSON via: ${makeCmd}`);
+      lockAndRunOrReturn(fullPath, makeCmd, { shell: "/usr/bin/bash", env });
+    }
 
-    //  "operation": "secp256k1_fe_mul_inner" would be the name of the function
-    //  if that operation is found in the raw json file, then we can proceed
-    const found = raw.find(({ operation }) => operation == METHOD_DETAILS[method].name);
-    console.log("Found", found);
-
+    // 3) read the file
+    const rawAll = JSON.parse(readFileSync(fullPath, "utf8")) as raw_T[];
+    // find the block that has "operation" == rustFnName
+    const found = rawAll.find(({ operation }) => operation === rustFnName);
     if (!found) {
       throw new Error(
-        `${METHOD_DETAILS[method].name} not found. TSNH. Available '#${raw.length}':${raw.map(
-          ({ operation }) => operation,
-        )}`,
+        `Operation '${rustFnName}' not found in '${jsonFile}'. We have: ${rawAll.map((x) => x.operation)}`,
       );
     }
 
-    console.log("before preprocessRaw", found);
-    // raw preprocessing (i.e. llvm->fiat)
-    // input the raw json file to preprocessRaw and output the fiat json file.
+    // 4) run our "RustPreprocessor", turning that single raw block → "Fiat JSON"
     const fiat = new RustPreprocessor().preprocessRaw(found);
-    console.log("after preprocessRaw", fiat);
 
-    // 'normal' preprocessing (fiat-> cryptopt)
+    // 5) run the "Fiat → CryptOpt" pass
     const cryptOpt = preprocessFunction(fiat);
     return cryptOpt;
   }
 
-  public machinecode(filename: string, method: METHOD_T): string {
+
+
+  public machinecode(filename: string, method: METHOD_T, curve: CURVE_T): string {
     if (!filename.endsWith(".so")) {
-      throw Error(`filename must end with .so, but instead is '${filename}'`);
+      throw Error(`filename must end with .asm, but instead is '${filename}'`);
     }
+
+    console.log(`Generating machinecode for ${method}...`);
   
 
     const opts = createExecOpts();
+
+    console.log(`opts: ${JSON.stringify(opts)}`);
+
     const command = `make -C ${cwd} all`; // to get LLVM-IR file
+
+    const { rustFnName } = RUST_SYMBOLS[curve][method];
+
+    console.log(`cmd to generate machinecode: ${command} w opts: ${JSON.stringify(opts)}`);
     Logger.log(`cmd to generate machinecode: ${command} w opts: ${JSON.stringify(opts)}`);
-    const targetName = this.getTargetName(method);
     try {
   
       lockAndRunOrReturn(cwd, command, opts);
       // Generate shared object file
-      const soCommand = `make -C ${cwd} TARGET_NAME=${targetName} ${filename}`;
+      const soCommand = `make -C ${cwd} TARGET_NAME=${rustFnName} ${filename}`;
+      console.log(`cmd to generate shared object file: ${soCommand} w opts: ${JSON.stringify(opts)}`);
       Logger.log(`cmd to generate shared object file: ${soCommand} w opts: ${JSON.stringify(opts)}`);
       execSync(soCommand, opts);
+      console.log(`Shared object file generated: ${filename}`);
     } catch (e) {
+      console.log(`Error generating machinecode: ${e}`);
       errorOut(ERRORS.bcbMakeFail);
     }
   
-    return METHOD_DETAILS[method].name;
+    return rustFnName;
   }
 
-
   public argnumin(m: METHOD_T): number {
-    switch (m) {
-      case "square":
-        return 1;
-
-      case "mul":
-        return 2;
-    }
+    return m === "square" ? 1 : 2;
   }
 
   public argnumout(_m: METHOD_T): number {
     return 1;
   }
 
-  // For fiat_curve25519_carry_mul's argwidth and bounds
-  public argwidth(_c: string, m: METHOD_T): number {
-    switch (m) {
-      case "mul":
-        return 5;
-      case "square":
-        return 5;
-
-      // case "scmul": // more like out:8, in0:8
-      // case "reduce": // more like out:8, in0:4, in1:4
-      // return 8;
-    }
-  }
-  public bounds(_c: string, m: METHOD_T): CryptOpt.HexConstant[] {
-
-    let bits = [] as number[]; // for field's
-    if (m == "mul" || m == "square") {
-      bits = [64,64,64,64,64]; // for field's
-    }
-
-    return bits.map(() => {
-      
-      return `0x18000000000000` as CryptOpt.HexConstant;
-    });
+  /**
+   * Looks up the curve details in our RUST_CURVE_DETAILS. 
+   * Just like FiatBridge.
+   */
+  public argwidth(curve: CURVE_T, _method: METHOD_T): number {
+    return RUST_CURVE_DETAILS[curve].argwidth;
   }
 
-  // For bls12_mul.rs's argwidth and bounds
-  // public argwidth(_c: string, m: METHOD_T): number {
-  //   switch (m) {
-  //     case "mul":
-  //       return 6;
-  //     case "square":
-  //       return 6;
-
-  //     // case "scmul": // more like out:8, in0:8
-  //     // case "reduce": // more like out:8, in0:4, in1:4
-  //     // return 8;
-  //   }
-  // }
-  // public bounds(_c: string, m: METHOD_T): CryptOpt.HexConstant[] {
-
-  //   let bits = [] as number[]; // for field's
-  //   if (m == "mul" || m == "square") {
-  //     bits = [64,64,64,64,64,64]; // for field's
-  //   }
-
-  //   return bits.map((bitwidth) => {
-  //     if (bitwidth % 4 !== 0) {
-  //       throw new Error("unsuppoted bitwidth");
-  //     }
-  //     bitwidth /= 4;
-  //     return `0x${Array(bitwidth).fill("f").join("")}` as CryptOpt.HexConstant;
-  //   });
-  // }
+  public bounds(curve: CURVE_T, _method: METHOD_T): CryptOpt.HexConstant[] {
+    return RUST_CURVE_DETAILS[curve].bounds as CryptOpt.HexConstant[];
+  }
 }
-
-// new BitcoinCoreBridge().getFiatFunction("square");

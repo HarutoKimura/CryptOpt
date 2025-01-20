@@ -61,10 +61,45 @@ export const KNOWN_SYMBOLS: {
   secp256k1_fe_sqr_inner: { bridge: "bitcoin-core" , method: "square", curve: "secp256k1_dettman" },
 
   // rust generated bls curves
-  bls12_mul: { bridge: "rust", method: "mul", curve: "bls12_381_p"},
-  bls12_square: { bridge: "rust", method: "square", curve: "bls12_381_p"},
-  rust_fiat_curve25519_mul: { bridge: "rust", method: "mul", curve: "curve25519"},
-  rust_fiat_curve25519_square: { bridge: "rust", method: "square", curve: "curve25519"},
+  bls12_mul: { bridge: "rust", method: "mul", curve: "bls12_381_p"}, // done
+  bls12_square: { bridge: "rust", method: "square", curve: "bls12_381_p"}, 
+  
+  rust_fiat_curve25519_mul: { bridge: "rust", method: "mul", curve: "curve25519"}, // done
+  rust_fiat_curve25519_square: { bridge: "rust", method: "square", curve: "curve25519"}, 
+
+  rust_fiat_curve25519_solinas_mul: { bridge: "rust", method: "mul", curve: "curve25519_solinas"}, // runnanble but not good
+  rust_fiat_curve25519_solinas_square: { bridge: "rust", method: "square", curve: "curve25519_solinas"}, // runnanble but not good
+
+  rust_fiat_p224_mul: { bridge: "rust", method: "mul", curve: "p224"},
+  rust_fiat_p224_square: { bridge: "rust", method: "square", curve: "p224"},
+
+  rust_fiat_p256_mul: { bridge: "rust", method: "mul", curve: "p256"},
+  rust_fiat_p256_square: { bridge: "rust", method: "square", curve: "p256"},
+
+  rust_fiat_p384_mul: { bridge: "rust", method: "mul", curve: "p384"},
+  rust_fiat_p384_square: { bridge: "rust", method: "square", curve: "p384"},
+
+  rust_fiat_p434_mul: { bridge: "rust", method: "mul", curve: "p434"},
+  rust_fiat_p434_square: { bridge: "rust", method: "square", curve: "p434"},
+
+  rust_fiat_p448_solinas_carry_mul: { bridge: "rust", method: "mul", curve: "p448_solinas"}, //done
+  rust_fiat_p448_solinas_square: { bridge: "rust", method: "square", curve: "p448_solinas"},
+
+  rust_fiat_p521_mul: { bridge: "rust", method: "mul", curve: "p521"}, //done
+  rust_fiat_p521_square: { bridge: "rust", method: "square", curve: "p521"}, 
+
+  rust_fiat_poly1305_carry_mul: { bridge: "rust", method: "mul", curve: "poly1305"}, //done
+  rust_fiat_poly1305_carry_square: { bridge: "rust", method: "square", curve: "poly1305"},
+
+  rust_fiat_secp256k1_montgomery_mul: { bridge: "rust", method: "mul", curve: "secp256k1_montgomery"}, 
+  rust_fiat_secp256k1_montgomery_square: { bridge: "rust", method: "square", curve: "secp256k1_montgomery"},
+
+  rust_fiat_secp256k1_dettman_mul: { bridge: "rust", method: "mul", curve: "secp256k1_dettman"}, //done
+  rust_fiat_secp256k1_dettman_square: { bridge: "rust", method: "square", curve: "secp256k1_dettman"},
+
+  // new curve after CryptOpt publication
+  rust_fiat_sm2_mul: { bridge: "rust", method: "mul", curve: "sm2"},
+  rust_fiat_sm2_square: { bridge: "rust", method: "square", curve: "sm2"},
   // rust_bls12_381_q_mul: {bridge: "rust", method: "mul", curve: "bls12_381_q"},
   // rust_bls12_381_q_square: {bridge: "rust", method: "square", curve: "bls12_381_q"},
 };

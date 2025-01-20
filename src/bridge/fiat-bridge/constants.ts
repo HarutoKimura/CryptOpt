@@ -35,6 +35,7 @@ export const AVAILABLE_CURVES = [
   "poly1305",
   "secp256k1_montgomery",
   "secp256k1_dettman",
+  "sm2",
 ] as const;
 export const AVAILABLE_METHODS = ["square", "mul" /* currently unsupported "mul2", , "add", "sub"*/] as const;
 
@@ -254,5 +255,14 @@ export const CURVE_DETAILS: {
       "0x1ffffffffffffe",
       "0x1fffffffffffe",
     ],
+  },
+
+  // new curve in fiat-cryptography: sm2_64.rs
+  sm2: {
+    argwidth: 4,
+    bitwidth: 64,
+    prime: "2^256 - 2^224 - 2^96 + 2^64 - 1",
+    binary: BINS.wbw_montgomery,
+    bounds: ["0xffffffffffffffff", "0xffffffffffffffff", "0xffffffffffffffff", "0xffffffffffffffff"],
   },
 };
