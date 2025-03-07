@@ -24,9 +24,13 @@ all: lib.rs
 # 	@echo "Converting $< to $@"
 # 	python3 llvm2json.py $< $@
 
-# Original commnand to generate LLVM-IR From Rust source
+# Original commnand to generate LLVM-IR From Rust source, previously I use opt-level=1, but now I change to opt-level=3
 # $(TARGET_NAME).ll: $(TARGET_NAME).rs
-# rustc --crate-type=lib --emit=llvm-ir -C opt-level=1 ${<} -o ${@}
+# rustc --crate-type=lib --emit=llvm-ir -C opt-level=3 ${<} -o ${@} // This is the original command
+
+# but then since when I generate .so and .asm file, I use --crate-type=cdylib, I need to change the command to:
+# the output is totally the same.
+# rustc --crate-type=cdylib --emit=llvm-ir -C opt-level=1 ${<} -o ${@}
 
 # Generate LLVM IR from Rust source
 # $(TARGET_NAME).ll: $(TARGET_NAME).rs
@@ -119,9 +123,48 @@ all: lib.rs
 # %.so: $(TARGET_NAME).rs
 # 	rustc -v --crate-type=cdylib -o ${@} ${<} 
 
+
+# # Compile LLVM-IR from Rust file with opt-level=1
+# %.ll: $(TARGET_NAME).rs
+# 	rustc -C opt-level=1 --crate-type=cdylib --emit=llvm-ir -o ${@} ${<}
+
+# # Compile object file from LLVM-IR with opt-level=1 for bls12 case
+# %.ll: $(TARGET_NAME).rs
+# 	rustc -C opt-level=1 --crate-type=cdylib --emit=llvm-ir symbol-mangling-version=v0 -o ${@} ${<}
+
 # Compile shared object from object file with opt-level=1
-%.so: $(TARGET_NAME).rs
-	rustc -C opt-level=1 --crate-type=cdylib -o ${@} ${<} 
+# but now I change the opt-level to 3 to get the best performance
+# %.so: $(TARGET_NAME).rs
+# 	rustc -C opt-level=1 --crate-type=cdylib -o ${@} ${<} 
+
+# %.so: $(TARGET_NAME).rs
+# 	rustc --crate-type=cdylib -o ${@} ${<} 
+
+## original version for Rust
+# %.so: $(TARGET_NAME).rs
+# 	rustc -C opt-level=3 --crate-type=cdylib -o ${@} ${<} 
+
+## test version for C
+%.so: $(TARGET_NAME).c
+	$(CC) -fPIC -shared -O3 -o ${@} ${<}
+
+# # Seocnd new version 
+# # Compile .asm file from Rust file with opt-level=1
+# %.asm: $(TARGET_NAME).rs
+# 	rustc -C opt-level=1 --crate-type=cdylib -C llvm-args=-x86-asm-syntax=intel --emit=asm -o ${@} ${<}
+
+# ## Newest Version
+# # Compile .asm file from Rust file with opt-level=1 and also x86-asm-syntax=intel and supported operation syntux by AssemblyLine
+# # Then python script to clean up the .asm file
+# %.asm: $(TARGET_NAME).rs
+# 	rustc -C opt-level=1 \
+#       --crate-type=cdylib \
+#       -C target-feature=+bmi2 \
+#       -C llvm-args="-x86-asm-syntax=intel" \
+#       --emit=asm \
+# 	  -o ${@} ${<}
+# 	python3 asm-cleaner.py ${@} ${@}
+
 
 # Clean up generated files
 distclean:

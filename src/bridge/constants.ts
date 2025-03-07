@@ -102,4 +102,7 @@ export const KNOWN_SYMBOLS: {
   rust_fiat_sm2_square: { bridge: "rust", method: "square", curve: "sm2"},
   // rust_bls12_381_q_mul: {bridge: "rust", method: "mul", curve: "bls12_381_q"},
   // rust_bls12_381_q_square: {bridge: "rust", method: "square", curve: "bls12_381_q"},
+
+  c_fiat_curve25519_carry_mul: { bridge: "rust", method: "mul", curve: "curve25519"},
+  c_fiat_curve25519_carry_square: { bridge: "rust", method: "square", curve: "curve25519"},
 };
