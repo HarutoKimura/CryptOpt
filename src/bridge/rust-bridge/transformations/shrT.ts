@@ -35,7 +35,7 @@ function shr(input: SSA): Intermediate {
       name: input.name,
       datatype: "u64",
       operation: "limb",
-      arguments: [scalars[0].id, "1"],
+      arguments: [scalars[0].id, "1"],// in u64 case, 0 or 1 don't mattar since this is for splitting u128 into 2 * u64
     };
   }
   const args = getScalarsAndImmMappedAsConstArg(input.arguments);

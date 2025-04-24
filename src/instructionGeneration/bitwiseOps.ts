@@ -78,6 +78,8 @@ export function bitwiseOp(c: CryptOpt.StringOperation): asm[] {
 
       switch (choice) {
         case C_DI_INSTRUCTION_AND.C_BZHI:
+          // console.log("bzhi");
+          // console.log(c);
           return [comment, ...bzhi(c)];
         case C_DI_INSTRUCTION_AND.C_AND:
           return [comment, ...and(c)];
@@ -148,28 +150,68 @@ function and(_c: CryptOpt.StringOperation): asm[] {
 }
 
 function and128(c: CryptOpt.StringOperation): asm[] {
+  // console.log("and128 started");
   const ra = RegisterAllocator.getInstance();
   ra.initNewInstruction(c);
-  // first usecase:
-  //
-  // arguments[0] is xDD && u128 and arguments[1] is u128 imm
+
   if (c.arguments.length !== 2) {
     throw new Error("currently unsupported, to have more than 2 args in and128");
   }
-  if (!matchXD(c.arguments[0]) || ra.getCurrentAllocations()[c.arguments[0]].datatype !== "u128") {
-    throw new Error("arg[0] must be xdd(u128)");
-  }
-
-  if (!matchIMM(c.arguments[1])) {
-    throw new Error("arg[1] must be imm");
-  }
-  const immlimbs = limbifyImm(c.arguments[1]);
 
   let res = [] as asm[];
-  if (immlimbs.length > 1) {
+  
+  // Case 1: arg0 is xd(u128) and arg1 is imm: this is the original one
+  if (matchXD(c.arguments[0]) && 
+      ra.getCurrentAllocations()[c.arguments[0]]?.datatype === "u128" && 
+      matchIMM(c.arguments[1])) {
+    
+    const immlimbs = limbifyImm(c.arguments[1]);
+    // console.log("immlimbs", immlimbs); // 0xfffffffffffffffff 64 bit imm
+
+    if (immlimbs.length > 1) {
+      const allocation = ra.allocate({
+        oReg: limbify(c.name),
+        in: [...limbify(c.arguments[0]), ...immlimbs],
+        allocationFlags:
+          AllocationFlags.IN_0_AS_OUT_REGISTER |
+          AllocationFlags.SAVE_FLAG_OF |
+          AllocationFlags.SAME_SIZE_READ |
+          AllocationFlags.SAVE_FLAG_CF |
+          AllocationFlags.DISALLOW_XMM |
+          AllocationFlags.DISALLOW_IMM,
+      });
+      ra.declare128(c.name[0]);
+      res = [
+        ...ra.pres,
+        `and ${allocation.oReg[0]}, ${allocation.in[2]}`,
+        `mov ${allocation.oReg[1]}, ${allocation.in[1]}`,
+        `and ${allocation.oReg[1]}, ${allocation.in[3]}`,
+      ];
+    } else {
+      const allocation = ra.allocate({ //hehehehe
+        oReg: c.name,
+        in: [limbify(c.arguments[0])[0], c.arguments[1]],
+        allocationFlags:
+          AllocationFlags.IN_0_AS_OUT_REGISTER |
+          AllocationFlags.SAME_SIZE_READ |
+          AllocationFlags.SAVE_FLAG_OF |
+          AllocationFlags.SAVE_FLAG_CF |
+          AllocationFlags.DISALLOW_XMM |
+          AllocationFlags.DISALLOW_IMM,
+      });
+
+      ra.zext(c.name[0], c.name[0]);
+      res = [...ra.pres, `and ${allocation.oReg[0]}, ${allocation.in[1]}; lo limb and'ed`]; // and r11, r9; x327_0 & 0xffffffffffffffff
+    }
+  }
+  // Case 2: arg0 is u64 and arg1 is xd(u128) edge case from rust_fiat_p256
+  else if (ra.getCurrentAllocations()[c.arguments[0]]?.datatype === "u64" && 
+           matchXD(c.arguments[1]) && 
+           ra.getCurrentAllocations()[c.arguments[1]]?.datatype === "u128") {
+    
     const allocation = ra.allocate({
       oReg: limbify(c.name),
-      in: [...limbify(c.arguments[0]), ...immlimbs],
+      in: [c.arguments[0], ...limbify(c.arguments[1])],
       allocationFlags:
         AllocationFlags.IN_0_AS_OUT_REGISTER |
         AllocationFlags.SAVE_FLAG_OF |
@@ -178,31 +220,23 @@ function and128(c: CryptOpt.StringOperation): asm[] {
         AllocationFlags.DISALLOW_XMM |
         AllocationFlags.DISALLOW_IMM,
     });
+
     ra.declare128(c.name[0]);
     res = [
       ...ra.pres,
-      // `mov ${allocation.oReg[0]}, ${allocation.in[0]}`,// done via flag
-      `and ${allocation.oReg[0]}, ${allocation.in[2]}`,
-      `mov ${allocation.oReg[1]}, ${allocation.in[1]}`,
-      `and ${allocation.oReg[1]}, ${allocation.in[3]}`,
+      `and ${allocation.oReg[0]}, ${allocation.in[1]}; and with low limb`,  // Since arg0 is u64, high bits should be 0
     ];
-  } else {
-    // only lo limb, since hi-limb will be zero'ed anyway
-    const allocation = ra.allocate({
-      oReg: c.name,
-      in: [limbify(c.arguments[0])[0], c.arguments[1]],
-      allocationFlags:
-        AllocationFlags.IN_0_AS_OUT_REGISTER |
-        AllocationFlags.SAME_SIZE_READ |
-        AllocationFlags.SAVE_FLAG_OF |
-        AllocationFlags.SAVE_FLAG_CF |
-        AllocationFlags.DISALLOW_XMM |
-        AllocationFlags.DISALLOW_IMM,
-    });
-
-    ra.zext(c.name[0], c.name[0]);
-    res = [...ra.pres, `and ${allocation.oReg[0]}, ${allocation.in[1]}; lo limb and'ed`];
   }
+  else {
+    throw new Error(
+      `Unsupported argument types in and128: arg0=${c.arguments[0]}(${
+        ra.getCurrentAllocations()[c.arguments[0]]?.datatype
+      }), arg1=${c.arguments[1]}(${
+        ra.getCurrentAllocations()[c.arguments[1]]?.datatype
+      })`
+    );
+  }
+
   ra.declareFlagState(Flags.CF, FlagState.ZERO);
   ra.declareFlagState(Flags.OF, FlagState.ZERO);
   return res;
@@ -213,6 +247,7 @@ function bzhi(_c: CryptOpt.StringOperation): asm[] {
   const c = cloneDeep(_c);
   const ra = RegisterAllocator.getInstance();
   const allocs = ra.getCurrentAllocations();
+  // console.log("bzhi started and the allocation is:", allocs);
   ra.initNewInstruction(c);
   if (c.datatype === "u128" && c.arguments[1].length > IMM_64_BIT_IMM.length) {
     /*cannot happen at the moment, because then the bzhi would not be in decisions, because the imm would be >64bit, which is currently not in LSB_MAPPING*/

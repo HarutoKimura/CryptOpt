@@ -180,6 +180,8 @@ export class Optimizer {
             const p = pathResolve(this.libcheckfunctionDirectory, "with_undefined.asm");
             writeString(p, this.asmStrings[FUNCTIONS.F_A]);
 
+            console.log("asm string:",this.asmStrings[FUNCTIONS.F_A]);
+
             const e = `\n\n\nNah... we dont want undefined; wrote ${p}, plx fix. \n\n\n`;
             console.error(e);
             throw new Error(e);
@@ -210,6 +212,18 @@ export class Optimizer {
               this.asmStrings[FUNCTIONS.F_B],
             ]);
             Logger.log("well done guys. The results are in!");
+
+
+            if (results) {
+              console.log("Measurement results:", {
+                numFunctions: results.stats.numFunctions,
+                functionTypes: results.functions.map(f => f.type),
+                numCycleArrays: results.cycles.length
+              });
+            } else {
+              console.error("Measurement results are null");
+            }
+            
 
             accumulatedTimeSpentByMeasuring += Date.now() - now_measure;
 
@@ -248,7 +262,7 @@ export class Optimizer {
             errorOut(ERRORS.measureGeneric);
           }
 
-          const [meanrawA, meanrawB, meanrawCheck] = analyseResult.rawMedian;
+          const [meanrawA, meanrawB, meanrawCheck] = analyseResult.rawMedian; // meausrawCheck is the median of the check function (the shared object file)
 
           batchSize = Math.ceil((Number(this.args.cyclegoal) / meanrawCheck) * batchSize);
           // We want to limit for some corner cases.

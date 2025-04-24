@@ -28,7 +28,7 @@ start:
   %_353.not = icmp eq i64 %in0.1, 0
   %x0 = load i64, ptr %in0.0, align 8, !noundef !4
   %_356.not = icmp eq i64 %in0.1, 1
-  %0 = getelementptr inbounds [0 x i64], ptr %in0.0, i64 0, i64 1
+  
   %x1 = load i64, ptr %0, align 8, !noundef !4
   %_359 = icmp ugt i64 %in0.1, 2
   %1 = getelementptr inbounds [0 x i64], ptr %in0.0, i64 0, i64 2
@@ -37,7 +37,7 @@ start:
   %2 = getelementptr inbounds [0 x i64], ptr %in0.0, i64 0, i64 3
   %x3 = load i64, ptr %2, align 8, !noundef !4
   %_365 = icmp ugt i64 %in0.1, 4
-  %3 = getelementptr inbounds [0 x i64], ptr %in0.0, i64 0, i64 4
+  %3 = getelementptr inbounds [0 x i64], ptr %in0.0, i64 0, i64 4%0 = getelementptr inbounds [0 x i64], ptr %in0.0, i64 0, i64 1
   %x4 = load i64, ptr %3, align 8, !noundef !4
   %_368.not = icmp eq i64 %in0.1, 5
   %4 = getelementptr inbounds [0 x i64], ptr %in0.0, i64 0, i64 5

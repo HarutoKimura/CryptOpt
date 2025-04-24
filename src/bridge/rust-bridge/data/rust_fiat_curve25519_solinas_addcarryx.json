@@ -1,0 +1,97 @@
+[
+  {
+    "operation": "fiat_curve25519_solinas_addcarryx_u64",
+    "arguments": [
+      "x1, x2, x3"
+    ],
+    "returns": [
+      {
+        "datatype": "i64*",
+        "name": "x0"
+      }
+    ],
+    "body": [
+      {
+        "name": [
+          "x5"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i8",
+        "arguments": "i8 x2 to i128"
+      },
+      {
+        "name": [
+          "x6"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x3 to i128"
+      },
+      {
+        "name": [
+          "x7"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x6, x5"
+      },
+      {
+        "name": [
+          "x8"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x4 to i128"
+      },
+      {
+        "name": [
+          "x9"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x7, x8"
+      },
+      {
+        "name": [
+          "x10"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x9 to i64"
+      },
+      {
+        "name": [
+          "x11"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x9, 64 // yes, I am marged: lshr+trunc"
+      },
+      {
+        "name": [
+          "_"
+        ],
+        "operation": "store",
+        "datatype": "i64",
+        "arguments": "i64 x10, ptr x0",
+        "modifiers": "align 8"
+      },
+      {
+        "name": [
+          "_"
+        ],
+        "operation": "store",
+        "datatype": "i8",
+        "arguments": "i8 x11, ptr x1",
+        "modifiers": "align 1"
+      }
+    ]
+  }
+]

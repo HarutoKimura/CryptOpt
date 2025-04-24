@@ -140,7 +140,7 @@ all: lib.rs
 # %.so: $(TARGET_NAME).rs
 # 	rustc --crate-type=cdylib -o ${@} ${<} 
 
-## original version for Rust
+# # original version for Rust
 # %.so: $(TARGET_NAME).rs
 # 	rustc -C opt-level=3 --crate-type=cdylib -o ${@} ${<} 
 

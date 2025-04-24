@@ -109,3 +109,75 @@ export function conditionalMovZNZ(c: CryptOpt.StringOperation): asm[] {
     `cmovnz ${allocation.oReg[0]}, ${allocation.in[2]}; if !ZF, ${c.name[0]}<- ${nzVarname} (nzVar)`,
   ];
 }
+
+export function conditionalMovSelect(c: CryptOpt.StringOperation): asm[] {
+  // c.arguments: [ condition, trueValue, falseValue ]
+  const ra = RegisterAllocator.getInstance();
+  ra.initNewInstruction(c);
+
+  const [condVar, tValVar, fValVar] = c.arguments as string[];
+  const condAlloc = ra.getCurrentAllocations()[condVar];
+
+  if (isFlag(condAlloc.store)) {
+    // condVar is a hardware flag, but we only have CF or OF.
+    let cmovInstr: string;
+    switch (condAlloc.store) {
+      case Flags.CF:
+        // "condVar != 0" means CF=1, so use cmovc
+        cmovInstr = "cmovc";
+        break;
+      case Flags.OF:
+        // "condVar != 0" means OF=1, so use cmovo
+        cmovInstr = "cmovo";
+        break;
+      default:
+        throw new Error(
+          `Unsupported flag ${condAlloc.store} for select. Only CF or OF is supported.`
+        );
+    }
+
+    // We'll allocate outReg with fValVar in it, then conditionally move tValVar.
+    const allocation = ra.allocate({
+      oReg: c.name,
+      in: [fValVar, tValVar],
+      allocationFlags:
+        AllocationFlags.DISALLOW_XMM |
+        AllocationFlags.DISALLOW_IMM |
+        AllocationFlags.IN_0_AS_OUT_REGISTER
+    });
+
+    return [
+      `; ${c.name[0]} = select(${condVar} != 0, ${tValVar}, ${fValVar})`,
+      ...ra.pres,
+      `mov ${allocation.oReg[0]}, ${allocation.in[0]}   ; out = falseVal`,
+      `${cmovInstr} ${allocation.oReg[0]}, ${allocation.in[1]} ; if flag=1, out = trueVal`
+    ];
+
+  } else {
+    // condVar is NOT a flag => do a test + cmovnz approach
+    //
+    // 1) out = fValVar
+    // 2) test condVar, condVar
+    // 3) cmovnz out, tValVar
+    // This corresponds to "select(condVar != 0, tValVar, fValVar)."
+
+    const allocation = ra.allocate({
+      oReg: c.name,
+      in: [fValVar, condVar, tValVar],
+      allocationFlags:
+        AllocationFlags.DISALLOW_XMM |
+        AllocationFlags.DISALLOW_IMM |
+        AllocationFlags.IN_0_AS_OUT_REGISTER
+      // If you need to preserve CF/OF from earlier instructions, you can add:
+      // AllocationFlags.SAVE_FLAG_OF | AllocationFlags.SAVE_FLAG_CF
+    });
+
+    return [
+      `; ${c.name[0]} = select(${condVar} != 0, ${tValVar}, ${fValVar})`,
+      ...ra.pres,
+      `mov ${allocation.oReg[0]}, ${allocation.in[0]}    ; out = falseVal`,
+      `test ${allocation.in[1]}, ${allocation.in[1]}      ; test condVar`,
+      `cmovnz ${allocation.oReg[0]}, ${allocation.in[2]}  ; if (condVar!=0) out = trueVal`
+    ];
+  }
+}

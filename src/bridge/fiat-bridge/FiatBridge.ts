@@ -90,6 +90,7 @@ export class FiatBridge implements Bridge {
     Logger.log(`json-fiat-Buffer length: ${jsonBuffer.length}b`);
     const jsonString = jsonBuffer.toString();
     const fiat = JSON.parse(jsonString) as Fiat.FiatFunction;
+    // console.log("fiat-json", JSON.stringify(fiat, undefined, 2))
     if (!fiat || !("body" in fiat)) {
       console.error(`Cache File: >>${jsonCacheFilename}<<`);
       errorOut(ERRORS.fiatReadJSONFail);
@@ -131,7 +132,9 @@ export class FiatBridge implements Bridge {
       lockAndRunOrReturn(cCacheFilename, command, { shell: "/usr/bin/bash" }); // we need the shell to understand the <<< redirect
     }
 
-    // then we can compile from the c file.
+    // then we can compile from the c file. 
+    // this part compiles the c file to an shared object file. 
+    // If I modify here, I may be able to generate .asm from .c for the fair comparison.
     const command = `${cc} ${CFLAGS} -fPIC -shared -o ${filename} ${cCacheFilename}`;
     Logger.log(`cmd to generate machinecode: ${command}`);
     lockAndRunOrReturn(filename, command, { shell: "/usr/bin/bash" });

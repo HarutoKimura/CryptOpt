@@ -26,3 +26,4 @@ export * from "./xorT";
 export * from "./zextT";
 export * from "./subT";
 export * from "./cmovznzT";
+export * from "./addcarryxT";

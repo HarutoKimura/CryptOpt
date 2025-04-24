@@ -246,6 +246,8 @@ export function writeString(filename: string, asmString: string): void {
   writeFileSync(filename, asmString);
 }
 
+// limbify and delimbify are used to split and join the limbs of a 128-bit number
+// If arg is "x123", the function will return ["x123_0", "x123_1"].
 export function limbify(
   arg: // various types of arguments as input
     | CryptOpt.DynArgument["name"]
@@ -262,6 +264,7 @@ export function limbify(
   } else {
     xdd = arg; // if it's not an array, we take the element itself
   }
+
   const match = matchXD(xdd); 
   if (match && !match?.[2]) {
     // if there is a match, but no _d
@@ -273,6 +276,8 @@ export function limbify(
 /**
  * This one cuts of the n-part from xDD_n
  */
+// This function removes the limb suffix from variable names like x123_0 and x123_1, returning the base variable name x123.
+// not concatinating the _0 and _1 
 export function delimbify(
   arg: CryptOpt.ArgumentWithStringArguments["arguments"][number] | CryptOpt.Varname,
 ): Exclude<CryptOpt.ArgumentWithStringArguments["arguments"][number], CryptOpt.VarnameL> {

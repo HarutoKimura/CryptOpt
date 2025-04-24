@@ -60,7 +60,7 @@ export function analyseMeasureResult(
   }
 
   const [cc, ca, cb] = result.cycles.map(analyseRow);
-  const rawMedian: numTripel = [ca.pre.median, cb.pre.median, cc.pre.median];
+  const rawMedian: numTripel = [ca.pre.median, cb.pre.median, cc.pre.median]; // order is swampped now cc (the shared object file is the third element)
 
   if (rawMedian.some(isNaN)) {
     console.error("TSNH. Some mean is NaN." + JSON.stringify(result));

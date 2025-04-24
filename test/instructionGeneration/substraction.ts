@@ -35,6 +35,16 @@ const allocs = {
   x48: { datatype: "u1", store: "r12b" },
   x12: { datatype: "u1", store: "[ rsp + 0x0 ]" },
   x13: { datatype: "u64", store: "rdx" },
+  
+  // for 128 bit substruction
+  x332: { datatype: "u64", store: "r8x" },
+  x332_0: { datatype: "u64", store: "r9" },
+  x361: { datatype: "u64", store: "r10" },
+  x361_0: { datatype: "u64", store: "r11" },
+  x364: { datatype: "u128"},
+  x364_0: { datatype: "u64", store: "rdx"},
+  x364_1: { datatype: "u64", store: "rbx"},
+
 } as Allocations;
 
 const allocate = vi.fn();
@@ -515,6 +525,34 @@ describe("instructionGeneration:sub", () => {
     expect(code[0]).toBe("sub rax, r10"); // because x1120 is in r10
     expect(spillFlag).toBeCalledWith(Flags.CF);
     expect(spillFlag).toBeCalledWith(Flags.OF);
+  });
+
+  it ("128 bit substruction: u64 - u64 = u65", () => {
+    getCurrentAllocations.mockClear();
+    backupIfVarHasDependencies.mockClear().mockImplementation(() => Register.rax);
+    declareHavoc.mockClear();
+    addToPreInstructions.mockClear();
+    spillFlag.mockClear();
+  
+    const c: CryptOpt.StringOperation = {
+      operation: "subborrowx",
+      datatype: "u64",
+      name: ["x364_0", "x364_1"],
+      arguments: ["0x0", "332", "x361"],
+      decisions: {
+        di_choose_arg: [0, ["x332", "x361"]],
+        [DECISION_IDENTIFIER.DI_SPILL_LOCATION]: [
+          0,
+          [C_DI_SPILL_LOCATION.C_DI_MEM, C_DI_SPILL_LOCATION.C_DI_XMM_REG],
+        ],
+      },
+      decisionsHot: [],
+    };
+  
+    const code = sub(c).filter((a) => !a.startsWith(";"));
+    expect(code).toHaveLength(1);
+    expect(code[0]).toBe("sub rax, r10"); // because both higher bits are 0x0 so just substract the lower bits
+
   });
 
 });

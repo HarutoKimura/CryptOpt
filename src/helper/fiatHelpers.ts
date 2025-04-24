@@ -83,6 +83,7 @@ export function preprocessFunction(func: Fiat.FiatFunction): CryptOpt.Function {
   // types
   body.forEach(assertStringArguments);
   body.forEach(assertStringNames);
+  // console.log("body", JSON.stringify(body, undefined, 2));
   return {
     body,
     operation: func.operation,

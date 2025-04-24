@@ -1,0 +1,159 @@
+; ModuleID = 'field_5x52.25cc2e35debd5488-cgu.0'
+source_filename = "field_5x52.25cc2e35debd5488-cgu.0"
+target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-unknown-linux-gnu"
+
+; Function Attrs: alwaysinline mustprogress nofree norecurse nosync nounwind nonlazybind willreturn memory(argmem: readwrite) uwtable
+define void @mul_inner(ptr dead_on_unwind noalias nocapture noundef writable writeonly sret([40 x i8]) align 8 dereferenceable(40) %_0, ptr noalias nocapture noundef readonly align 8 dereferenceable(40) %self, ptr noalias nocapture noundef readonly align 8 dereferenceable(40) %rhs) unnamed_addr #0 {
+start:
+  %_4 = load i64, ptr %self, align 8, !noundef !3
+  %a0 = zext i64 %_4 to i128
+  %0 = getelementptr inbounds i8, ptr %self, i64 8
+  %_6 = load i64, ptr %0, align 8, !noundef !3
+  %a1 = zext i64 %_6 to i128
+  %1 = getelementptr inbounds i8, ptr %self, i64 16
+  %_8 = load i64, ptr %1, align 8, !noundef !3
+  %a2 = zext i64 %_8 to i128
+  %2 = getelementptr inbounds i8, ptr %self, i64 24
+  %_10 = load i64, ptr %2, align 8, !noundef !3
+  %a3 = zext i64 %_10 to i128
+  %3 = getelementptr inbounds i8, ptr %self, i64 32
+  %_12 = load i64, ptr %3, align 8, !noundef !3
+  %a4 = zext i64 %_12 to i128
+  %_14 = load i64, ptr %rhs, align 8, !noundef !3
+  %b0 = zext i64 %_14 to i128
+  %4 = getelementptr inbounds i8, ptr %rhs, i64 8
+  %_16 = load i64, ptr %4, align 8, !noundef !3
+  %b1 = zext i64 %_16 to i128
+  %5 = getelementptr inbounds i8, ptr %rhs, i64 16
+  %_18 = load i64, ptr %5, align 8, !noundef !3
+  %b2 = zext i64 %_18 to i128
+  %6 = getelementptr inbounds i8, ptr %rhs, i64 24
+  %_20 = load i64, ptr %6, align 8, !noundef !3
+  %b3 = zext i64 %_20 to i128
+  %7 = getelementptr inbounds i8, ptr %rhs, i64 32
+  %_22 = load i64, ptr %7, align 8, !noundef !3
+  %b4 = zext i64 %_22 to i128
+  %_26 = mul nuw i128 %b3, %a0
+  %_27 = mul nuw i128 %b2, %a1
+  %_28 = mul nuw i128 %b1, %a2
+  %_29 = mul nuw i128 %b0, %a3
+  %8 = mul nuw i128 %b4, %a4
+  %_32 = and i128 %8, 4503599627370495
+  %_31 = mul nuw nsw i128 %_32, 68719492368
+  %_25 = add i128 %_28, %_29
+  %_24 = add i128 %_25, %_27
+  %9 = add i128 %_24, %_26
+  %10 = add i128 %9, %_31
+  %11 = lshr i128 %8, 52
+  %12 = lshr i128 %10, 52
+  %_45 = and i128 %12, 18446744073709551615
+  %_46 = mul nuw i128 %b4, %a0
+  %_47 = mul nuw i128 %b3, %a1
+  %_48 = mul nuw i128 %b2, %a2
+  %_49 = mul nuw i128 %b1, %a3
+  %_50 = mul nuw i128 %b0, %a4
+  %_52 = and i128 %11, 18446744073709551615
+  %_51 = mul nuw nsw i128 %_52, 68719492368
+  %_44 = add i128 %_49, %_50
+  %_43 = add i128 %_44, %_48
+  %_42 = add i128 %_43, %_47
+  %_41 = add i128 %_42, %_46
+  %13 = add i128 %_41, %_51
+  %14 = add i128 %13, %_45
+  %15 = trunc i128 %14 to i64
+  %16 = lshr i128 %14, 52
+  %t4 = lshr i64 %15, 48
+  %tx = and i64 %t4, 15
+  %17 = mul nuw i128 %b0, %a0
+  %_63 = and i128 %16, 18446744073709551615
+  %_64 = mul nuw i128 %b4, %a1
+  %_65 = mul nuw i128 %b3, %a2
+  %_66 = mul nuw i128 %b2, %a3
+  %_67 = mul nuw i128 %b1, %a4
+  %_62 = add i128 %_66, %_67
+  %_61 = add i128 %_62, %_65
+  %_60 = add i128 %_61, %_64
+  %18 = add i128 %_60, %_63
+  %19 = trunc i128 %18 to i64
+  %20 = lshr i128 %18, 52
+  %u0 = shl i64 %19, 4
+  %_74 = and i64 %u0, 72057594037927920
+  %u04 = or disjoint i64 %_74, %tx
+  %_76 = zext nneg i64 %u04 to i128
+  %_75 = mul nuw nsw i128 %_76, 4294968273
+  %21 = add i128 %_75, %17
+  %22 = trunc i128 %21 to i64
+  %r0 = and i64 %22, 4503599627370495
+  %23 = lshr i128 %21, 52
+  %_83 = and i128 %23, 18446744073709551615
+  %_84 = mul nuw i128 %b1, %a0
+  %_85 = mul nuw i128 %b0, %a1
+  %_88 = and i128 %20, 18446744073709551615
+  %_89 = mul nuw i128 %b4, %a2
+  %_90 = mul nuw i128 %b3, %a3
+  %_91 = mul nuw i128 %b2, %a4
+  %_87 = add i128 %_90, %_91
+  %_86 = add i128 %_87, %_89
+  %24 = add i128 %_86, %_88
+  %_93 = and i128 %24, 4503599627370495
+  %_92 = mul nuw nsw i128 %_93, 68719492368
+  %_82 = add i128 %_84, %_85
+  %25 = add i128 %_82, %_92
+  %26 = add i128 %25, %_83
+  %27 = lshr i128 %24, 52
+  %28 = trunc i128 %26 to i64
+  %r1 = and i64 %28, 4503599627370495
+  %29 = lshr i128 %26, 52
+  %_104 = and i128 %29, 18446744073709551615
+  %_105 = mul nuw i128 %b2, %a0
+  %_106 = mul nuw i128 %b1, %a1
+  %_107 = mul nuw i128 %b0, %a2
+  %_109 = and i128 %27, 18446744073709551615
+  %_110 = mul nuw i128 %b4, %a3
+  %_111 = mul nuw i128 %b3, %a4
+  %_108 = add i128 %_110, %_111
+  %30 = add i128 %_108, %_109
+  %_113 = and i128 %30, 4503599627370495
+  %_112 = mul nuw nsw i128 %_113, 68719492368
+  %_103 = add i128 %_106, %_107
+  %_102 = add i128 %_103, %_105
+  %31 = add i128 %_102, %_112
+  %32 = add i128 %31, %_104
+  %33 = lshr i128 %30, 52
+  %34 = trunc i128 %32 to i64
+  %r2 = and i64 %34, 4503599627370495
+  %35 = lshr i128 %32, 52
+  %_123 = and i128 %35, 18446744073709551615
+  %_125 = and i128 %33, 18446744073709551615
+  %_124 = mul nuw nsw i128 %_125, 68719492368
+  %_126 = and i128 %10, 4503599627370495
+  %_122 = add nuw nsw i128 %_124, %_126
+  %36 = add nuw nsw i128 %_122, %_123
+  %37 = trunc i128 %36 to i64
+  %r3 = and i64 %37, 4503599627370495
+  %38 = lshr i128 %36, 52
+  %_133 = and i128 %14, 281474976710655
+  %39 = add nuw nsw i128 %38, %_133
+  %r4 = trunc nuw nsw i128 %39 to i64
+  store i64 %r0, ptr %_0, align 8
+  %_136.sroa.4.0._0.sroa_idx = getelementptr inbounds i8, ptr %_0, i64 8
+  store i64 %r1, ptr %_136.sroa.4.0._0.sroa_idx, align 8
+  %_136.sroa.5.0._0.sroa_idx = getelementptr inbounds i8, ptr %_0, i64 16
+  store i64 %r2, ptr %_136.sroa.5.0._0.sroa_idx, align 8
+  %_136.sroa.6.0._0.sroa_idx = getelementptr inbounds i8, ptr %_0, i64 24
+  store i64 %r3, ptr %_136.sroa.6.0._0.sroa_idx, align 8
+  %_136.sroa.7.0._0.sroa_idx = getelementptr inbounds i8, ptr %_0, i64 32
+  store i64 %r4, ptr %_136.sroa.7.0._0.sroa_idx, align 8
+  ret void
+}
+
+attributes #0 = { alwaysinline mustprogress nofree norecurse nosync nounwind nonlazybind willreturn memory(argmem: readwrite) uwtable "probe-stack"="inline-asm" "target-cpu"="x86-64" }
+
+!llvm.module.flags = !{!0, !1}
+!llvm.ident = !{!2}
+
+!0 = !{i32 8, !"PIC Level", i32 2}
+!1 = !{i32 2, !"RtLibUseGOT", i32 1}
+!2 = !{!"rustc version 1.83.0 (90b35a623 2024-11-26)"}
+!3 = !{}

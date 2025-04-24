@@ -47,7 +47,10 @@ export const RUST_SYMBOLS: Record<
   bls12_381_p: {
     mul: {
       rustFnName: "bls12_mul",
-      jsonFile: "bls12_mul.json",
+      // jsonFile: "bls12_mul_work.json",// original working one
+      // jsonFile: "demangled_bls12_mul2.json",// testing new version one
+      // jsonFile: "test_bls12_mul.json",// testing new version one
+      jsonFile: "bls12_mul_updated.json",// testing new version one
     },
     square: {
       rustFnName: "bls12_square",
@@ -67,14 +70,32 @@ export const RUST_SYMBOLS: Record<
   },
 
   curve25519: {
+    // mul: {
+    //   rustFnName: "rust_fiat_curve25519_carry_mul",
+    //   jsonFile: "rust_fiat_curve25519_carry_mul_updated.json",
+    //   // rustFnName: "c_fiat_curve25519_carry_mul", // test for fiat-c
+    //   // jsonFile: "c_fiat_curve25519_carry_mul_ssa.json",
+    // },
     mul: {
-      rustFnName: "rust_fiat_curve25519_carry_mul",
-      jsonFile: "rust_fiat_curve25519_carry_mul.json",
+      rustFnName: "c_fiat_curve25519_carry_mul", // test for fiat-c
+      jsonFile: "c_fiat_curve25519_carry_mul_ssa.json",
     },
+    // mul: {
+    //   rustFnName: "mul",
+    //   jsonFile: "curve25519_dalek_u64_mul.json",
+    // },
+    // square: {
+    //   rustFnName: "rust_fiat_curve25519_carry_square",
+    //   jsonFile: "rust_fiat_curve25519_carry_square.json",
+    // },
     square: {
-      rustFnName: "rust_fiat_curve25519_carry_square",
-      jsonFile: "rust_fiat_curve25519_carry_square.json",
-    },
+      rustFnName: "c_fiat_curve25519_carry_square", // test for fiat-c
+      jsonFile: "c_fiat_curve25519_carry_square_ssa.json",
+    }
+    // square: {
+    //   rustFnName: "square",
+    //   jsonFile: "square.json",
+    // }
   },
 
   curve25519_solinas: {
@@ -90,9 +111,13 @@ export const RUST_SYMBOLS: Record<
 
   // ...and so on for p224, p256, p384, etc....
   p224: {
-    mul: {
-      rustFnName: "rust_fiat_p224_mul",
-      jsonFile: "rust_fiat_p224_mul.json",
+    // mul: {
+    //   rustFnName: "rust_fiat_p224_mul",
+    //   jsonFile: "rust_fiat_p224_mul.json",
+    // },
+    mul :{
+      rustFnName: "c_fiat_p224_mul", // test for fiat-c
+      jsonFile: "c_fiat_p224_mul_ssa.json",
     },
     square: {
       rustFnName: "rust_fiat_p224_square",
@@ -136,14 +161,23 @@ export const RUST_SYMBOLS: Record<
 
   // ...
   p448_solinas: {
-    mul: {
-      rustFnName: "rust_fiat_p448_solinas_carry_mul",
-      jsonFile: "rust_fiat_p448_solinas_carry_mul.json",
+    // mul: {
+    //   rustFnName: "rust_fiat_p448_solinas_carry_mul",
+    //   // jsonFile: "rust_fiat_p448_solinas_carry_mul.json",
+    //   jsonFile: "rust_fiat_p448_solinas_carry_mul_updated.json",
+    // },
+    // square: {
+    //   rustFnName: "rust_fiat_p448_solinas_carry_square",
+    //   jsonFile: "rust_fiat_p448_solinas_carry_square.json",
+    // },
+    mul : {
+      rustFnName: "c_fiat_p448_carry_mul", // test for fiat-c
+      jsonFile: "c_fiat_p448_carry_mul_ssa.json",
     },
     square: {
-      rustFnName: "rust_fiat_p448_solinas_carry_square",
-      jsonFile: "rust_fiat_p448_solinas_carry_square.json",
-    },
+      rustFnName: "c_fiat_p448_carry_square", // test for fiat-c
+      jsonFile: "c_fiat_p448_carry_square_ssa.json",
+    }
   },
 
   p521: {
@@ -158,14 +192,32 @@ export const RUST_SYMBOLS: Record<
   },
 
   poly1305: {
-    mul: {
-      rustFnName: "rust_fiat_poly1305_carry_mul",
-      jsonFile: "rust_fiat_poly1305_carry_mul.json",
+    // mul: {
+    //   rustFnName: "rust_fiat_poly1305_carry_mul",
+    //   // jsonFile: "rust_fiat_poly1305_carry_mul.json",
+    //   jsonFile: "rust_fiat_poly1305_carry_mul_updated.json",
+    // },
+    // square: {
+    //   rustFnName: "rust_fiat_poly1305_carry_square",
+    //   jsonFile: "rust_fiat_poly1305_carry_square.json",
+    // },
+    mul : {
+      rustFnName: "c_fiat_poly1305_carry_mul", // test for fiat-c
+      jsonFile: "c_fiat_poly1305_carry_mul_ssa.json",
     },
+    // mul: {
+    //   rustFnName: "mul_r_mod_p", // test for fiat-c
+    //   jsonFile: "mul_r_mod_p.json",
+    // },
+    // square : {
+    //   rustFnName: "mul_r_mod_p", // test for fiat-c
+    //   jsonFile: "mul_r_mod_p.json",
+    // },
     square: {
-      rustFnName: "rust_fiat_poly1305_carry_square",
-      jsonFile: "rust_fiat_poly1305_carry_square.json",
+      rustFnName: "c_fiat_poly1305_carry_square", // test for fiat-c
+      jsonFile: "c_fiat_poly1305_carry_square_ssa.json",
     },
+
   },
 
   secp256k1_montgomery: {
@@ -180,14 +232,29 @@ export const RUST_SYMBOLS: Record<
   },
 
   secp256k1_dettman: {
-    mul: {
-      rustFnName: "rust_fiat_secp256k1_dettman_mul",
-      jsonFile: "rust_fiat_secp256k1_dettman_mul.json",
+    // mul: {
+    //   rustFnName: "rust_fiat_secp256k1_dettman_mul",
+    //   // jsonFile: "rust_fiat_secp256k1_dettman_mul.json",
+    //   jsonFile: "rust_fiat_secp256k1_dettman_mul_updated.json",
+    // },
+    // mul: {
+    //   rustFnName: "mul_inner", // test for fiat-c
+    //   jsonFile: "field_5x52.json",
+    // },
+
+    // // 
+    // square :{
+    //   rustFnName: "rust_ec_secp256k1_square",
+    //   jsonFile: "rust_ec_secp256k1_square.json",
+    // }
+    mul : {
+      rustFnName: "c_fiat_secp256k1_dettman_mul", // test for fiat-c
+      jsonFile: "c_fiat_secp256k1_dettman_mul_ssa.json",
     },
     square: {
-      rustFnName: "rust_fiat_secp256k1_dettman_square",
-      jsonFile: "rust_fiat_secp256k1_dettman_square.json",
-    },
+      rustFnName: "c_fiat_secp256k1_dettman_square", // test for fiat-c
+      jsonFile: "c_fiat_secp256k1_dettman_square_ssa.json",
+    }
   },
 
   sm2: {

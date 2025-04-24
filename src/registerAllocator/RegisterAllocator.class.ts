@@ -111,8 +111,10 @@ export class RegisterAllocator {
 
   public static getInstance(): RegisterAllocator {
     if (RegisterAllocator._instance) {
+      console.log("yes i am ")
       return RegisterAllocator._instance;
     }
+    console.log("no i am not ")
     return new RegisterAllocator();
   }
   public static reset(): RegisterAllocator {
@@ -912,7 +914,14 @@ export class RegisterAllocator {
       store: flag,
     };
   }
-
+  public shareFlag(flag: Flags, newName: string): void {
+    // Don't delete existing allocation
+    this._flagState[flag] = FlagState.ALIVE;
+    this._allocations[newName] = {
+      datatype: "u1",
+      store: flag,
+    };
+  }
   public moveOneMemoryToRegister<MA extends { store: mem }>(
     args: Array<MA>,
     moveInstruction = "mov",

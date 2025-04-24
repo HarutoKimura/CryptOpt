@@ -30,7 +30,7 @@ import {
 } from "@/bridge/fiat-bridge/constants";
 import {
   METHOD_T,
-  AVAILABLE_METHODS as RUST_METHODS,
+  RUST_AVAILABLE_METHODS as RUST_METHODS,
 } from "@/bridge/rust-bridge/constants";
 import { errorOut, ERRORS } from "@/errors";
 

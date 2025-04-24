@@ -1,0 +1,12 @@
+[package]
+name = "fiat_test"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "fiat_test"
+path = "src/lib.rs"
+
+[[bin]]
+name = "fiat_test"
+path = "src/main.rs"

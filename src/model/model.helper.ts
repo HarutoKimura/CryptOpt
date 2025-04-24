@@ -107,11 +107,14 @@ export function createDependencyRelation(
 
     // n is x11 or x12 or arg1[2] or x1_1
     names.forEach((n, limbno) => {
+      console.log(`Processing ${n}`);
+      console.log(`limbno: ${limbno}`);
       if (n == "_") {
         return;
       }
       // If we have memoryConstraints and the current limb is an out-node
       if (memoryConstraints !== "none" && n.startsWith(OUT_PREFIX)) {
+        console.log(`Processing ${n} with memoryConstraints ${memoryConstraints}`);
         // we need to find the nodes, which read memory, that the current out-node overwrites
 
         // this filterLambda is used to find all the nodes which potentially need to be scheduled before the current out-node
@@ -162,11 +165,13 @@ export function createDependencyRelation(
           // n is xN_${limbo} or xN if we only have one limb
 
           const d = groupDepLimbs(node.operation, node.arguments);
+          // console.log(`d: ${d}`);
 
           const needed_limbs = d[limbno];
           needed_limbs.forEach((nl) => {
             const neededBySet = neededBy.get(nl) ?? new Set<string>();
             neededBySet.add(n);
+            // console.log(`Adding ${n} to ${nl}`);
             neededBy.set(nl, neededBySet);
           });
         }
@@ -208,6 +213,7 @@ function groupDepLimbs(
   op: CryptOpt.Operation_T,
   args: CryptOpt.StringOperation["arguments"],
 ): [string[], string[]] {
+  console.log(`groupDepLimbs: ${op}, ${args}`);
   switch (op) {
     case "mulx":
     case "+":
@@ -248,6 +254,27 @@ function groupDepLimbs(
       return [argLimbs, argLimbs];
     }
     case "&": {
+
+      // if (args[1] === "0xffffffffffffffff") {
+      //   const argLimbs = limbify(args[0]) as [CryptOpt.Varname, CryptOpt.Varname];
+      //   if (limbifyImm(args[1]).length > 1) {
+      //     // ANDing with  more than 64 bit
+      //     // we will just assume, that there then also exist 2 limbs from limbify
+      //     return [[argLimbs[0]], [argLimbs[1]]];
+      //   } else {
+      //     return [[argLimbs[0]], []];
+      //   }
+      // } else {
+      // // Process both arguments since either could be u128
+      // // since now we need to consider both arguments
+      //   const argLimbs2 = args.map(limbify);
+
+      //   const lo = argLimbs2.map((l) => l[0]);
+      //   const hi = argLimbs2.map((l) => l[1]).filter((l) => typeof l !== "undefined") as CryptOpt.Varname[];
+
+      //   return [lo, hi];
+      // }
+
       const argLimbs = limbify(args[0]) as [CryptOpt.Varname, CryptOpt.Varname];
       if (limbifyImm(args[1]).length > 1) {
         // ANDing with  more than 64 bit

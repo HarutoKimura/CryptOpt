@@ -1,0 +1,790 @@
+[
+  {
+    "operation": "square",
+    "arguments": [
+      "ptr dead_on_unwind noalias nocapture noundef writable writeonly sret([40 x i8]) align 8 dereferenceable(40) x0, ptr noalias nocapture noundef readonly align 8 dereferenceable(40) x1"
+    ],
+    "returns": [
+      {
+        "datatype": "i64*",
+        "name": "x0"
+      }
+    ],
+    "body": [
+      {
+        "name": [
+          "x2"
+        ],
+        "operation": "getelementptr",
+        "modifiers": "inbounds ",
+        "datatype": "i8",
+        "arguments": "i8, ptr x1, i64 4"
+      },
+      {
+        "name": [
+          "x3"
+        ],
+        "operation": "load",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 ptr x2, align 8, !alias.scope !6, !noalias !3"
+      },
+      {
+        "name": [
+          "x4"
+        ],
+        "operation": "getelementptr",
+        "modifiers": "inbounds ",
+        "datatype": "i8",
+        "arguments": "i8, ptr x1, i64 3"
+      },
+      {
+        "name": [
+          "x5"
+        ],
+        "operation": "load",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 ptr x4, align 8, !alias.scope !6, !noalias !3"
+      },
+      {
+        "name": [
+          "x6"
+        ],
+        "operation": "getelementptr",
+        "modifiers": "inbounds ",
+        "datatype": "i8",
+        "arguments": "i8, ptr x1, i64 2"
+      },
+      {
+        "name": [
+          "x7"
+        ],
+        "operation": "load",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 ptr x6, align 8, !alias.scope !6, !noalias !3"
+      },
+      {
+        "name": [
+          "x8"
+        ],
+        "operation": "getelementptr",
+        "modifiers": "inbounds ",
+        "datatype": "i8",
+        "arguments": "i8, ptr x1, i64 1"
+      },
+      {
+        "name": [
+          "x9"
+        ],
+        "operation": "load",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 ptr x8, align 8, !alias.scope !6, !noalias !3"
+      },
+      {
+        "name": [
+          "x10"
+        ],
+        "operation": "load",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 ptr x1, align 8, !alias.scope !6, !noalias !3"
+      },
+      {
+        "name": [
+          "x11"
+        ],
+        "operation": "mul",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x5, 19"
+      },
+      {
+        "name": [
+          "x12"
+        ],
+        "operation": "mul",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x3, 19"
+      },
+      {
+        "name": [
+          "x13"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x10 to i128"
+      },
+      {
+        "name": [
+          "x14"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x13, x13"
+      },
+      {
+        "name": [
+          "x15"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x9 to i128"
+      },
+      {
+        "name": [
+          "x16"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x12 to i128"
+      },
+      {
+        "name": [
+          "x17"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x15, x16"
+      },
+      {
+        "name": [
+          "x18"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x7 to i128"
+      },
+      {
+        "name": [
+          "x19"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x11 to i128"
+      },
+      {
+        "name": [
+          "x20"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x18, x19"
+      },
+      {
+        "name": [
+          "x21"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x5 to i128"
+      },
+      {
+        "name": [
+          "x22"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x19, x21"
+      },
+      {
+        "name": [
+          "x23"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x13, x15"
+      },
+      {
+        "name": [
+          "x24"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x18, x16"
+      },
+      {
+        "name": [
+          "x25"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x15, x15"
+      },
+      {
+        "name": [
+          "x26"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x13, x18"
+      },
+      {
+        "name": [
+          "x27"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x3 to i128"
+      },
+      {
+        "name": [
+          "x28"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x19, x27"
+      },
+      {
+        "name": [
+          "x29"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x16, x27"
+      },
+      {
+        "name": [
+          "x30"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x13, x21"
+      },
+      {
+        "name": [
+          "x31"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x15, x18"
+      },
+      {
+        "name": [
+          "x32"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x18, x18"
+      },
+      {
+        "name": [
+          "x33"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x13, x27"
+      },
+      {
+        "name": [
+          "x34"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x15, x21"
+      },
+      {
+        "name": [
+          "x35"
+        ],
+        "operation": "add",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x17, x20"
+      },
+      {
+        "name": [
+          "x36"
+        ],
+        "operation": "shl",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x35, 1"
+      },
+      {
+        "name": [
+          "x37"
+        ],
+        "operation": "add",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x36, x14"
+      },
+      {
+        "name": [
+          "x38"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x37 to i64"
+      },
+      {
+        "name": [
+          "x39"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x38, 2251799813685247"
+      },
+      {
+        "name": [
+          "x40"
+        ],
+        "operation": "add",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x33, x34"
+      },
+      {
+        "name": [
+          "x41"
+        ],
+        "operation": "shl",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x40, 1"
+      },
+      {
+        "name": [
+          "x42"
+        ],
+        "operation": "add",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x41, x32"
+      },
+      {
+        "name": [
+          "x43"
+        ],
+        "operation": "add",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x30, x31"
+      },
+      {
+        "name": [
+          "x44"
+        ],
+        "operation": "shl",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x43, 1"
+      },
+      {
+        "name": [
+          "x45"
+        ],
+        "operation": "add",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x44, x29"
+      },
+      {
+        "name": [
+          "x46"
+        ],
+        "operation": "add",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x26, x28"
+      },
+      {
+        "name": [
+          "x47"
+        ],
+        "operation": "shl",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x46, 1"
+      },
+      {
+        "name": [
+          "x48"
+        ],
+        "operation": "add",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x47, x25"
+      },
+      {
+        "name": [
+          "x49"
+        ],
+        "operation": "add",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x23, x24"
+      },
+      {
+        "name": [
+          "x50"
+        ],
+        "operation": "shl",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x49, 1"
+      },
+      {
+        "name": [
+          "x51"
+        ],
+        "operation": "add",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x50, x22"
+      },
+      {
+        "name": [
+          "x52"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x37, 51"
+      },
+      {
+        "name": [
+          "x53"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x52, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x54"
+        ],
+        "operation": "add",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x51, x53"
+      },
+      {
+        "name": [
+          "x55"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x54, 51"
+      },
+      {
+        "name": [
+          "x56"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x55, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x57"
+        ],
+        "operation": "add",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x48, x56"
+      },
+      {
+        "name": [
+          "x58"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x57, 51"
+      },
+      {
+        "name": [
+          "x59"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x58, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x60"
+        ],
+        "operation": "add",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x45, x59"
+      },
+      {
+        "name": [
+          "x61"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x60, 51"
+      },
+      {
+        "name": [
+          "x62"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x61, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x63"
+        ],
+        "operation": "add",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x42, x62"
+      },
+      {
+        "name": [
+          "x64"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x63, 51"
+      },
+      {
+        "name": [
+          "x65"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x64 to i64"
+      },
+      {
+        "name": [
+          "x66"
+        ],
+        "operation": "mul",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x65, 19"
+      },
+      {
+        "name": [
+          "x67"
+        ],
+        "operation": "add",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x66, x39"
+      },
+      {
+        "name": [
+          "x68"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x67, 2251799813685247"
+      },
+      {
+        "name": [
+          "x69"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x54 to i64"
+      },
+      {
+        "name": [
+          "x70"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x69, 2251799813685247"
+      },
+      {
+        "name": [
+          "x71"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x67, 51"
+      },
+      {
+        "name": [
+          "x72"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i64",
+        "arguments": "i64 x71, x70"
+      },
+      {
+        "name": [
+          "x73"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x63 to i64"
+      },
+      {
+        "name": [
+          "x74"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x73, 2251799813685247"
+      },
+      {
+        "name": [
+          "x75"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x60 to i64"
+      },
+      {
+        "name": [
+          "x76"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x75, 2251799813685247"
+      },
+      {
+        "name": [
+          "x77"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x57 to i64"
+      },
+      {
+        "name": [
+          "x78"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x77, 2251799813685247"
+      },
+      {
+        "name": [
+          "_"
+        ],
+        "operation": "store",
+        "datatype": "i64",
+        "arguments": "i64 x68, ptr x0",
+        "modifiers": "align 8"
+      },
+      {
+        "name": [
+          "x79"
+        ],
+        "operation": "getelementptr",
+        "modifiers": "inbounds ",
+        "datatype": "i8",
+        "arguments": "i8, ptr x0, i64 1"
+      },
+      {
+        "name": [
+          "_"
+        ],
+        "operation": "store",
+        "datatype": "i64",
+        "arguments": "i64 x72, ptr x79",
+        "modifiers": "align 8"
+      },
+      {
+        "name": [
+          "x80"
+        ],
+        "operation": "getelementptr",
+        "modifiers": "inbounds ",
+        "datatype": "i8",
+        "arguments": "i8, ptr x0, i64 2"
+      },
+      {
+        "name": [
+          "_"
+        ],
+        "operation": "store",
+        "datatype": "i64",
+        "arguments": "i64 x78, ptr x80",
+        "modifiers": "align 8"
+      },
+      {
+        "name": [
+          "x81"
+        ],
+        "operation": "getelementptr",
+        "modifiers": "inbounds ",
+        "datatype": "i8",
+        "arguments": "i8, ptr x0, i64 3"
+      },
+      {
+        "name": [
+          "_"
+        ],
+        "operation": "store",
+        "datatype": "i64",
+        "arguments": "i64 x76, ptr x81",
+        "modifiers": "align 8"
+      },
+      {
+        "name": [
+          "x82"
+        ],
+        "operation": "getelementptr",
+        "modifiers": "inbounds ",
+        "datatype": "i8",
+        "arguments": "i8, ptr x0, i64 4"
+      },
+      {
+        "name": [
+          "_"
+        ],
+        "operation": "store",
+        "datatype": "i64",
+        "arguments": "i64 x74, ptr x82",
+        "modifiers": "align 8"
+      }
+    ]
+  }
+]

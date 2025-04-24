@@ -40,6 +40,7 @@ import { BIAS, Paul } from "@/paul";
 import type { CryptOpt, MEMORY_CONSTRAINTS_OPTIONS_T } from "@/types";
 
 import { createDependencyRelation, nodeLookupMap } from "./model.helper";
+import { RegisterAllocator } from "@/registerAllocator";
 
 type methodParam = CryptOpt.Function["arguments"][number] | CryptOpt.Function["returns"][number];
 export class Model {
@@ -138,8 +139,28 @@ export class Model {
 
     Model._nodes = json.body as CryptOpt.StringOperation[];
     Model._nodeLookupMap = nodeLookupMap(Model._nodes);
+    // console.log("lookupMap");
+    const allEntriesForLookup = Array.from(Model._nodeLookupMap).map(([key, value]) => {
+      // Convert Set to Array for each entry
+      return `${key} => ${value}`;
+    });
+    // Print all entries, one per line
+    allEntriesForLookup.forEach(entry => console.log(entry));
+
+    // console.log("neededBy");
+
     Model._neededBy = createDependencyRelation(Model._nodes, Model._nodeLookupMap, memoryConstraints);
+    // Convert Map to Array and then to string
+    const allEntries = Array.from(Model._neededBy).map(([key, value]) => {
+      // Convert Set to Array for each entry
+      return `${key} => ${Array.from(value).join(', ')}`;
+    });
+
+    // Print all entries, one per line
+    allEntries.forEach(entry => console.log(entry));
+
     Model._order = toposort(Model._nodes, Model._neededBy);
+    // console.log("topological order: ", Model._order);
     Logger.log(Model._order.join(" @ "));
     Logger.log(
       Model.nodesInTopologicalOrder

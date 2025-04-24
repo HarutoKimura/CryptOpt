@@ -77,15 +77,19 @@ export function fr__rm_rm(cout: string, out: string, arg0: ValueAllocation, arg1
   const mem0 = isMem(arg0.store);
   const mem1 = isMem(arg1.store);
   if (!mem0 && !mem1) {
+    // console.log("arguments are not mm. Abort 1");
     return fr__r_r(cout, out, arg0 as RegisterAllocation, arg1 as RegisterAllocation);
   }
   if (!mem0 && mem1) {
+    // console.log("arguments are not mm. Abort 2");
     return fr__r_m(cout, out, arg0 as RegisterAllocation, arg1 as MemoryAllocation);
   }
   if (mem0 && !mem1) {
+    // console.log("arguments are not mm. Abort 3");
     return fr__r_m(cout, out, arg1 as RegisterAllocation, arg0 as MemoryAllocation);
   }
   if (mem0 && mem1) {
+    // console.log("arguments are not mm. Abort 4");
     return fr__m_m(cout, out, arg0 as MemoryAllocation, arg1 as MemoryAllocation);
   }
   throw new Error("arguments are not rr / rm / mm. Abort");

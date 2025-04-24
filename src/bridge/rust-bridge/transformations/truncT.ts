@@ -28,8 +28,10 @@ export function transformTrunc(input: Readonly<SSA>): Intermediate {
 
   const { casts, scalars } = getArguments(input.arguments);
 
-  if (casts[0].type != "i64") {
-    throw new Error("I am Afraid. I cannot trunc to anything but i64.");
+
+  // in p224 case, we are truncating from i128 to i64 and also from i128 to i8
+  if (casts[0].type != "i64" && casts[0].type != "i8") {
+    throw new Error("I am Afraid. I cannot trunc to anything but i64 or i8.");
   }
 
   return {

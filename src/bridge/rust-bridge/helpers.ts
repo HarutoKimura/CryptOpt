@@ -73,17 +73,45 @@ export function getScalarsAndImmMappedAsConstArg(s: string): CryptOpt.ConstArgum
     const isNeg = bi < 0n;
     return `${isNeg ? "-" : ""}0x${(isNeg ? bi * -1n : bi).toString(16)}` as CryptOpt.ConstArgument;
   });
+
+  if (OrderChecker(s)) {
+    return immsAsConstArg.concat(scalarsAsConstArg);
+  }
+
   return scalarsAsConstArg.concat(immsAsConstArg);
 }
 
-// For transoformation Sub, change the order of imm and scalar to represent -%x1 => 0 - x1120 => 0x0, x1120
-export function getScalarsAndImmMappedAsConstArgForSub(s: string): CryptOpt.ConstArgument[] {
-  const { scalars, imm } = getArguments(s);
-  const scalarsAsConstArg = scalars.map(({ id }) => id as CryptOpt.ConstArgument); // simply extracts the id like x1, x2
-  const immsAsConstArg = imm.map(({ imm }) => { // it converts the immediate value to a hex string
-    const bi = BigInt(imm);
-    const isNeg = bi < 0n;
-    return `${isNeg ? "-" : ""}0x${(isNeg ? bi * -1n : bi).toString(16)}` as CryptOpt.ConstArgument;
-  });
-  return immsAsConstArg.concat(scalarsAsConstArg);
+// // For transoformation Sub, change the order of imm and scalar to represent -%x1 => 0 - x1120 => 0x0, x1120
+// export function getScalarsAndImmMappedAsConstArgForSub(s: string): CryptOpt.ConstArgument[] {
+//   const { scalars, imm } = getArguments(s);
+//   const scalarsAsConstArg = scalars.map(({ id }) => id as CryptOpt.ConstArgument); // simply extracts the id like x1, x2
+//   const immsAsConstArg = imm.map(({ imm }) => { // it converts the immediate value to a hex string
+//     const bi = BigInt(imm);
+//     const isNeg = bi < 0n;
+//     return `${isNeg ? "-" : ""}0x${(isNeg ? bi * -1n : bi).toString(16)}` as CryptOpt.ConstArgument;
+//   });
+//   return immsAsConstArg.concat(scalarsAsConstArg);
+// }
+
+// To preserve the order of the arguments especially for sub operation
+
+function OrderChecker(s: string): boolean {
+  const parts = s.split(',').map(s => s.trim()).filter(Boolean);
+  
+  // Early return if there aren't exactly 2 arguments
+  // if (parts.length !== 2) return true;
+  
+  // Check if first part is immediate (number) and second is scalar (starts with x)
+  const isFirstImm = /^(i\d+\s)?-?\d+/.test(parts[0]);
+  const isFirstScalar = /^(i\d+\s)?x\d+/.test(parts[0]);
+  const isSecondImm = /^(i\d+\s)?-?\d+/.test(parts[1]);
+  const isSecondScalar = /^(i\d+\s)?x\d+/.test(parts[1]);
+  
+  // If first is immediate and second is scalar: true
+  // If first is scalar and second is immediate: false
+  if (isFirstImm && isSecondScalar) return true;
+  if (isFirstScalar && isSecondImm) return false;
+  
+  // For any other case return true
+  return true;
 }

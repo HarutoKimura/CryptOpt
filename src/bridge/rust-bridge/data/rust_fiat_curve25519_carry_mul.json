@@ -2,7 +2,7 @@
   {
     "operation": "rust_fiat_curve25519_carry_mul",
     "arguments": [
-      "ptr noalias nocapture noundef nonnull writeonly align 8  x0, i64 noundef x1, ptr noalias nocapture noundef nonnull readonly align 8 x2, i64 noundef x3, ptr noalias nocapture noundef nonnull readonly align 8 x4, i64 noundef x5"
+      "ptr noalias nocapture noundef writeonly align 8 dereferenceable(40) x0, ptr noalias nocapture noundef readonly align 8 dereferenceable(40) x1, ptr noalias nocapture noundef readonly align 8 dereferenceable(40) x2"
     ],
     "returns": [
       {

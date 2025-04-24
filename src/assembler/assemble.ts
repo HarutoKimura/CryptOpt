@@ -35,7 +35,10 @@ export function assemble(resultspath: string): { stacklength: number; code: asm[
   let curOp: CryptOpt.StringOperation | null = null;
   while ((curOp = Model.nextOperation())) {
     try {
+      // console.log("curOp", curOp);
       const ins = getInstruction(curOp);
+      const allocs = RegisterAllocator.getInstance().getCurrentAllocations();
+      // console.log("curOp allocation:",allocs);
 
       output.push(...ins);
       Logger.log(sanityCheckAllocations(curOp)); // bit of a hack to remove it in non-debug mode

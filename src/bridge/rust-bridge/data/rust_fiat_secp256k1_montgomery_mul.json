@@ -1,0 +1,3805 @@
+[
+  {
+    "operation": "rust_fiat_secp256k1_montgomery_mul",
+    "arguments": [
+      "ptr noalias nocapture noundef writeonly align 8 dereferenceable(40) x0, ptr noalias nocapture noundef readonly align 8 dereferenceable(40) x1, ptr noalias nocapture noundef readonly align 8 dereferenceable(40) x2"
+    ],
+    "returns": [
+      {
+        "datatype": "i64*",
+        "name": "x0"
+      }
+    ],
+    "body": [
+      {
+        "name": [
+          "x3"
+        ],
+        "operation": "getelementptr",
+        "modifiers": "inbounds ",
+        "datatype": "i64",
+        "arguments": "i64, ptr x1, i64 1"
+      },
+      {
+        "name": [
+          "x4"
+        ],
+        "operation": "load",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 ptr x3"
+      },
+      {
+        "name": [
+          "x5"
+        ],
+        "operation": "getelementptr",
+        "modifiers": "inbounds ",
+        "datatype": "i64",
+        "arguments": "i64, ptr x1, i64 2"
+      },
+      {
+        "name": [
+          "x6"
+        ],
+        "operation": "load",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 ptr x5"
+      },
+      {
+        "name": [
+          "x7"
+        ],
+        "operation": "getelementptr",
+        "modifiers": "inbounds ",
+        "datatype": "i64",
+        "arguments": "i64, ptr x1, i64 3"
+      },
+      {
+        "name": [
+          "x8"
+        ],
+        "operation": "load",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 ptr x7"
+      },
+      {
+        "name": [
+          "x9"
+        ],
+        "operation": "load",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 ptr x1"
+      },
+      {
+        "name": [
+          "x10"
+        ],
+        "operation": "getelementptr",
+        "modifiers": "inbounds ",
+        "datatype": "i64",
+        "arguments": "i64, ptr x2, i64 3"
+      },
+      {
+        "name": [
+          "x11"
+        ],
+        "operation": "load",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 ptr x10"
+      },
+      {
+        "name": [
+          "x12"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x9 to i128"
+      },
+      {
+        "name": [
+          "x13"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x11 to i128"
+      },
+      {
+        "name": [
+          "x14"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x13, x12"
+      },
+      {
+        "name": [
+          "x15"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x14, 64"
+      },
+      {
+        "name": [
+          "x16"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x15 to i64"
+      },
+      {
+        "name": [
+          "x17"
+        ],
+        "operation": "getelementptr",
+        "modifiers": "inbounds ",
+        "datatype": "i64",
+        "arguments": "i64, ptr x2, i64 2"
+      },
+      {
+        "name": [
+          "x18"
+        ],
+        "operation": "load",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 ptr x17"
+      },
+      {
+        "name": [
+          "x19"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x18 to i128"
+      },
+      {
+        "name": [
+          "x20"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x19, x12"
+      },
+      {
+        "name": [
+          "x21"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x20, 64"
+      },
+      {
+        "name": [
+          "x22"
+        ],
+        "operation": "getelementptr",
+        "modifiers": "inbounds ",
+        "datatype": "i64",
+        "arguments": "i64, ptr x2, i64 1"
+      },
+      {
+        "name": [
+          "x23"
+        ],
+        "operation": "load",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 ptr x22"
+      },
+      {
+        "name": [
+          "x24"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x23 to i128"
+      },
+      {
+        "name": [
+          "x25"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x24, x12"
+      },
+      {
+        "name": [
+          "x26"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x25, 64"
+      },
+      {
+        "name": [
+          "x27"
+        ],
+        "operation": "load",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 ptr x2"
+      },
+      {
+        "name": [
+          "x28"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x27 to i128"
+      },
+      {
+        "name": [
+          "x29"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x28, x12"
+      },
+      {
+        "name": [
+          "x30"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x29, 64"
+      },
+      {
+        "name": [
+          "x31"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x25, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x32"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x30, x31"
+      },
+      {
+        "name": [
+          "x33"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x32, 64"
+      },
+      {
+        "name": [
+          "x34"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x20, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x35"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x26, x34"
+      },
+      {
+        "name": [
+          "x36"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x35, x33"
+      },
+      {
+        "name": [
+          "x37"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x36, 64"
+      },
+      {
+        "name": [
+          "x38"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x14, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x39"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x21, x38"
+      },
+      {
+        "name": [
+          "x40"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x39, x37"
+      },
+      {
+        "name": [
+          "x41"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x40, 64"
+      },
+      {
+        "name": [
+          "x42"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x41 to i64"
+      },
+      {
+        "name": [
+          "x43"
+        ],
+        "operation": "add",
+        "modifiers": "nuw",
+        "datatype": "i64",
+        "arguments": "i64 x42, x16"
+      },
+      {
+        "name": [
+          "x44"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x29, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x45"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x29 to i64"
+      },
+      {
+        "name": [
+          "x46"
+        ],
+        "operation": "mul",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x45, -2866531139136965327"
+      },
+      {
+        "name": [
+          "x47"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x46 to i128"
+      },
+      {
+        "name": [
+          "x48"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x47, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x49"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x48, 64"
+      },
+      {
+        "name": [
+          "x50"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x49 to i64"
+      },
+      {
+        "name": [
+          "x51"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x47, 18446744069414583343"
+      },
+      {
+        "name": [
+          "x52"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x51, 64"
+      },
+      {
+        "name": [
+          "x53"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x48, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x54"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x52, x53"
+      },
+      {
+        "name": [
+          "x55"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x54, 64"
+      },
+      {
+        "name": [
+          "x56"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x53, x49"
+      },
+      {
+        "name": [
+          "x57"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x56, x55"
+      },
+      {
+        "name": [
+          "x58"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x57, 64"
+      },
+      {
+        "name": [
+          "x59"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x53, x49"
+      },
+      {
+        "name": [
+          "x60"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x59, x58"
+      },
+      {
+        "name": [
+          "x61"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x60, 64"
+      },
+      {
+        "name": [
+          "x62"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x61 to i64"
+      },
+      {
+        "name": [
+          "x63"
+        ],
+        "operation": "add",
+        "modifiers": "nuw",
+        "datatype": "i64",
+        "arguments": "i64 x62, x50"
+      },
+      {
+        "name": [
+          "x64"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x51, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x65"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x64, x44"
+      },
+      {
+        "name": [
+          "x66"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x65, 64"
+      },
+      {
+        "name": [
+          "x67"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x32, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x68"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x66, x67"
+      },
+      {
+        "name": [
+          "x69"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x54, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x70"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x68, x69"
+      },
+      {
+        "name": [
+          "x71"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x70, 64"
+      },
+      {
+        "name": [
+          "x72"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x36, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x73"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x71, x72"
+      },
+      {
+        "name": [
+          "x74"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x57, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x75"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x73, x74"
+      },
+      {
+        "name": [
+          "x76"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x75, 64"
+      },
+      {
+        "name": [
+          "x77"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x40, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x78"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x76, x77"
+      },
+      {
+        "name": [
+          "x79"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x60, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x80"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x78, x79"
+      },
+      {
+        "name": [
+          "x81"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x80, 64"
+      },
+      {
+        "name": [
+          "x82"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x43 to i128"
+      },
+      {
+        "name": [
+          "x83"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x81, x82"
+      },
+      {
+        "name": [
+          "x84"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x63 to i128"
+      },
+      {
+        "name": [
+          "x85"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x83, x84"
+      },
+      {
+        "name": [
+          "x86"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x85, 64"
+      },
+      {
+        "name": [
+          "x87"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x4 to i128"
+      },
+      {
+        "name": [
+          "x88"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x13, x87"
+      },
+      {
+        "name": [
+          "x89"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x88, 64"
+      },
+      {
+        "name": [
+          "x90"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x89 to i64"
+      },
+      {
+        "name": [
+          "x91"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x19, x87"
+      },
+      {
+        "name": [
+          "x92"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x91, 64"
+      },
+      {
+        "name": [
+          "x93"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x24, x87"
+      },
+      {
+        "name": [
+          "x94"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x93, 64"
+      },
+      {
+        "name": [
+          "x95"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x28, x87"
+      },
+      {
+        "name": [
+          "x96"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x95, 64"
+      },
+      {
+        "name": [
+          "x97"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x93, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x98"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x96, x97"
+      },
+      {
+        "name": [
+          "x99"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x98, 64"
+      },
+      {
+        "name": [
+          "x100"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x91, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x101"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x94, x100"
+      },
+      {
+        "name": [
+          "x102"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x101, x99"
+      },
+      {
+        "name": [
+          "x103"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x102, 64"
+      },
+      {
+        "name": [
+          "x104"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x88, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x105"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x92, x104"
+      },
+      {
+        "name": [
+          "x106"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x105, x103"
+      },
+      {
+        "name": [
+          "x107"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x106, 64"
+      },
+      {
+        "name": [
+          "x108"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x107 to i64"
+      },
+      {
+        "name": [
+          "x109"
+        ],
+        "operation": "add",
+        "modifiers": "nuw",
+        "datatype": "i64",
+        "arguments": "i64 x108, x90"
+      },
+      {
+        "name": [
+          "x110"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x70, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x111"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x95, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x112"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x110, x111"
+      },
+      {
+        "name": [
+          "x113"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x112, 64"
+      },
+      {
+        "name": [
+          "x114"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x75, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x115"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x98, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x116"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x113, x115"
+      },
+      {
+        "name": [
+          "x117"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x116, x114"
+      },
+      {
+        "name": [
+          "x118"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x117, 64"
+      },
+      {
+        "name": [
+          "x119"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x80, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x120"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x102, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x121"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x118, x120"
+      },
+      {
+        "name": [
+          "x122"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x121, x119"
+      },
+      {
+        "name": [
+          "x123"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x122, 64"
+      },
+      {
+        "name": [
+          "x124"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x85, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x125"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x106, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x126"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x123, x125"
+      },
+      {
+        "name": [
+          "x127"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x126, x124"
+      },
+      {
+        "name": [
+          "x128"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x127, 64"
+      },
+      {
+        "name": [
+          "x129"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x109 to i128"
+      },
+      {
+        "name": [
+          "x130"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x86, x129"
+      },
+      {
+        "name": [
+          "x131"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x130, x128"
+      },
+      {
+        "name": [
+          "x132"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x131, 64"
+      },
+      {
+        "name": [
+          "x133"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x132 to i64"
+      },
+      {
+        "name": [
+          "x134"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x112, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x135"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x112 to i64"
+      },
+      {
+        "name": [
+          "x136"
+        ],
+        "operation": "mul",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x135, -2866531139136965327"
+      },
+      {
+        "name": [
+          "x137"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x136 to i128"
+      },
+      {
+        "name": [
+          "x138"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x137, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x139"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x138, 64"
+      },
+      {
+        "name": [
+          "x140"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x139 to i64"
+      },
+      {
+        "name": [
+          "x141"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x137, 18446744069414583343"
+      },
+      {
+        "name": [
+          "x142"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x141, 64"
+      },
+      {
+        "name": [
+          "x143"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x138, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x144"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x142, x143"
+      },
+      {
+        "name": [
+          "x145"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x144, 64"
+      },
+      {
+        "name": [
+          "x146"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x143, x139"
+      },
+      {
+        "name": [
+          "x147"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x146, x145"
+      },
+      {
+        "name": [
+          "x148"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x147, 64"
+      },
+      {
+        "name": [
+          "x149"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x143, x139"
+      },
+      {
+        "name": [
+          "x150"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x149, x148"
+      },
+      {
+        "name": [
+          "x151"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x150, 64"
+      },
+      {
+        "name": [
+          "x152"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x151 to i64"
+      },
+      {
+        "name": [
+          "x153"
+        ],
+        "operation": "add",
+        "modifiers": "nuw",
+        "datatype": "i64",
+        "arguments": "i64 x152, x140"
+      },
+      {
+        "name": [
+          "x154"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x141, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x155"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x154, x134"
+      },
+      {
+        "name": [
+          "x156"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x155, 64"
+      },
+      {
+        "name": [
+          "x157"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x117, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x158"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x156, x157"
+      },
+      {
+        "name": [
+          "x159"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x144, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x160"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x158, x159"
+      },
+      {
+        "name": [
+          "x161"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x160, 64"
+      },
+      {
+        "name": [
+          "x162"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x122, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x163"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x161, x162"
+      },
+      {
+        "name": [
+          "x164"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x147, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x165"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x163, x164"
+      },
+      {
+        "name": [
+          "x166"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x165, 64"
+      },
+      {
+        "name": [
+          "x167"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x127, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x168"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x166, x167"
+      },
+      {
+        "name": [
+          "x169"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x150, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x170"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x168, x169"
+      },
+      {
+        "name": [
+          "x171"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x170, 64"
+      },
+      {
+        "name": [
+          "x172"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x131, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x173"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x171, x172"
+      },
+      {
+        "name": [
+          "x174"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x153 to i128"
+      },
+      {
+        "name": [
+          "x175"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x173, x174"
+      },
+      {
+        "name": [
+          "x176"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x175, 64"
+      },
+      {
+        "name": [
+          "x177"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x176 to i64"
+      },
+      {
+        "name": [
+          "x178"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i64",
+        "arguments": "i64 x177, x133"
+      },
+      {
+        "name": [
+          "x179"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x6 to i128"
+      },
+      {
+        "name": [
+          "x180"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x13, x179"
+      },
+      {
+        "name": [
+          "x181"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x180, 64"
+      },
+      {
+        "name": [
+          "x182"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x181 to i64"
+      },
+      {
+        "name": [
+          "x183"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x19, x179"
+      },
+      {
+        "name": [
+          "x184"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x183, 64"
+      },
+      {
+        "name": [
+          "x185"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x24, x179"
+      },
+      {
+        "name": [
+          "x186"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x185, 64"
+      },
+      {
+        "name": [
+          "x187"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x28, x179"
+      },
+      {
+        "name": [
+          "x188"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x187, 64"
+      },
+      {
+        "name": [
+          "x189"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x185, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x190"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x188, x189"
+      },
+      {
+        "name": [
+          "x191"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x190, 64"
+      },
+      {
+        "name": [
+          "x192"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x183, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x193"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x186, x192"
+      },
+      {
+        "name": [
+          "x194"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x193, x191"
+      },
+      {
+        "name": [
+          "x195"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x194, 64"
+      },
+      {
+        "name": [
+          "x196"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x180, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x197"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x184, x196"
+      },
+      {
+        "name": [
+          "x198"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x197, x195"
+      },
+      {
+        "name": [
+          "x199"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x198, 64"
+      },
+      {
+        "name": [
+          "x200"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x199 to i64"
+      },
+      {
+        "name": [
+          "x201"
+        ],
+        "operation": "add",
+        "modifiers": "nuw",
+        "datatype": "i64",
+        "arguments": "i64 x200, x182"
+      },
+      {
+        "name": [
+          "x202"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x160, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x203"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x187, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x204"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x202, x203"
+      },
+      {
+        "name": [
+          "x205"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x204, 64"
+      },
+      {
+        "name": [
+          "x206"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x165, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x207"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x190, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x208"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x205, x207"
+      },
+      {
+        "name": [
+          "x209"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x208, x206"
+      },
+      {
+        "name": [
+          "x210"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x209, 64"
+      },
+      {
+        "name": [
+          "x211"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x170, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x212"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x194, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x213"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x210, x212"
+      },
+      {
+        "name": [
+          "x214"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x213, x211"
+      },
+      {
+        "name": [
+          "x215"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x214, 64"
+      },
+      {
+        "name": [
+          "x216"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x175, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x217"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x198, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x218"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x215, x217"
+      },
+      {
+        "name": [
+          "x219"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x218, x216"
+      },
+      {
+        "name": [
+          "x220"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x219, 64"
+      },
+      {
+        "name": [
+          "x221"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x178 to i128"
+      },
+      {
+        "name": [
+          "x222"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x201 to i128"
+      },
+      {
+        "name": [
+          "x223"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x221, x222"
+      },
+      {
+        "name": [
+          "x224"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x223, x220"
+      },
+      {
+        "name": [
+          "x225"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x224, 64"
+      },
+      {
+        "name": [
+          "x226"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x225 to i64"
+      },
+      {
+        "name": [
+          "x227"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x204, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x228"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x204 to i64"
+      },
+      {
+        "name": [
+          "x229"
+        ],
+        "operation": "mul",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x228, -2866531139136965327"
+      },
+      {
+        "name": [
+          "x230"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x229 to i128"
+      },
+      {
+        "name": [
+          "x231"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x230, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x232"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x231, 64"
+      },
+      {
+        "name": [
+          "x233"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x232 to i64"
+      },
+      {
+        "name": [
+          "x234"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x230, 18446744069414583343"
+      },
+      {
+        "name": [
+          "x235"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x234, 64"
+      },
+      {
+        "name": [
+          "x236"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x231, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x237"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x235, x236"
+      },
+      {
+        "name": [
+          "x238"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x237, 64"
+      },
+      {
+        "name": [
+          "x239"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x236, x232"
+      },
+      {
+        "name": [
+          "x240"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x239, x238"
+      },
+      {
+        "name": [
+          "x241"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x240, 64"
+      },
+      {
+        "name": [
+          "x242"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x236, x232"
+      },
+      {
+        "name": [
+          "x243"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x242, x241"
+      },
+      {
+        "name": [
+          "x244"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x243, 64"
+      },
+      {
+        "name": [
+          "x245"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x244 to i64"
+      },
+      {
+        "name": [
+          "x246"
+        ],
+        "operation": "add",
+        "modifiers": "nuw",
+        "datatype": "i64",
+        "arguments": "i64 x245, x233"
+      },
+      {
+        "name": [
+          "x247"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x234, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x248"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x247, x227"
+      },
+      {
+        "name": [
+          "x249"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x248, 64"
+      },
+      {
+        "name": [
+          "x250"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x209, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x251"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x249, x250"
+      },
+      {
+        "name": [
+          "x252"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x237, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x253"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x251, x252"
+      },
+      {
+        "name": [
+          "x254"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x253, 64"
+      },
+      {
+        "name": [
+          "x255"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x214, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x256"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x254, x255"
+      },
+      {
+        "name": [
+          "x257"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x240, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x258"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x256, x257"
+      },
+      {
+        "name": [
+          "x259"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x258, 64"
+      },
+      {
+        "name": [
+          "x260"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x219, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x261"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x259, x260"
+      },
+      {
+        "name": [
+          "x262"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x243, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x263"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x261, x262"
+      },
+      {
+        "name": [
+          "x264"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x263, 64"
+      },
+      {
+        "name": [
+          "x265"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x224, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x266"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x264, x265"
+      },
+      {
+        "name": [
+          "x267"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x246 to i128"
+      },
+      {
+        "name": [
+          "x268"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x266, x267"
+      },
+      {
+        "name": [
+          "x269"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x268, 64"
+      },
+      {
+        "name": [
+          "x270"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x269 to i64"
+      },
+      {
+        "name": [
+          "x271"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i64",
+        "arguments": "i64 x270, x226"
+      },
+      {
+        "name": [
+          "x272"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x8 to i128"
+      },
+      {
+        "name": [
+          "x273"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x13, x272"
+      },
+      {
+        "name": [
+          "x274"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x273, 64"
+      },
+      {
+        "name": [
+          "x275"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x274 to i64"
+      },
+      {
+        "name": [
+          "x276"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x19, x272"
+      },
+      {
+        "name": [
+          "x277"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x276, 64"
+      },
+      {
+        "name": [
+          "x278"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x24, x272"
+      },
+      {
+        "name": [
+          "x279"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x278, 64"
+      },
+      {
+        "name": [
+          "x280"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x28, x272"
+      },
+      {
+        "name": [
+          "x281"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x280, 64"
+      },
+      {
+        "name": [
+          "x282"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x278, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x283"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x281, x282"
+      },
+      {
+        "name": [
+          "x284"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x283, 64"
+      },
+      {
+        "name": [
+          "x285"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x276, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x286"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x279, x285"
+      },
+      {
+        "name": [
+          "x287"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x286, x284"
+      },
+      {
+        "name": [
+          "x288"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x287, 64"
+      },
+      {
+        "name": [
+          "x289"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x273, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x290"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x277, x289"
+      },
+      {
+        "name": [
+          "x291"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x290, x288"
+      },
+      {
+        "name": [
+          "x292"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x291, 64"
+      },
+      {
+        "name": [
+          "x293"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x292 to i64"
+      },
+      {
+        "name": [
+          "x294"
+        ],
+        "operation": "add",
+        "modifiers": "nuw",
+        "datatype": "i64",
+        "arguments": "i64 x293, x275"
+      },
+      {
+        "name": [
+          "x295"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x253, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x296"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x280, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x297"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x295, x296"
+      },
+      {
+        "name": [
+          "x298"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x297, 64"
+      },
+      {
+        "name": [
+          "x299"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x258, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x300"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x283, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x301"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x298, x300"
+      },
+      {
+        "name": [
+          "x302"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x301, x299"
+      },
+      {
+        "name": [
+          "x303"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x302, 64"
+      },
+      {
+        "name": [
+          "x304"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x263, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x305"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x287, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x306"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x303, x305"
+      },
+      {
+        "name": [
+          "x307"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x306, x304"
+      },
+      {
+        "name": [
+          "x308"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x307, 64"
+      },
+      {
+        "name": [
+          "x309"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x268, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x310"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x291, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x311"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x308, x310"
+      },
+      {
+        "name": [
+          "x312"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x311, x309"
+      },
+      {
+        "name": [
+          "x313"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x312, 64"
+      },
+      {
+        "name": [
+          "x314"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x271 to i128"
+      },
+      {
+        "name": [
+          "x315"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x294 to i128"
+      },
+      {
+        "name": [
+          "x316"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x314, x315"
+      },
+      {
+        "name": [
+          "x317"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x316, x313"
+      },
+      {
+        "name": [
+          "x318"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x317, 64"
+      },
+      {
+        "name": [
+          "x319"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x318 to i64"
+      },
+      {
+        "name": [
+          "x320"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x297, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x321"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x297 to i64"
+      },
+      {
+        "name": [
+          "x322"
+        ],
+        "operation": "mul",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x321, -2866531139136965327"
+      },
+      {
+        "name": [
+          "x323"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x322 to i128"
+      },
+      {
+        "name": [
+          "x324"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x323, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x325"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x324, 64"
+      },
+      {
+        "name": [
+          "x326"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x325 to i64"
+      },
+      {
+        "name": [
+          "x327"
+        ],
+        "operation": "mul",
+        "modifiers": "nuw",
+        "datatype": "i128",
+        "arguments": "i128 x323, 18446744069414583343"
+      },
+      {
+        "name": [
+          "x328"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x327, 64"
+      },
+      {
+        "name": [
+          "x329"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x324, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x330"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x328, x329"
+      },
+      {
+        "name": [
+          "x331"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x330, 64"
+      },
+      {
+        "name": [
+          "x332"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x329, x325"
+      },
+      {
+        "name": [
+          "x333"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x332, x331"
+      },
+      {
+        "name": [
+          "x334"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x333, 64"
+      },
+      {
+        "name": [
+          "x335"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x329, x325"
+      },
+      {
+        "name": [
+          "x336"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x335, x334"
+      },
+      {
+        "name": [
+          "x337"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x336, 64"
+      },
+      {
+        "name": [
+          "x338"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x337 to i64"
+      },
+      {
+        "name": [
+          "x339"
+        ],
+        "operation": "add",
+        "modifiers": "nuw",
+        "datatype": "i64",
+        "arguments": "i64 x338, x326"
+      },
+      {
+        "name": [
+          "x340"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x327, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x341"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x340, x320"
+      },
+      {
+        "name": [
+          "x342"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x341, 64"
+      },
+      {
+        "name": [
+          "x343"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x302, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x344"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x342, x343"
+      },
+      {
+        "name": [
+          "x345"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x330, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x346"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x344, x345"
+      },
+      {
+        "name": [
+          "x347"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x346, 64"
+      },
+      {
+        "name": [
+          "x348"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x307, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x349"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x347, x348"
+      },
+      {
+        "name": [
+          "x350"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x333, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x351"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x349, x350"
+      },
+      {
+        "name": [
+          "x352"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x351, 64"
+      },
+      {
+        "name": [
+          "x353"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x312, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x354"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x352, x353"
+      },
+      {
+        "name": [
+          "x355"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x336, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x356"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x354, x355"
+      },
+      {
+        "name": [
+          "x357"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x356, 64"
+      },
+      {
+        "name": [
+          "x358"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x317, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x359"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x357, x358"
+      },
+      {
+        "name": [
+          "x360"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x339 to i128"
+      },
+      {
+        "name": [
+          "x361"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i128",
+        "arguments": "i128 x359, x360"
+      },
+      {
+        "name": [
+          "x362"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x361, 64"
+      },
+      {
+        "name": [
+          "x363"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x362 to i64"
+      },
+      {
+        "name": [
+          "x364"
+        ],
+        "operation": "add",
+        "modifiers": "nuw nsw",
+        "datatype": "i64",
+        "arguments": "i64 x363, x319"
+      },
+      {
+        "name": [
+          "x365"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x346, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x366"
+        ],
+        "operation": "add",
+        "modifiers": "nsw",
+        "datatype": "i128",
+        "arguments": "i128 x365, -18446744069414583343"
+      },
+      {
+        "name": [
+          "x367"
+        ],
+        "operation": "ashr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x366, 64"
+      },
+      {
+        "name": [
+          "x368"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x367 to i8"
+      },
+      {
+        "name": [
+          "x369"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x366 to i64"
+      },
+      {
+        "name": [
+          "x370"
+        ],
+        "operation": "sub",
+        "modifiers": "nsw",
+        "datatype": "i8",
+        "arguments": "i8 0, x368"
+      },
+      {
+        "name": [
+          "x371"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x351, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x372"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i8",
+        "arguments": "i8 x370 to i128"
+      },
+      {
+        "name": [
+          "x373"
+        ],
+        "operation": "add",
+        "modifiers": "nsw",
+        "datatype": "i128",
+        "arguments": "i128 x371, -18446744073709551615"
+      },
+      {
+        "name": [
+          "x374"
+        ],
+        "operation": "sub",
+        "modifiers": "nsw",
+        "datatype": "i128",
+        "arguments": "i128 x373, x372"
+      },
+      {
+        "name": [
+          "x375"
+        ],
+        "operation": "ashr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x374, 64"
+      },
+      {
+        "name": [
+          "x376"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x375 to i8"
+      },
+      {
+        "name": [
+          "x377"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x374 to i64"
+      },
+      {
+        "name": [
+          "x378"
+        ],
+        "operation": "sub",
+        "modifiers": "nsw",
+        "datatype": "i8",
+        "arguments": "i8 0, x376"
+      },
+      {
+        "name": [
+          "x379"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x356, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x380"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i8",
+        "arguments": "i8 x378 to i128"
+      },
+      {
+        "name": [
+          "x381"
+        ],
+        "operation": "add",
+        "modifiers": "nsw",
+        "datatype": "i128",
+        "arguments": "i128 x379, -18446744073709551615"
+      },
+      {
+        "name": [
+          "x382"
+        ],
+        "operation": "sub",
+        "modifiers": "nsw",
+        "datatype": "i128",
+        "arguments": "i128 x381, x380"
+      },
+      {
+        "name": [
+          "x383"
+        ],
+        "operation": "ashr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x382, 64"
+      },
+      {
+        "name": [
+          "x384"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x383 to i8"
+      },
+      {
+        "name": [
+          "x385"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x382 to i64"
+      },
+      {
+        "name": [
+          "x386"
+        ],
+        "operation": "sub",
+        "modifiers": "nsw",
+        "datatype": "i8",
+        "arguments": "i8 0, x384"
+      },
+      {
+        "name": [
+          "x387"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x361, 18446744073709551615"
+      },
+      {
+        "name": [
+          "x388"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i8",
+        "arguments": "i8 x386 to i128"
+      },
+      {
+        "name": [
+          "x389"
+        ],
+        "operation": "add",
+        "modifiers": "nsw",
+        "datatype": "i128",
+        "arguments": "i128 x387, -18446744073709551615"
+      },
+      {
+        "name": [
+          "x390"
+        ],
+        "operation": "sub",
+        "modifiers": "nsw",
+        "datatype": "i128",
+        "arguments": "i128 x389, x388"
+      },
+      {
+        "name": [
+          "x391"
+        ],
+        "operation": "lshr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x390, 64"
+      },
+      {
+        "name": [
+          "x392"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x391 to i8"
+      },
+      {
+        "name": [
+          "x393"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x390 to i64"
+      },
+      {
+        "name": [
+          "x394"
+        ],
+        "operation": "sub",
+        "modifiers": "nsw",
+        "datatype": "i8",
+        "arguments": "i8 0, x392"
+      },
+      {
+        "name": [
+          "x395"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x364 to i128"
+      },
+      {
+        "name": [
+          "x396"
+        ],
+        "operation": "zext",
+        "modifiers": "",
+        "datatype": "i8",
+        "arguments": "i8 x394 to i128"
+      },
+      {
+        "name": [
+          "x397"
+        ],
+        "operation": "sub",
+        "modifiers": "nsw",
+        "datatype": "i128",
+        "arguments": "i128 x395, x396"
+      },
+      {
+        "name": [
+          "x398"
+        ],
+        "operation": "ashr",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x397, 64"
+      },
+      {
+        "name": [
+          "x399"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x398 to i64"
+      },
+      {
+        "name": [
+          "x400"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x398, x346"
+      },
+      {
+        "name": [
+          "x401"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x400 to i64"
+      },
+      {
+        "name": [
+          "x402"
+        ],
+        "operation": "xor",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x399, -1"
+      },
+      {
+        "name": [
+          "x403"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x402, x369"
+      },
+      {
+        "name": [
+          "x404"
+        ],
+        "operation": "or",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x403, x401"
+      },
+      {
+        "name": [
+          "x405"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x398, x351"
+      },
+      {
+        "name": [
+          "x406"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x405 to i64"
+      },
+      {
+        "name": [
+          "x407"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x402, x377"
+      },
+      {
+        "name": [
+          "x408"
+        ],
+        "operation": "or",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x407, x406"
+      },
+      {
+        "name": [
+          "x409"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x398, x356"
+      },
+      {
+        "name": [
+          "x410"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x409 to i64"
+      },
+      {
+        "name": [
+          "x411"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x402, x385"
+      },
+      {
+        "name": [
+          "x412"
+        ],
+        "operation": "or",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x411, x410"
+      },
+      {
+        "name": [
+          "x413"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x398, x361"
+      },
+      {
+        "name": [
+          "x414"
+        ],
+        "operation": "trunc",
+        "modifiers": "",
+        "datatype": "i128",
+        "arguments": "i128 x413 to i64"
+      },
+      {
+        "name": [
+          "x415"
+        ],
+        "operation": "and",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x402, x393"
+      },
+      {
+        "name": [
+          "x416"
+        ],
+        "operation": "or",
+        "modifiers": "",
+        "datatype": "i64",
+        "arguments": "i64 x415, x414"
+      },
+      {
+        "name": [
+          "_"
+        ],
+        "operation": "store",
+        "datatype": "i64",
+        "arguments": "i64 x404, ptr x0",
+        "modifiers": "align 8"
+      },
+      {
+        "name": [
+          "x417"
+        ],
+        "operation": "getelementptr",
+        "modifiers": "inbounds ",
+        "datatype": "i64",
+        "arguments": "i64, ptr x0, i64 1"
+      },
+      {
+        "name": [
+          "_"
+        ],
+        "operation": "store",
+        "datatype": "i64",
+        "arguments": "i64 x408, ptr x417",
+        "modifiers": "align 8"
+      },
+      {
+        "name": [
+          "x418"
+        ],
+        "operation": "getelementptr",
+        "modifiers": "inbounds ",
+        "datatype": "i64",
+        "arguments": "i64, ptr x0, i64 2"
+      },
+      {
+        "name": [
+          "_"
+        ],
+        "operation": "store",
+        "datatype": "i64",
+        "arguments": "i64 x412, ptr x418",
+        "modifiers": "align 8"
+      },
+      {
+        "name": [
+          "x419"
+        ],
+        "operation": "getelementptr",
+        "modifiers": "inbounds ",
+        "datatype": "i64",
+        "arguments": "i64, ptr x0, i64 3"
+      },
+      {
+        "name": [
+          "_"
+        ],
+        "operation": "store",
+        "datatype": "i64",
+        "arguments": "i64 x416, ptr x419",
+        "modifiers": "align 8"
+      }
+    ]
+  }
+]

@@ -25,7 +25,7 @@ import { ManualBridge } from "@/bridge/manual-bridge";
 import { Model } from "@/model";
 import { OptimizerArgs } from "@/types";
 import { llvm_BitcoinCoreBridge } from "@/bridge/llvm-bitcoin-core-bridge";
-import { RustBridge, METHOD_T as RUST_METHOD_T } from "@/bridge/rust-bridge";
+import { RustBridge, METHOD_T as RUST_METHOD_T, CURVE_T as RUST_CURVE_T} from "@/bridge/rust-bridge";
 
 
 type needComms = Pick<OptimizerArgs, "bridge" | "seed" | "memoryConstraints">;
@@ -51,8 +51,9 @@ interface needllvmBitcoinCore extends needComms {
   method: BITCOIN_CORE_METHOD_T;
 }
 interface needRust extends needComms {
-  bridge: "rust";
+  curve: RUST_CURVE_T;
   method: RUST_METHOD_T;
+  bridge: "rust";
 }
 
 type neededArgs = needJasmin | needFiat | needManual | needBitcoinCore | needllvmBitcoinCore | needRust;
@@ -172,16 +173,16 @@ function initRust(sharedObjectFilename: string, args: needRust): ret {
   const bridge = new RustBridge();
   Model.init({
     memoryConstraints: args.memoryConstraints,
-    json: bridge.getCryptOptFunction(args.method),
+    json: bridge.getCryptOptFunction(args.method, args.curve),
   });
 
-  const symbolname = bridge.machinecode(sharedObjectFilename, args.method);
+  const symbolname = bridge.machinecode(sharedObjectFilename, args.method, args.curve);
   const chunksize = 16; // only for reading the chunk breaks atm. see MS code
-  const argwidth = bridge.argwidth("",args.method);
+  const argwidth = bridge.argwidth(args.curve ,args.method);
   const argnumin = bridge.argnumin(args.method);
   const argnumout = bridge.argnumout(args.method);
 
-  const bounds = bridge.bounds("", args.method);
+  const bounds = bridge.bounds(args.curve, args.method);
   return { symbolname, chunksize, argwidth, argnumin, argnumout, bounds };
 }
 

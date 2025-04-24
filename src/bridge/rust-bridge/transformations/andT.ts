@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { getScalarsAndImmMappedAsConstArg } from "../helpers";
+import { getScalarsAndImmMappedAsConstArg, getArguments } from "../helpers";
 import type { SSA } from "../raw.type";
 import type { Intermediate } from "./intermediate.type";
 
@@ -29,6 +29,28 @@ export function transformAnd(input: SSA): Intermediate {
   }
   const args = getScalarsAndImmMappedAsConstArg(input.arguments);
 
+  // // 18446744073709551615 = 0xFFFFFFFFFFFFFFFF thus, this is the bit mask.
+  // // 18446744073709551614 = 0xFFFFFFFFFFFFFFFE thus, this is the bit mask.
+  // const {scalars , imm} = getArguments(input.arguments);
+  
+  // if (imm.length > 0 && imm[0].imm === "18446744073709551615") {
+  //   return {
+  //     name: input.name,
+  //     datatype: "u64",
+  //     operation: "limb",
+  //     arguments: [scalars[0].id, "0"],// in u64 case, 0 or 1 don't mattar since this is for splitting u128 into 2 * u64
+  //   };
+  // }
+
+  // if (imm.length > 0 && imm[0].imm === "18446744073709551614") {
+  //   return {
+  //     name: input.name,
+  //     datatype: "u64",
+  //     operation: "&",
+  //     arguments: args,// in u64 case, 0 or 1 don't mattar since this is for splitting u128 into 2 * u64
+  //   };
+  // }
+ 
   return {
     name: input.name,
     datatype,

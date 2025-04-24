@@ -16,7 +16,7 @@
 
 export type StructName = `struct.${string}`;
 export type PT = "i64*" | `${StructName}*`; // pointer type
-export type ST = "i1" | "i64" | "i128"; // scalar type
+export type ST = "i1" | "i8" |  "i64" | "i128"; // scalar type
 export type DT = PT | ST; // datatype
 export type OP =
   | "add"
@@ -34,7 +34,8 @@ export type OP =
   | "xor"
   | "zext"
   | "sub"
-  | "cmovznz" ; //raw types
+  | "cmovznz"  //raw types
+  | "addcarryx"
 export type varName_T = `x${number}`;
 
 export type SSA = {

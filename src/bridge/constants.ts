@@ -64,8 +64,8 @@ export const KNOWN_SYMBOLS: {
   bls12_mul: { bridge: "rust", method: "mul", curve: "bls12_381_p"}, // done
   bls12_square: { bridge: "rust", method: "square", curve: "bls12_381_p"}, 
   
-  rust_fiat_curve25519_mul: { bridge: "rust", method: "mul", curve: "curve25519"}, // done
-  rust_fiat_curve25519_square: { bridge: "rust", method: "square", curve: "curve25519"}, 
+  rust_fiat_curve25519_carry_mul: { bridge: "rust", method: "mul", curve: "curve25519"}, // done
+  rust_fiat_curve25519_carry_square: { bridge: "rust", method: "square", curve: "curve25519"}, 
 
   rust_fiat_curve25519_solinas_mul: { bridge: "rust", method: "mul", curve: "curve25519_solinas"}, // runnanble but not good
   rust_fiat_curve25519_solinas_square: { bridge: "rust", method: "square", curve: "curve25519_solinas"}, // runnanble but not good
@@ -83,7 +83,7 @@ export const KNOWN_SYMBOLS: {
   rust_fiat_p434_square: { bridge: "rust", method: "square", curve: "p434"},
 
   rust_fiat_p448_solinas_carry_mul: { bridge: "rust", method: "mul", curve: "p448_solinas"}, //done
-  rust_fiat_p448_solinas_square: { bridge: "rust", method: "square", curve: "p448_solinas"},
+  rust_fiat_p448_solinas_carry_square: { bridge: "rust", method: "square", curve: "p448_solinas"},
 
   rust_fiat_p521_mul: { bridge: "rust", method: "mul", curve: "p521"}, //done
   rust_fiat_p521_square: { bridge: "rust", method: "square", curve: "p521"}, 

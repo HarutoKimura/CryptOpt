@@ -36,6 +36,7 @@ import {
   transformZext,
   transformSub,
   transformCmovznz,
+  transformAddcarryx,
 } from "./transformations";
 import type { Intermediate } from "./transformations/intermediate.type";
 // import { zextR, sextR } from "./transformations/reducers";
@@ -92,6 +93,7 @@ export class RustPreprocessor {
       icmp: transformIcmp,
       sub: transformSub,
       cmovznz: transformCmovznz,
+      addcarryx: transformAddcarryx,
     }).reduce((acc, [op, func]) => {
       if (grouped[op]) {
         acc.push(
@@ -120,6 +122,7 @@ export class RustPreprocessor {
     delete grouped.icmp;
     delete grouped.sub;
     delete grouped.cmovznz;
+    delete grouped.addcarryx;
 
     //original body.concat stores, loads, otherInstrs
     body = body.concat(

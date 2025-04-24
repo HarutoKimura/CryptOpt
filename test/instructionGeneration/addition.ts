@@ -51,7 +51,7 @@ const allocs = {
   x19_0: { datatype: "u64", store: "rbx" },
   x19_1: { datatype: "u64", store: "rdx" },
   x19: { datatype: "u128" },
-  x0: { datatype: "u1", store: "OF" },
+  // x0: { datatype: "1u1", store: "CF" },
 
   // u128 + zext'ed u64
   x90: { datatype: "u128" },
@@ -89,6 +89,39 @@ const allocs = {
   // u64 = u1 + u1 but one u1 is still needed elsewehere
   x250: { datatype: "u1", store: Flags.CF },
   x251: { datatype: "u1", store: Flags.OF },
+
+
+  // destorying u128 bit addition case
+  // x92 = x91+ x89 // max data size should be 66 bit
+  // x91: { datatype: "u128" }, // max data size is 65 bit
+  // x89: { datatype: "u128" }, // max data size is 64 bit
+
+  // x91_0: { datatype: "u64", store: "r12" },
+  // x91_1: { datatype: "u1", store: "CF" },
+
+  // x89_0: { datatype: "u64", store: "r9" },
+  // x89_1: empty
+
+ // x92_0 = x91_0 + x89_0
+ // x92_1 = x91_1 + x89_1 = CF + 0x0 + carry from the lower bit
+
+
+  // since x161 is mased by &0xffffffffffffffff in the previous operation, it is actually u64
+  x161: { datatype: "u128" }, // x161 is actually u64
+  x161_0: { datatype: "u64", store: "r15" },
+  //x161_1 is empty but it should be allocated
+
+  x160: { datatype: "u128" }, // x160 is u65
+  x160_0: { datatype: "u64", store: "r12" },
+  x160_1: { datatype: "u1", store: "CF" },  // High limb as flag
+
+  x158: { datatype: "u128" }, // actually x158 is u64
+  x158_0: { datatype: "u64", store: "r9" },
+  //x158_1 is empty
+
+  //x300: { datatype: "u1", store: "CF" }, // this is temp_value, "0x0" in the actual error case
+
+
 } as Allocations;
 type MOCK_MODEL = any;
 const allocate = vi.fn();
@@ -193,6 +226,8 @@ describe("instructionGeneration:add", () => {
 
     const code = add(c).filter((a) => !a.startsWith(";"));
 
+    console.log("generated code should add two u128 to one u128 using provided flag-choice", code);
+
     expect(code).toHaveLength(2);
     // no clear OF, because that would be in ra.pres
     expect(code[0]).toBe("adox rbx, r14"); // this adox comes from the di_flag decision + flagState being both FlagState.KILLED
@@ -232,6 +267,8 @@ describe("instructionGeneration:add", () => {
     };
 
     const code = add(c).filter((a) => !a.startsWith(";"));
+
+    console.log("generated code should add a u128 and a u128, which only has the lo limb set.", code);
     expect(code).toHaveLength(2);
     expect(code).toEqual(["adox rdx, rbp", "adox r9, r8"]);
     expect(getCurrentAllocations).toBeCalled();
@@ -657,4 +694,135 @@ describe("instructionGeneration:add", () => {
     expect(code[0]).toEqual(`adc ${flagSpillMockReg}, 0x0; r<-f+f`);
     expect(code[1]).toEqual(`movzx ${flagSpillMockReg__64}, ${flagSpillMockReg}`);
   });
+
+  it("destroying u128 bit addition entire case", () => {
+    getCurrentAllocations.mockClear();
+    flagState.mockImplementation(
+      () =>
+        ({
+          [Flags.CF]: FlagState.ALIVE,
+          [Flags.OF]: FlagState.ALIVE,
+        }) as { [f in Flags]: FlagState },
+    );
+
+    const c: CryptOpt.StringOperation = {
+      name: ["x161"],
+      datatype: "u128",
+      operation: "+",
+      decisions: {
+        di_choose_arg: [0, ["x160", "x158"]],
+        di_flag: [0, [Flags.CF, Flags.OF]],
+        di_handle_flags_kk: [
+          1,
+          [C_DI_HANDLE_FLAGS_KK.C_ADD, C_DI_HANDLE_FLAGS_KK.C_XOR_ADX, C_DI_HANDLE_FLAGS_KK.C_TEST_ADX],
+        ],
+        di_choose_imm: [1, ["0x0", "-0x1"]],
+        [DECISION_IDENTIFIER.DI_SPILL_LOCATION]: [
+          0,
+          [C_DI_SPILL_LOCATION.C_DI_MEM, C_DI_SPILL_LOCATION.C_DI_XMM_REG],
+        ],
+      },
+      decisionsHot: [],
+      arguments: ["x160", "x158"],
+    };
+
+    const code = add(c).filter((a) => !a.startsWith(";"));
+    expect(code).toHaveLength(3);
+
+    console.warn("generated code 128 bit addition", code);
+
+    expect(code).toEqual(["adcx r9, r12", "adc r11b, 0x0; r<-f+f", "movzx r11, r11b"]);
+    expect(getCurrentAllocations).toBeCalled();
+    expect(flagState).toBeCalled();
+  });
+
+//   it("destroying case: lower bit addition similation", () => {
+//     getCurrentAllocations.mockClear();
+//     flagState.mockImplementation(
+//       () => ({
+//         [Flags.CF]: FlagState.ALIVE,
+//         [Flags.OF]: FlagState.ALIVE,
+//       }) as { [f in Flags]: FlagState },
+//     );
+
+//     const c: CryptOpt.StringOperation = {
+//       name: ["x161_0", "x300"],
+//       datatype: "u64",
+//       operation: "addcarryx",
+//       decisions: {
+//         di_choose_arg: [0, ["0x0", "x160_0", "x158_0"]],
+//         di_flag: [0, [Flags.CF, Flags.OF]],
+//         di_handle_flags_kk: [
+//           1,
+//           [C_DI_HANDLE_FLAGS_KK.C_ADD, C_DI_HANDLE_FLAGS_KK.C_XOR_ADX, C_DI_HANDLE_FLAGS_KK.C_TEST_ADX],
+//         ],
+//         di_choose_imm: [1, ["0x0", "-0x1"]],
+//         [DECISION_IDENTIFIER.DI_SPILL_LOCATION]: [
+//           1,
+//           [C_DI_SPILL_LOCATION.C_DI_MEM, C_DI_SPILL_LOCATION.C_DI_XMM_REG],
+//         ],
+//       },
+//       decisionsHot: [],
+//       arguments: ["0x0", "x160_0", "x158_0"],
+//     };
+//      // should probably be mocked.
+//      Paul.currentInstruction = c;
+
+
+//      const code = add(c).filter((a) => !a.startsWith(";"));
+//      expect(code).toHaveLength(1);
+
+//      console.warn("generated code 128 bit addition higher bit part", code);
+ 
+//      // I dont really care about the order as long as the allocation was done correctly.
+//     //  expect(code[0]).toMatch(/adc r11b, 0x0/);  // Changed expectation
+//      expect(code[0]).toEqual("adcx r9, r12");
+//      expect(getCurrentAllocations).toBeCalled();
+// });
+
+// it("destroying case continue: higher bit addition similation", () => {
+//   getCurrentAllocations.mockClear();
+//   flagState.mockImplementation(
+//     () => ({
+//       [Flags.CF]: FlagState.ALIVE,
+//       [Flags.OF]: FlagState.ALIVE,
+//     }) as { [f in Flags]: FlagState },
+//   );
+
+//   const c: CryptOpt.StringOperation = {
+//     name: ["x161_1"],
+//     datatype: "u64",
+//     operation: "+",
+//     decisions: {
+//       di_choose_arg: [0, ["x300", "x160_1"]],
+//       di_flag: [0, [Flags.CF, Flags.OF]],
+//       di_handle_flags_kk: [
+//         1,
+//         [C_DI_HANDLE_FLAGS_KK.C_ADD, C_DI_HANDLE_FLAGS_KK.C_XOR_ADX, C_DI_HANDLE_FLAGS_KK.C_TEST_ADX],
+//       ],
+//       di_choose_imm: [1, ["0x0", "-0x1"]],
+//       [DECISION_IDENTIFIER.DI_SPILL_LOCATION]: [
+//         1,
+//         [C_DI_SPILL_LOCATION.C_DI_MEM, C_DI_SPILL_LOCATION.C_DI_XMM_REG],
+//       ],
+//     },
+//     decisionsHot: [],
+//     arguments: ["x300", "x160_1"],
+//   };
+//    Paul.currentInstruction = c;
+
+//    const code = add(c).filter((a) => !a.startsWith(";"));
+
+//   console.warn("generated code 128 bit additon lower bit part", code);
+
+
+//    expect(code).toHaveLength(2);
+
+//    // For flag + 0x0, expect single adc instruction
+//    expect(code[0]).toBe("adc r11b, 0x0; r<-f+f");
+//    expect(code[1]).toBe("movzx r11, r11b");
+//    expect(getCurrentAllocations).toBeCalled();
+
+//    expect(getCurrentAllocations).toBeCalled();
+// });
 });

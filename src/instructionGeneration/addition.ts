@@ -16,7 +16,7 @@
 
 import { omit } from "lodash-es";
 
-import { delimbify, isFlag, isImm, isU1, isXmmRegister, limbify, TEMP_VARNAME } from "@/helper";
+import { delimbify, isByteRegister, isFlag, isImm, isU1, isXmmRegister, limbify, matchArg, TEMP_VARNAME} from "@/helper";
 import { Model } from "@/model";
 import { Paul } from "@/paul";
 import { RegisterAllocator } from "@/registerAllocator";
@@ -32,6 +32,8 @@ import type {
 } from "@/types";
 
 import { fr__rm_rm, fr__rm_rm_rmf, fr_rm_f_f, r__rm_f_f, r__rm_rm_rmf, r__rmf_rmf } from "./additionhelpers";
+import { AllocationFlags, Flags } from "@/enums";
+import { argv0 } from "process";
 
 export function add(c: CryptOpt.StringOperation): asm[] {
   // Step 1 Find out, what to do and get allocations: highlevel
@@ -47,13 +49,19 @@ export function add(c: CryptOpt.StringOperation): asm[] {
 }
 
 function add128(c: CryptOpt.StringOperation): asm[] {
+
+  // console.log("add128 starts with ", c);
   // for now, add all to the first 1
   const [collector, ...tail] = c.arguments;
   const [olo, ohi] = limbify(c.name);
   if (!ohi) {
     throw new Error("TSNH. ohi shall be defined.");
   }
+  
   const ra = RegisterAllocator.getInstance();
+
+  const allocbeforeadd128 = ra.getCurrentAllocations();
+  // console.log("allocbeforeadd128", allocbeforeadd128);
 
   function zeroIfNotAllocced<T extends CryptOpt.ArgumentWithStringArguments["arguments"][number]>([lo, hi]: [
     T,
@@ -125,6 +133,7 @@ function add128(c: CryptOpt.StringOperation): asm[] {
     Paul.currentInstruction = cLo;
 
     const asmlo = add64(cLo);
+    // console.log ("suspicious asmlo", asmlo);
     asmlo.unshift(...RegisterAllocator.getInstance().pres);
     asmlo.push(";;;done with asmlo");
 
@@ -163,6 +172,7 @@ function add128(c: CryptOpt.StringOperation): asm[] {
     };
     Paul.currentInstruction = cHi;
     const asmhi = add64(cHi);
+    // console.log("suspicious asmhi", asmhi);
     asmhi.unshift(...RegisterAllocator.getInstance().pres);
     asmhi.push(";done with asmhi-2");
     acc.push(...asmhi);
@@ -171,7 +181,14 @@ function add128(c: CryptOpt.StringOperation): asm[] {
   }, [] as string[]);
 
   Model.hardDependencies.clear();
+  const beforedeclareAllocs = RegisterAllocator.getInstance().getCurrentAllocations();
+  // console.log("beforedeclareAllocs", beforedeclareAllocs);
+
   ra.declare128(c.name[0]);
+
+  const afterdeclareAllocs = RegisterAllocator.getInstance().getCurrentAllocations();
+  // console.log("afterdeclareAllocs", afterdeclareAllocs);
+  // console.log("what is all", all);
   return all;
 }
 function add64(c: CryptOpt.StringOperation): asm[] {
@@ -268,6 +285,7 @@ function add64(c: CryptOpt.StringOperation): asm[] {
           arguments: [cin, arg, immediate],
         });
       }
+      // console.log("addcarryx with undefined", c);
 
       return [";fr__rm_rm", ...fr__rm_rm(c.name[1] /* COUT */, c.name[0], a_arg1, a_arg2)];
     }
@@ -298,6 +316,7 @@ function add64(c: CryptOpt.StringOperation): asm[] {
         );
       }
       if (both_u1_are_flags) {
+        // console.log("curve25519-solinas problmatic part comes to here")
         return ["; fr_rm_f_f", ...fr_rm_f_f(c.name[1] /* COUT */, c.name[0], a_arg1)];
       }
 

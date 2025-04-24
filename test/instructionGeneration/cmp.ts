@@ -150,7 +150,7 @@ describe("instructionGeneration:cmp", () => {
         const result = cmp(instr);
 
         expect(result).toHaveLength(1);
-        expect(result[0]).toMatch(/cmp r10, -0x1/);
+        expect(result[0]).toMatch(/cmp qword r10, -0x1/);
         expect(setCC).toBeCalledWith(setcc, "x257");
         expect(allocate).toBeCalled();
       });
@@ -201,7 +201,7 @@ describe("instructionGeneration:cmp", () => {
         declareFlagState.mockClear();
         const result = cmp(c);
         expect(result).toHaveLength(1);
-        expect(result[0]).toMatch(/cmp r10, -0x1/);
+        expect(result[0]).toMatch(/cmp qword r10, -0x1/);
         expect(setCC).not.toBeCalled();
         expect(allocate).toBeCalled();
         expect(declareFlagState).toBeCalledTimes(1);
@@ -257,7 +257,7 @@ describe("instructionGeneration:cmp", () => {
         allocate.mockClear().mockImplementation(mockimpl);
         const result = cmp(instr);
         expect(result).toHaveLength(1);
-        expect(result[0]).toMatch(/cmp r10, r9/);
+        expect(result[0]).toMatch(/cmp qword r10, r9/);
         expect(allocate).toBeCalled();
       });
     });

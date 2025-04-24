@@ -15,7 +15,7 @@
  */
 
 import { C_DI_HANDLE_FLAGS_KK, Flags, FlagState } from "@/enums";
-import { ADX, isU1 } from "@/helper";
+import { ADX, isU1, TEMP_VARNAME } from "@/helper";
 import { Paul } from "@/paul";
 import { RegisterAllocator } from "@/registerAllocator";
 import type { asm, MemoryAllocation, RegisterAllocation, U64RegisterAllocation } from "@/types";
@@ -64,6 +64,8 @@ function fr__rm_r(
   r0: RegisterAllocation,
 ): asm[] {
   const ra = RegisterAllocator.getInstance();
+  const allocation_yo = ra.getCurrentAllocations();
+  // console.log("allocation_yo in fr__rm_r", allocation_yo);
   const r0store = ra.backupIfStoreHasDependencies(r0, out);
   let fs = ra.flagState();
   let r1store = r1.store;
@@ -132,7 +134,11 @@ function fr__rm_r(
     throw new Error("TSNH. still no known flag to use.");
   }
 
+  const allocation_yo2 = ra.getCurrentAllocations();
+  // console.log("allocation_yo 2 in fr__rm_r", allocation_yo2);
   // one flag has been zero
-  ra.declareVarForFlag(flagToUse, cout);
+  ra.declareVarForFlag(flagToUse, cout); // this one kill the x144_1 or x86_1 or whatever _1 datatype
+  const allocation_yo3 = ra.getCurrentAllocations();
+  // console.log("allocation_yo in the end in fr__rm_r", allocation_yo3);
   return [`${ADX[flagToUse]} ${r0store}, ${r1store}`];
 }
