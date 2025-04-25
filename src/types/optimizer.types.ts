@@ -17,6 +17,7 @@
 import { BRIDGES_T } from "@/bridge";
 import { METHOD_T } from "@/bridge/bitcoin-core-bridge";
 import { CURVE_T } from "@/bridge/fiat-bridge";
+import { LANGUAGE_T } from "@/bridge/rust-bridge";
 import { FRAME_POINTER_OPTIONS_T, MEMORY_CONSTRAINTS_OPTIONS_T } from "@/types";
 
 export type OptimizerArgs = {
@@ -38,6 +39,7 @@ export type OptimizerArgs = {
   preferXmm?: boolean;
   framePointer: FRAME_POINTER_OPTIONS_T;
   memoryConstraints: MEMORY_CONSTRAINTS_OPTIONS_T;
+  language?: LANGUAGE_T; // For rust-bridge to select between C and Rust
 };
 export type ParsedArgsT = OptimizerArgs & {
   startFromBestJson: boolean;

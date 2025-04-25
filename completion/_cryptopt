@@ -19,6 +19,7 @@ _arguments -S -s \
     '(--bridge)--bridge=[Bridge]:bridge:->bridges' \
     '(-c --curve -j --jsonFile -f --cFile)'{-c,--curve=}'[Curve]:curve:->curves' \
     '(-m --method -j --jsonFile -f --cFile)'{-m,--method=}'[Method]:method:->methods' \
+    '(-l --language)'{-l,--language=}'[Language for LLVM IR source (for rust bridge)]:language:->languages' \
     '(-j --jsonFile -c --curve -m --method)'{-j,--jsonFile=}'[JSON-CODE, must --bridge manual]:json:_files -g \*.json' \
     '(-f --cFile -c --curve -m --method)'{-f,--cFile=}'[C-CODE must --bridge manual]:cfile:_files -g \*.c' \
     '--readState=[Continue from this State file]:statejson:_files -g \*.json' \
@@ -47,6 +48,7 @@ case "$state" in
 			'bitcoin-core[Bitcoin Core Bridge (must specify -c secp256k1)]' \
 			'jasmin[Jasmin Bridge, experimental and currenly only supports the curve25519-add_double4 method]' \
 			'manual[Manual Bridge (must specify -j and -f)]' \
+            'rust[Rust Bridge for LLVM IR from Rust/C sources]' \
 		;;
 	methods)
 		_values  'method' \
@@ -68,6 +70,11 @@ case "$state" in
   			'poly1305[p=2^130 - 5;                         Unsaturated Solinas]' \
   			'secp256k1_montgomery[p=2^256 - 2^32 - 977;                Wbw Montgomery]' \
   			'secp256k1_dettman[p=2^256 - 4294968273;                Unsaturated Dettman]' \
+		;;
+    languages)
+        _values 'language' \
+            'rust[Use Rust-generated LLVM IR]' \
+            'c[Use C-generated LLVM IR]' \
 		;;
     framepointeroptions)
         _values 'framepointer' \

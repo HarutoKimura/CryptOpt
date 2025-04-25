@@ -25,10 +25,10 @@ import { ManualBridge } from "@/bridge/manual-bridge";
 import { Model } from "@/model";
 import { OptimizerArgs } from "@/types";
 import { llvm_BitcoinCoreBridge } from "@/bridge/llvm-bitcoin-core-bridge";
-import { RustBridge, METHOD_T as RUST_METHOD_T, CURVE_T as RUST_CURVE_T} from "@/bridge/rust-bridge";
+import { RustBridge, METHOD_T as RUST_METHOD_T, CURVE_T as RUST_CURVE_T, LANGUAGE_T} from "@/bridge/rust-bridge";
 
 
-type needComms = Pick<OptimizerArgs, "bridge" | "seed" | "memoryConstraints">;
+type needComms = Pick<OptimizerArgs, "bridge" | "seed" | "memoryConstraints" | "language">;
 interface needJasmin extends needComms {
   bridge: "jasmin";
 }
@@ -45,15 +45,18 @@ interface needManual extends needComms {
 interface needBitcoinCore extends needComms {
   bridge: "bitcoin-core";
   method: BITCOIN_CORE_METHOD_T;
+  curve?: CURVE_T;
 }
 interface needllvmBitcoinCore extends needComms {
   bridge: "llvm-bitcoin-core";
   method: BITCOIN_CORE_METHOD_T;
+  curve?: CURVE_T;
 }
 interface needRust extends needComms {
   curve: RUST_CURVE_T;
   method: RUST_METHOD_T;
   bridge: "rust";
+  language?: LANGUAGE_T;
 }
 
 type neededArgs = needJasmin | needFiat | needManual | needBitcoinCore | needllvmBitcoinCore | needRust;
@@ -170,7 +173,7 @@ function initllvmBitcoinCore(sharedObjectFilename: string, args: needllvmBitcoin
 }
 
 function initRust(sharedObjectFilename: string, args: needRust): ret {
-  const bridge = new RustBridge();
+  const bridge = new RustBridge(args.language || "rust");
   Model.init({
     memoryConstraints: args.memoryConstraints,
     json: bridge.getCryptOptFunction(args.method, args.curve),
@@ -178,7 +181,7 @@ function initRust(sharedObjectFilename: string, args: needRust): ret {
 
   const symbolname = bridge.machinecode(sharedObjectFilename, args.method, args.curve);
   const chunksize = 16; // only for reading the chunk breaks atm. see MS code
-  const argwidth = bridge.argwidth(args.curve ,args.method);
+  const argwidth = bridge.argwidth(args.curve, args.method);
   const argnumin = bridge.argnumin(args.method);
   const argnumout = bridge.argnumout(args.method);
 
@@ -204,7 +207,7 @@ function createMS(
   };
 }
 
-export function init(tmpDir: string, args: neededArgs): { symbolname: string; measuresuite: Measuresuite } {
+export function init(tmpDir: string, args: any): { symbolname: string; measuresuite: Measuresuite } {
   // Create temp directory for the so-files
   mkdirSync(tmpDir, { recursive: true });
 

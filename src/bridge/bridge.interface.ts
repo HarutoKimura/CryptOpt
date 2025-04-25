@@ -22,4 +22,8 @@ export interface Bridge {
   argnumin(method: string): number;
   argnumout(method: string): number;
   machinecode(sharedObject: string, method?: string, curve?: string): string;
+  
+  // Optional methods for bridges that support multiple languages
+  setLanguage?(language: string): void;
+  getLanguage?(): string;
 }

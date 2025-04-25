@@ -10,7 +10,7 @@ impl FieldElement5x52 {
 
     #[no_mangle]
     #[inline(always)]
-    pub fn mul_inner(&self, rhs: &Self) -> Self {
+    pub fn rust_ec_secp256k1_mul_inner(&self, rhs: &Self) -> Self {
         let a0 = self.0[0] as u128;
         let a1 = self.0[1] as u128;
         let a2 = self.0[2] as u128;

@@ -31,6 +31,10 @@ import {
 import {
   METHOD_T,
   RUST_AVAILABLE_METHODS as RUST_METHODS,
+  AVAILABLE_LANGUAGES as RUST_LANGUAGES,
+  LANGUAGE_T as RUST_LANGUAGE_T,
+  RUST_AVAILABLE_CURVES,
+  CURVE_T,
 } from "@/bridge/rust-bridge/constants";
 import { errorOut, ERRORS } from "@/errors";
 
@@ -42,11 +46,10 @@ export const parsedArgs = y
   .scriptName("./CryptOpt")
   .usage("$0 [OPTION]...")
   .option("curve", {
-    string: true,
-    alias: "c",
+    alias: ["c"],
+    choices: uniq([...FIAT_CURVES, ...RUST_AVAILABLE_CURVES]) as string[],
     default: "curve25519",
     describe: `Curve to optimise a method on. No applicable, if manual/bitcoin-core bridges are used.`,
-    choices: FIAT_CURVES,
   })
   .option("method", {
     string: true,
@@ -60,6 +63,13 @@ export const parsedArgs = y
     default: "fiat",
     describe: `If --bridge gets assigned 'manual', one must specify --cFile and --jsonFile, rather than curve/method.`,
     choices: BRIDGES,
+  })
+  .option("language", {
+    string: true,
+    alias: "l",
+    default: "rust",
+    describe: "Language to use for LLVM IR source (only applicable for rust bridge).",
+    choices: RUST_LANGUAGES,
   })
   .option("jsonFile", {
     string: true,
@@ -183,7 +193,7 @@ export const parsedArgs = y
       return Math.pow(1000, idx + 1) * Number(evals.substring(0, evals.length - 1));
     },
   })
-  .check(({ evals, bridge, cFile, jsonFile, method, curve }) => {
+  .check(({ evals, bridge, cFile, jsonFile, method, curve, language }) => {
     if (evals <= 0) {
       throw new Error("--evals must be >0");
     }
@@ -212,6 +222,12 @@ export const parsedArgs = y
     if (bridge == "rust") {
       if (!RUST_METHODS.includes(method as METHOD_T)) {
         throw new Error(`Bridge is rust. The specified method '${method}' not available.`);
+      }
+      if (!RUST_LANGUAGES.includes(language as RUST_LANGUAGE_T)) {
+        throw new Error(`Bridge is rust. The specified language '${language}' not available.`);
+      }
+      if (!RUST_AVAILABLE_CURVES.includes(curve as CURVE_T)) {
+        throw new Error(`Bridge is rust. The specified curve '${curve}' not available.`);
       }
     }
     return true;

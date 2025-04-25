@@ -1,6 +1,6 @@
 [
   {
-    "operation": "mul_inner",
+    "operation": "rust_ec_secp256k1_mul_inner",
     "arguments": [
       "ptr dead_on_unwind noalias nocapture noundef writable writeonly sret([40 x i8]) align 8 dereferenceable(40) x0, ptr noalias nocapture noundef readonly align 8 dereferenceable(40) x1, ptr noalias nocapture noundef readonly align 8 dereferenceable(40) x2"
     ],
