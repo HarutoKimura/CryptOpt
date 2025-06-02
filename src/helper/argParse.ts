@@ -39,6 +39,7 @@ import {
 import { errorOut, ERRORS } from "@/errors";
 
 import { FRAME_POINTER_OPTIONS, MEMORY_CONSTRAINTS_OPTIONS, ParsedArgsT } from "../types";
+import { MUTATION_MODE_OPTIONS } from "../types/optimizer.types";
 
 const y = await yargs(process.argv.slice(2));
 
@@ -245,6 +246,13 @@ export const parsedArgs = y
     describe:
       "Defines if memory reads are contraint. 'none' will not enforce anything. All reads are permitted at any time. 'all' enforces that no read from any `argN[n]` happens after any write to `outN[n]`. 'out1-arg1' enforces that no read from arg1[n] is permitted after `out1[n]` has been written (essentially permits mul(r,r,x) and sq(a,a); but not if elemets overlap but not align. (e.g. mul(r+1,r,x)))",
     choices: MEMORY_CONSTRAINTS_OPTIONS,
+  })
+  .option("mutationMode", {
+    default: "both",
+    string: true,
+    describe:
+      "Defines which mutation operators to use. 'both' uses both scheduling and template mutations (default), 'schedule-only' only mutates instruction ordering, 'template-only' only mutates instruction template choices.",
+    choices: MUTATION_MODE_OPTIONS,
   })
   .help("help")
   .alias("h", "help")

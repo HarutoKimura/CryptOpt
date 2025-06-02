@@ -20,6 +20,9 @@ import { CURVE_T } from "@/bridge/fiat-bridge";
 import { LANGUAGE_T } from "@/bridge/rust-bridge";
 import { FRAME_POINTER_OPTIONS_T, MEMORY_CONSTRAINTS_OPTIONS_T } from "@/types";
 
+export const MUTATION_MODE_OPTIONS = ["both", "schedule-only", "template-only"] as const;
+export type MUTATION_MODE_OPTIONS_T = typeof MUTATION_MODE_OPTIONS[number];
+
 export type OptimizerArgs = {
   evals: number;
   seed: number;
@@ -40,6 +43,7 @@ export type OptimizerArgs = {
   framePointer: FRAME_POINTER_OPTIONS_T;
   memoryConstraints: MEMORY_CONSTRAINTS_OPTIONS_T;
   language?: LANGUAGE_T; // For rust-bridge to select between C and Rust
+  mutationMode: MUTATION_MODE_OPTIONS_T;
 };
 export type ParsedArgsT = OptimizerArgs & {
   startFromBestJson: boolean;

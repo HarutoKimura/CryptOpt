@@ -6,6 +6,29 @@ CryptOpt is the result of a research project aiming to enhance the state-of-the-
 CryptOpt is an optimizer, which feeds itself from [Fiat Cryptography](https://github.com/mit-plv/fiat-crypto), generates optimized x86-64 Assembly for field arithmetic, and then feeds that Assembly back into Fiat Cryptography for end-to-end formal verification.
 With doing that, CryptOpt achieves much higher performance than GCC and Clang on many different micro-architectures, and in some cases even surpassing the performance hand-optimized Assembly.
 
+## Mutation Modes
+
+CryptOpt uses two main types of mutations to optimize code:
+
+1. **Schedule mutations** (instruction ordering): Reorders instructions while respecting dependencies to find better scheduling
+2. **Template mutations** (instruction selection): Chooses between different instruction templates (e.g., `add` vs `adcx`)
+
+You can control which mutation operators are used with the `--mutationMode` flag:
+
+- `--mutationMode both` (default): Uses both scheduling and template mutations
+- `--mutationMode schedule-only`: Only mutates instruction ordering, disabling template mutations
+- `--mutationMode template-only`: Only mutates instruction template choices, disabling scheduling mutations
+
+### Comparing Mutation Modes
+
+Use the provided script to compare the effectiveness of different mutation modes:
+
+```bash
+./CryptOpt --curve curve25519 --method mul --evals 100k --mutationMode both
+```
+
+This will run CryptOpt twice with the same parameters but different mutation modes and compare the results.
+
 The generated fast and verified assembly files are in the `fiat-amd64`-directory in the Fiat project and [here](generated/fiat-amd64). Here is the table from the research paper showcasing average speedups against GCC 12 / Clang 15 with respective highest optimization settings.
 
 ### Geometric means of Speedup CryptOpt vs. off- the-shelf compilers.
