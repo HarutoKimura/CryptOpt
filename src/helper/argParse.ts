@@ -194,9 +194,26 @@ export const parsedArgs = y
       return Math.pow(1000, idx + 1) * Number(evals.substring(0, evals.length - 1));
     },
   })
-  .check(({ evals, bridge, cFile, jsonFile, method, curve, language }) => {
+  .option("mutationMode", {
+    default: "both",
+    string: true,
+    describe:
+      "Defines which mutation operators to use. 'both' uses both scheduling and template mutations (default), 'schedule-only' only mutates instruction ordering, 'template-only' only mutates instruction template choices.",
+    choices: MUTATION_MODE_OPTIONS,
+  })
+  .option("scheduleRatio", {
+    default: 50,
+    number: true,
+    describe:
+      "Percentage (0-100) of mutations that should be schedule mutations. The remaining percentage will be template mutations. Takes priority over --mutationMode.",
+    alias: "schedule-ratio",
+  })
+  .check(({ evals, bridge, cFile, jsonFile, method, curve, language, scheduleRatio }) => {
     if (evals <= 0) {
       throw new Error("--evals must be >0");
+    }
+    if (scheduleRatio < 0 || scheduleRatio > 100) {
+      throw new Error("--scheduleRatio must be between 0 and 100");
     }
     if (bridge == "manual" && (!jsonFile || !cFile)) {
       throw new Error("Bridge is set to manual, but either json or c file is not specified.");
@@ -246,13 +263,6 @@ export const parsedArgs = y
     describe:
       "Defines if memory reads are contraint. 'none' will not enforce anything. All reads are permitted at any time. 'all' enforces that no read from any `argN[n]` happens after any write to `outN[n]`. 'out1-arg1' enforces that no read from arg1[n] is permitted after `out1[n]` has been written (essentially permits mul(r,r,x) and sq(a,a); but not if elemets overlap but not align. (e.g. mul(r+1,r,x)))",
     choices: MEMORY_CONSTRAINTS_OPTIONS,
-  })
-  .option("mutationMode", {
-    default: "both",
-    string: true,
-    describe:
-      "Defines which mutation operators to use. 'both' uses both scheduling and template mutations (default), 'schedule-only' only mutates instruction ordering, 'template-only' only mutates instruction template choices.",
-    choices: MUTATION_MODE_OPTIONS,
   })
   .help("help")
   .alias("h", "help")

@@ -44,6 +44,7 @@ export type OptimizerArgs = {
   memoryConstraints: MEMORY_CONSTRAINTS_OPTIONS_T;
   language?: LANGUAGE_T; // For rust-bridge to select between C and Rust
   mutationMode: MUTATION_MODE_OPTIONS_T;
+  scheduleRatio: number; // 0-100: percentage of mutations that should be schedule mutations
 };
 export type ParsedArgsT = OptimizerArgs & {
   startFromBestJson: boolean;

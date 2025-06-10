@@ -100,29 +100,17 @@ export class Optimizer {
    * mutate should not be called from outside with @param random=false*/
   private mutate(random = true): void {
     if (random) {
-      // Filter available choices based on mutation mode
-      const availableChoices = [];
-      if (this.args.mutationMode !== "template-only") {
-        availableChoices.push(CHOICE.PERMUTE);
-      }
-      if (this.args.mutationMode !== "schedule-only") {
-        availableChoices.push(CHOICE.DECISION);
-      }
-      
-      // If no choices available, fallback to both (shouldn't happen with valid config)
-      if (availableChoices.length === 0) {
-        choice = Paul.pick([CHOICE.PERMUTE, CHOICE.DECISION]);
+      // Use ratio-based weighted random selection
+      const randomValue = Paul.chooseBetween(100); // random integer [0, 99]
+      if (randomValue < this.args.scheduleRatio) {
+        choice = CHOICE.PERMUTE; // Schedule mutation
       } else {
-        choice = Paul.pick(availableChoices);
+        choice = CHOICE.DECISION; // Template mutation
       }
     }
     Logger.log("Mutationalita");
     switch (choice) {
       case CHOICE.PERMUTE: {
-        if (this.args.mutationMode === "template-only") {
-          // Skip scheduling mutation if in template-only mode
-          return;
-        }
         Model.mutatePermutation();
         this.revertFunction = () => {
           this.numRevert.permutation++;
@@ -132,13 +120,10 @@ export class Optimizer {
         break;
       }
       case CHOICE.DECISION: {
-        if (this.args.mutationMode === "schedule-only") {
-          // Skip template mutation if in schedule-only mode
-          return;
-        }
         const hasHappend = Model.mutateDecision();
         if (!hasHappend) {
           // this is the case, if there is no hot decisions.
+          // Fall back to schedule mutation
           choice = CHOICE.PERMUTE;
           this.mutate(false);
           return;

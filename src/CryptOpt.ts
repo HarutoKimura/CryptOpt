@@ -80,6 +80,18 @@ const { single, bets, betRatio, curve, method, verbose } = parsedArgs;
 if (parsedArgs.resultDir == "") {
   parsedArgs.resultDir = resolve(process.cwd(), "results");
 }
+
+// Resolve mutationMode and scheduleRatio conflicts
+// scheduleRatio takes priority, but mutationMode can override for backwards compatibility
+if (parsedArgs.mutationMode === "schedule-only" && parsedArgs.scheduleRatio === 50) {
+  // If schedule-only mode is set and ratio is default, force ratio to 100
+  parsedArgs.scheduleRatio = 100;
+} else if (parsedArgs.mutationMode === "template-only" && parsedArgs.scheduleRatio === 50) {
+  // If template-only mode is set and ratio is default, force ratio to 0
+  parsedArgs.scheduleRatio = 0;
+}
+// If both are explicitly set, scheduleRatio takes priority (no changes needed)
+
 // GENERAL INITIALIZATION
 if (!verbose) {
   console.log = () => {

@@ -53,6 +53,7 @@ export function getTestArgs(filename: string): OptimizerArgs {
     framePointer: "omit",
     memoryConstraints: "none",
     mutationMode: "both",
+    scheduleRatio: 50,
   };
 }
 
