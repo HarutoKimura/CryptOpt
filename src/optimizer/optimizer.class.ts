@@ -84,6 +84,8 @@ export class Optimizer {
     [FUNCTIONS.F_A]: "",
     [FUNCTIONS.F_B]: "",
   };
+  
+  // Enhanced mutation tracking system
   private numMut: { [id: string]: number } = {
     permutation: 0,
     decision: 0,
@@ -92,48 +94,126 @@ export class Optimizer {
     permutation: 0,
     decision: 0,
   };
+  
+  // Simplified tracking - only actual mutations that were executed
+  private mutationTracking = {
+    // Actual mutations executed (this is what really matters)
+    actualPermutation: 0,
+    actualDecision: 0,
+    
+    // Fallback tracking - how many times decision failed and became permutation
+    decisionToPermutationFallbacks: 0,
+    
+    // Success tracking - mutations that were kept (not reverted)
+    permutationKept: 0,
+    decisionKept: 0,
+    
+    // Revert tracking (same as existing for compatibility)
+    permutationReverted: 0,
+    decisionReverted: 0,
+    
+    // Deterministic quota system
+    targetPermutations: 0,
+    targetDecisions: 0,
+    permutationQuotaReached: false,
+    decisionQuotaReached: false,
+    exclusiveMode: false,
+    exclusiveModeType: null as CHOICE | null,
+  };
 
   private revertFunction = (): void => {
     /**intentionally blank */
   };
+  
+  /** Initialize mutation quotas based on total evaluations and scheduleRatio */
+  private initializeMutationQuotas(): void {
+    const totalMutations = this.args.evals - 1; // Subtract 1 for initial evaluation
+    this.mutationTracking.targetPermutations = Math.round(totalMutations * this.args.scheduleRatio / 100);
+    this.mutationTracking.targetDecisions = totalMutations - this.mutationTracking.targetPermutations;
+    
+    Logger.log(`Mutation quotas initialized: P=${this.mutationTracking.targetPermutations}, D=${this.mutationTracking.targetDecisions}`);
+  }
+  
   /** you usually don't want to mess with @param random.
    * mutate should not be called from outside with @param random=false*/
   private mutate(random = true): void {
+    let intendedChoice: CHOICE = choice; // Initialize with current choice
+    
     if (random) {
-      // Use ratio-based weighted random selection
-      const randomValue = Paul.chooseBetween(100); // random integer [0, 99]
-      if (randomValue < this.args.scheduleRatio) {
-        choice = CHOICE.PERMUTE; // Schedule mutation
+      // Check if we've reached quotas and need to switch to exclusive mode
+      if (!this.mutationTracking.permutationQuotaReached && 
+          this.mutationTracking.actualPermutation >= this.mutationTracking.targetPermutations) {
+        this.mutationTracking.permutationQuotaReached = true;
+        this.mutationTracking.exclusiveMode = true;
+        this.mutationTracking.exclusiveModeType = CHOICE.DECISION;
+        Logger.log(`Permutation quota reached (${this.mutationTracking.actualPermutation}/${this.mutationTracking.targetPermutations}). Switching to decision-only mode.`);
+      }
+      
+      if (!this.mutationTracking.decisionQuotaReached && 
+          this.mutationTracking.actualDecision >= this.mutationTracking.targetDecisions) {
+        this.mutationTracking.decisionQuotaReached = true;
+        this.mutationTracking.exclusiveMode = true;
+        this.mutationTracking.exclusiveModeType = CHOICE.PERMUTE;
+        Logger.log(`Decision quota reached (${this.mutationTracking.actualDecision}/${this.mutationTracking.targetDecisions}). Switching to permutation-only mode.`);
+      }
+      
+      // Determine choice based on quota system
+      if (this.mutationTracking.exclusiveMode && this.mutationTracking.exclusiveModeType) {
+        // One quota is reached, use only the other type
+        intendedChoice = this.mutationTracking.exclusiveModeType;
+        choice = intendedChoice;
       } else {
-        choice = CHOICE.DECISION; // Template mutation
+        // Normal random selection based on scheduleRatio
+        const randomValue = Paul.chooseBetween(100); // random integer [0, 99]
+        if (randomValue < this.args.scheduleRatio) {
+          intendedChoice = CHOICE.PERMUTE; // Schedule mutation
+        } else {
+          intendedChoice = CHOICE.DECISION; // Template mutation
+        }
+        choice = intendedChoice;
       }
     }
+    
     Logger.log("Mutationalita");
     switch (choice) {
       case CHOICE.PERMUTE: {
         Model.mutatePermutation();
+        
+        // Track actual mutation
+        this.mutationTracking.actualPermutation++;
+        this.numMut.permutation++;
+        
         this.revertFunction = () => {
           this.numRevert.permutation++;
+          this.mutationTracking.permutationReverted++;
           Model.revertLastMutation();
         };
-        this.numMut.permutation++;
         break;
       }
       case CHOICE.DECISION: {
         const hasHappend = Model.mutateDecision();
         if (!hasHappend) {
           // this is the case, if there is no hot decisions.
+          // Track fallback: intended decision became permutation
+          if (random && intendedChoice === CHOICE.DECISION) {
+            this.mutationTracking.decisionToPermutationFallbacks++;
+          }
+          
           // Fall back to schedule mutation
           choice = CHOICE.PERMUTE;
           this.mutate(false);
           return;
         }
+        
+        // Track actual decision mutation
+        this.mutationTracking.actualDecision++;
+        this.numMut.decision++;
+        
         this.revertFunction = () => {
           this.numRevert.decision++;
+          this.mutationTracking.decisionReverted++;
           Model.revertLastMutation();
         };
-
-        this.numMut.decision++;
       }
     }
   }
@@ -141,6 +221,10 @@ export class Optimizer {
   public optimise() {
     return new Promise<number>((resolve) => {
       Logger.log("starting optimisation");
+      
+      // Initialize mutation quotas based on total evaluations and scheduleRatio
+      this.initializeMutationQuotas();
+      
       printStartInfo({
         ...this.args,
         symbolname: this.symbolname,
@@ -290,6 +374,14 @@ export class Optimizer {
           ) {
             Logger.log("kept    mutation");
             kept = true;
+            
+            // Track kept mutations by type
+            if (choice === CHOICE.PERMUTE) {
+              this.mutationTracking.permutationKept++;
+            } else if (choice === CHOICE.DECISION) {
+              this.mutationTracking.decisionKept++;
+            }
+            
             currentNameOfTheFunctionThatHasTheMutation = toggleFUNCTIONS(
               currentNameOfTheFunctionThatHasTheMutation,
             );
@@ -339,6 +431,21 @@ export class Optimizer {
               symbolname: this.symbolname,
               writeout,
             });
+            
+            // Add enhanced tracking summary to status line when writing out
+            if (writeout) {
+              const totalActual = this.mutationTracking.actualPermutation + this.mutationTracking.actualDecision;
+              const actualPermutationRatio = totalActual > 0 ? (this.mutationTracking.actualPermutation / totalActual * 100).toFixed(1) : "0.0";
+              const actualDecisionRatio = totalActual > 0 ? (this.mutationTracking.actualDecision / totalActual * 100).toFixed(1) : "0.0";
+              const fallbackImpact = totalActual > 0 ? 
+                (this.mutationTracking.decisionToPermutationFallbacks / totalActual * 100).toFixed(1) : "0.0";
+              
+              const quotaStatus = this.mutationTracking.exclusiveMode ? " [QUOTA MODE]" : "";
+              const permutationProgress = `${this.mutationTracking.actualPermutation}/${this.mutationTracking.targetPermutations}`;
+              const decisionProgress = `${this.mutationTracking.actualDecision}/${this.mutationTracking.targetDecisions}`;
+              
+              process.stdout.write(`\n[MUTATION TRACKING] Actual: P=${actualPermutationRatio}% D=${actualDecisionRatio}% | Progress: P=${permutationProgress} D=${decisionProgress} | Fallbacks: ${fallbackImpact}%${quotaStatus}`);
+            }
             process.stdout.write(statusline);
 
             globals.convergence.push(ratioString);
@@ -371,6 +478,8 @@ export class Optimizer {
               framePointer: this.args.framePointer,
               memoryConstraints: this.args.memoryConstraints,
               cyclegoal: this.args.cyclegoal,
+              mutationTracking: this.mutationTracking,
+              scheduleRatio: this.args.scheduleRatio,
             });
             Logger.log(statistics);
 
