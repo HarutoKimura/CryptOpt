@@ -45,6 +45,7 @@ export type OptimizerArgs = {
   language?: LANGUAGE_T; // For rust-bridge to select between C and Rust
   mutationMode: MUTATION_MODE_OPTIONS_T;
   scheduleRatio: number; // 0-100: percentage of mutations that should be schedule mutations
+  quotaMode: "execution" | "success"; // Controls whether scheduleRatio applies to executed or successful mutations
 };
 export type ParsedArgsT = OptimizerArgs & {
   startFromBestJson: boolean;

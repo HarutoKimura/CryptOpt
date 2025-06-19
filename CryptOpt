@@ -25,7 +25,13 @@ INSTALLDIR="$(dirname "${0}")"
 # go into the Install directory. Everything is relative from there
 cd "${INSTALLDIR}"
 
+# Set user-specific cache directory
+CUSTOM_CACHE_DIR="/tmp/CryptOpt.cache.$(whoami)"
+mkdir -p "${CUSTOM_CACHE_DIR}"
+export TMPDIR="${CUSTOM_CACHE_DIR}"
+
 #run
 PATH="$(realpath ./bins/node/bin):${PATH}" \
+  TMPDIR="${CUSTOM_CACHE_DIR}" \
   /usr/bin/env node \
   "./dist/CryptOpt.js" "${@}"

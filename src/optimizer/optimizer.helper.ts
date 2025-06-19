@@ -130,8 +130,8 @@ export function genStatistics(a: {
 
   // Original stats for backward compatibility
   const originalStats = ["permutation", "decision"].map((key) => {
-    const r = ((a.numRevert[key] / a.numMut[key]) * 100).toFixed(3);
-    return `; number reverted ${key} / tried ${key}: ${a.numRevert[key]} / ${a.numMut[key]} =${r}%`;
+      const r = ((a.numRevert[key] / a.numMut[key]) * 100).toFixed(3);
+      return `; number reverted ${key} / tried ${key}: ${a.numRevert[key]} / ${a.numMut[key]} =${r}%`;
   });
 
   // Enhanced mutation tracking stats - focus on ACTUAL mutations

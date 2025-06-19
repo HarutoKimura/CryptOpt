@@ -112,7 +112,15 @@ export class Optimizer {
     permutationReverted: 0,
     decisionReverted: 0,
     
-    // Deterministic quota system
+    // Success-based quota system (NEW)
+    targetSuccessfulPermutations: 0,
+    targetSuccessfulDecisions: 0,
+    successfulPermutationQuotaReached: false,
+    successfulDecisionQuotaReached: false,
+    successBasedExclusiveMode: false,
+    successBasedExclusiveModeType: null as CHOICE | null,
+    
+    // Execution-based quota system (EXISTING - for comparison)
     targetPermutations: 0,
     targetDecisions: 0,
     permutationQuotaReached: false,
@@ -128,10 +136,23 @@ export class Optimizer {
   /** Initialize mutation quotas based on total evaluations and scheduleRatio */
   private initializeMutationQuotas(): void {
     const totalMutations = this.args.evals - 1; // Subtract 1 for initial evaluation
-    this.mutationTracking.targetPermutations = Math.round(totalMutations * this.args.scheduleRatio / 100);
-    this.mutationTracking.targetDecisions = totalMutations - this.mutationTracking.targetPermutations;
     
-    Logger.log(`Mutation quotas initialized: P=${this.mutationTracking.targetPermutations}, D=${this.mutationTracking.targetDecisions}`);
+    if (this.args.quotaMode === "execution") {
+      // Execution-based quotas (original system)
+      this.mutationTracking.targetPermutations = Math.round(totalMutations * this.args.scheduleRatio / 100);
+      this.mutationTracking.targetDecisions = totalMutations - this.mutationTracking.targetPermutations;
+      
+      Logger.log(`Execution-based quotas initialized: P=${this.mutationTracking.targetPermutations}, D=${this.mutationTracking.targetDecisions}`);
+    } else {
+      // Success-based quotas (new system)
+      // We need to estimate how many successful mutations we'll have
+      // Based on typical success rates, let's assume ~20% overall success rate
+      const estimatedSuccessfulMutations = Math.round(totalMutations * 0.2);
+      this.mutationTracking.targetSuccessfulPermutations = Math.round(estimatedSuccessfulMutations * this.args.scheduleRatio / 100);
+      this.mutationTracking.targetSuccessfulDecisions = estimatedSuccessfulMutations - this.mutationTracking.targetSuccessfulPermutations;
+      
+      Logger.log(`Success-based quotas initialized: P=${this.mutationTracking.targetSuccessfulPermutations}, D=${this.mutationTracking.targetSuccessfulDecisions} (estimated from ${estimatedSuccessfulMutations} total successful)`);
+    }
   }
   
   /** you usually don't want to mess with @param random.
@@ -140,37 +161,74 @@ export class Optimizer {
     let intendedChoice: CHOICE = choice; // Initialize with current choice
     
     if (random) {
-      // Check if we've reached quotas and need to switch to exclusive mode
-      if (!this.mutationTracking.permutationQuotaReached && 
-          this.mutationTracking.actualPermutation >= this.mutationTracking.targetPermutations) {
-        this.mutationTracking.permutationQuotaReached = true;
-        this.mutationTracking.exclusiveMode = true;
-        this.mutationTracking.exclusiveModeType = CHOICE.DECISION;
-        Logger.log(`Permutation quota reached (${this.mutationTracking.actualPermutation}/${this.mutationTracking.targetPermutations}). Switching to decision-only mode.`);
-      }
-      
-      if (!this.mutationTracking.decisionQuotaReached && 
-          this.mutationTracking.actualDecision >= this.mutationTracking.targetDecisions) {
-        this.mutationTracking.decisionQuotaReached = true;
-        this.mutationTracking.exclusiveMode = true;
-        this.mutationTracking.exclusiveModeType = CHOICE.PERMUTE;
-        Logger.log(`Decision quota reached (${this.mutationTracking.actualDecision}/${this.mutationTracking.targetDecisions}). Switching to permutation-only mode.`);
-      }
-      
-      // Determine choice based on quota system
-      if (this.mutationTracking.exclusiveMode && this.mutationTracking.exclusiveModeType) {
-        // One quota is reached, use only the other type
-        intendedChoice = this.mutationTracking.exclusiveModeType;
-        choice = intendedChoice;
-      } else {
-        // Normal random selection based on scheduleRatio
-        const randomValue = Paul.chooseBetween(100); // random integer [0, 99]
-        if (randomValue < this.args.scheduleRatio) {
-          intendedChoice = CHOICE.PERMUTE; // Schedule mutation
-        } else {
-          intendedChoice = CHOICE.DECISION; // Template mutation
+      if (this.args.quotaMode === "execution") {
+        // Execution-based quota system
+        // Check if we've reached quotas and need to switch to exclusive mode
+        if (!this.mutationTracking.permutationQuotaReached && 
+            this.mutationTracking.actualPermutation >= this.mutationTracking.targetPermutations) {
+          this.mutationTracking.permutationQuotaReached = true;
+          this.mutationTracking.exclusiveMode = true;
+          this.mutationTracking.exclusiveModeType = CHOICE.DECISION;
+          Logger.log(`Permutation quota reached (${this.mutationTracking.actualPermutation}/${this.mutationTracking.targetPermutations}). Switching to decision-only mode.`);
         }
-        choice = intendedChoice;
+        
+        if (!this.mutationTracking.decisionQuotaReached && 
+            this.mutationTracking.actualDecision >= this.mutationTracking.targetDecisions) {
+          this.mutationTracking.decisionQuotaReached = true;
+          this.mutationTracking.exclusiveMode = true;
+          this.mutationTracking.exclusiveModeType = CHOICE.PERMUTE;
+          Logger.log(`Decision quota reached (${this.mutationTracking.actualDecision}/${this.mutationTracking.targetDecisions}). Switching to permutation-only mode.`);
+        }
+        
+        // Determine choice based on execution quota system
+        if (this.mutationTracking.exclusiveMode && this.mutationTracking.exclusiveModeType) {
+          // One quota is reached, use only the other type
+          intendedChoice = this.mutationTracking.exclusiveModeType;
+          choice = intendedChoice;
+        } else {
+          // Normal random selection based on scheduleRatio
+      const randomValue = Paul.chooseBetween(100); // random integer [0, 99]
+      if (randomValue < this.args.scheduleRatio) {
+            intendedChoice = CHOICE.PERMUTE; // Schedule mutation
+          } else {
+            intendedChoice = CHOICE.DECISION; // Template mutation
+          }
+          choice = intendedChoice;
+        }
+      } else {
+        // Success-based quota system
+        // Check if we've reached success quotas and need to switch to exclusive mode
+        if (!this.mutationTracking.successfulPermutationQuotaReached && 
+            this.mutationTracking.permutationKept >= this.mutationTracking.targetSuccessfulPermutations) {
+          this.mutationTracking.successfulPermutationQuotaReached = true;
+          this.mutationTracking.successBasedExclusiveMode = true;
+          this.mutationTracking.successBasedExclusiveModeType = CHOICE.DECISION;
+          Logger.log(`Successful permutation quota reached (${this.mutationTracking.permutationKept}/${this.mutationTracking.targetSuccessfulPermutations}). Switching to decision-only mode.`);
+        }
+        
+        if (!this.mutationTracking.successfulDecisionQuotaReached && 
+            this.mutationTracking.decisionKept >= this.mutationTracking.targetSuccessfulDecisions) {
+          this.mutationTracking.successfulDecisionQuotaReached = true;
+          this.mutationTracking.successBasedExclusiveMode = true;
+          this.mutationTracking.successBasedExclusiveModeType = CHOICE.PERMUTE;
+          Logger.log(`Successful decision quota reached (${this.mutationTracking.decisionKept}/${this.mutationTracking.targetSuccessfulDecisions}). Switching to permutation-only mode.`);
+        }
+        
+        // Determine choice based on success quota system
+        if (this.mutationTracking.successBasedExclusiveMode && this.mutationTracking.successBasedExclusiveModeType) {
+          // One success quota is reached, use only the other type
+          intendedChoice = this.mutationTracking.successBasedExclusiveModeType;
+          choice = intendedChoice;
+        } else {
+          // Normal random selection based on scheduleRatio
+          const randomValue = Paul.chooseBetween(100); // random integer [0, 99]
+          if (randomValue < this.args.scheduleRatio) {
+            intendedChoice = CHOICE.PERMUTE; // Schedule mutation
+          } else {
+            intendedChoice = CHOICE.DECISION; // Template mutation
+          }
+          choice = intendedChoice;
+        }
       }
     }
     

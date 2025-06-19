@@ -208,6 +208,13 @@ export const parsedArgs = y
       "Percentage (0-100) of mutations that should be schedule mutations. The remaining percentage will be template mutations. Takes priority over --mutationMode.",
     alias: "schedule-ratio",
   })
+  .option("quotaMode", {
+    default: "execution",
+    string: true,
+    describe:
+      "Controls what scheduleRatio applies to. 'execution' (default) controls the ratio of executed mutations. 'success' controls the ratio of successful (kept) mutations.",
+    choices: ["execution", "success"],
+  })
   .check(({ evals, bridge, cFile, jsonFile, method, curve, language, scheduleRatio }) => {
     if (evals <= 0) {
       throw new Error("--evals must be >0");
