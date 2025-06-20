@@ -93,6 +93,13 @@ export class Optimizer {
     decision: 0,
   };
 
+  // Add new counters for fallback and successful mutations
+  private numFallback = 0;
+  private numKept: { [id: string]: number } = {
+    permutation: 0,
+    decision: 0,
+  };
+
   private revertFunction = (): void => {
     /**intentionally blank */
   };
@@ -117,6 +124,7 @@ export class Optimizer {
         const hasHappend = Model.mutateDecision();
         if (!hasHappend) {
           // this is the case, if there is no hot decisions.
+          this.numFallback++; // Track fallback occurrence
           choice = CHOICE.PERMUTE;
           this.mutate(false);
           return;
@@ -269,6 +277,12 @@ export class Optimizer {
           ) {
             Logger.log("kept    mutation");
             kept = true;
+            // Track successful mutations
+            if (choice === CHOICE.PERMUTE) {
+              this.numKept.permutation++;
+            } else {
+              this.numKept.decision++;
+            }
             currentNameOfTheFunctionThatHasTheMutation = toggleFUNCTIONS(
               currentNameOfTheFunctionThatHasTheMutation,
             );
@@ -346,6 +360,8 @@ export class Optimizer {
               acc: accumulatedTimeSpentByMeasuring,
               numRevert: this.numRevert,
               numMut: this.numMut,
+              numFallback: this.numFallback,
+              numKept: this.numKept,
               counter: this.measuresuite.timer,
               framePointer: this.args.framePointer,
               memoryConstraints: this.args.memoryConstraints,

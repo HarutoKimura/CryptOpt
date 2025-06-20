@@ -92,6 +92,8 @@ export function genStatistics(a: {
   acc: number;
   numRevert: { [k: string]: number };
   numMut: { [k: string]: number };
+  numFallback: number;
+  numKept: { [k: string]: number };
   counter: string;
   framePointer: string;
   memoryConstraints: string;
@@ -114,6 +116,11 @@ export function genStatistics(a: {
       const r = ((a.numRevert[key] / a.numMut[key]) * 100).toFixed(3);
       return `; number reverted ${key} / tried ${key}: ${a.numRevert[key]} / ${a.numMut[key]} =${r}%`;
     }),
+    ...["permutation", "decision"].map((key) => {
+      const r = ((a.numKept[key] / a.numMut[key]) * 100).toFixed(3);
+      return `; number successful ${key} / tried ${key}: ${a.numKept[key]} / ${a.numMut[key]} =${r}%`;
+    }),
+    `; number decision->permutation fallbacks: ${a.numFallback}`,
   ];
 }
 export function logMutation({
