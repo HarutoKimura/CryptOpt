@@ -104,14 +104,14 @@ export function genStatistics(a: {
     decisionKept: number;
     permutationReverted: number;
     decisionReverted: number;
-    targetPermutations: number;
-    targetDecisions: number;
-    permutationQuotaReached: boolean;
-    decisionQuotaReached: boolean;
-    exclusiveMode: boolean;
-    exclusiveModeType: CHOICE | null;
+    mutationSequence: Array<{
+      evaluation: number;
+      intended: CHOICE;
+      actual: CHOICE;
+      fellback: boolean;
+      kept: boolean;
+    }>;
   };
-  scheduleRatio?: number;
 }): string[] {
   const baseStats = [
     `; cpu ${cpus()[0].model}`,
@@ -134,76 +134,53 @@ export function genStatistics(a: {
       return `; number reverted ${key} / tried ${key}: ${a.numRevert[key]} / ${a.numMut[key]} =${r}%`;
   });
 
-  // Enhanced mutation tracking stats - focus on ACTUAL mutations
-  const enhancedStats: string[] = [];
-  if (a.mutationTracking && a.scheduleRatio !== undefined) {
+  // Natural mutation distribution analysis
+  const naturalDistributionStats: string[] = [];
+  if (a.mutationTracking) {
     const totalActualMutations = a.mutationTracking.actualPermutation + a.mutationTracking.actualDecision;
     const totalEvaluated = a.evals - 1; // Subtract 1 for the initial evaluation
 
-    // ACTUAL mutation ratios (this is what really happened)
-    const actualPermutationRatio = totalActualMutations > 0 ? (a.mutationTracking.actualPermutation / totalActualMutations * 100).toFixed(1) : "0.0";
-    const actualDecisionRatio = totalActualMutations > 0 ? (a.mutationTracking.actualDecision / totalActualMutations * 100).toFixed(1) : "0.0";
+    // Natural distribution ratios
+    const naturalPermutationRatio = totalActualMutations > 0 ? (a.mutationTracking.actualPermutation / totalActualMutations * 100).toFixed(1) : "0.0";
+    const naturalDecisionRatio = totalActualMutations > 0 ? (a.mutationTracking.actualDecision / totalActualMutations * 100).toFixed(1) : "0.0";
 
-    // Fallback impact analysis
-    const totalPermutationsIncludingFallbacks = a.mutationTracking.actualPermutation;
-    const originalPermutations = totalPermutationsIncludingFallbacks - a.mutationTracking.decisionToPermutationFallbacks;
-    const fallbackImpactOnRatio = totalActualMutations > 0 ? 
+    // Fallback analysis
+    const originalPermutations = a.mutationTracking.actualPermutation - a.mutationTracking.decisionToPermutationFallbacks;
+    const fallbackRate = totalActualMutations > 0 ? 
       (a.mutationTracking.decisionToPermutationFallbacks / totalActualMutations * 100).toFixed(1) : "0.0";
 
-    // Success rates (kept mutations)
+    // Success rates
     const permutationSuccessRate = a.mutationTracking.actualPermutation > 0 ? 
       (a.mutationTracking.permutationKept / a.mutationTracking.actualPermutation * 100).toFixed(1) : "0.0";
     const decisionSuccessRate = a.mutationTracking.actualDecision > 0 ? 
       (a.mutationTracking.decisionKept / a.mutationTracking.actualDecision * 100).toFixed(1) : "0.0";
 
-    // Ratio deviation from target
-    const targetPermutationRatio = a.scheduleRatio;
-    const actualPermutationRatioNum = parseFloat(actualPermutationRatio);
-    const ratioDeviation = (actualPermutationRatioNum - targetPermutationRatio).toFixed(1);
-    const deviationSign = parseFloat(ratioDeviation) >= 0 ? "+" : "";
-
-    // Quota system analysis
-    const permutationQuotaProgress = `${a.mutationTracking.actualPermutation}/${a.mutationTracking.targetPermutations}`;
-    const decisionQuotaProgress = `${a.mutationTracking.actualDecision}/${a.mutationTracking.targetDecisions}`;
-    const permutationQuotaAchieved = a.mutationTracking.actualPermutation >= a.mutationTracking.targetPermutations;
-    const decisionQuotaAchieved = a.mutationTracking.actualDecision >= a.mutationTracking.targetDecisions;
-    const bothQuotasAchieved = permutationQuotaAchieved && decisionQuotaAchieved;
-
-    enhancedStats.push(
+    naturalDistributionStats.push(
       `;`,
-      `; === DETERMINISTIC QUOTA SYSTEM ===`,
-      `; Target Schedule Ratio: ${a.scheduleRatio}% permutation, ${100 - a.scheduleRatio}% decision`,
+      `; === NATURAL MUTATION DISTRIBUTION ANALYSIS ===`,
+      `; Study Goal: Measure inherent mutation preferences without forced ratios`,
       `; Total Evaluations: ${totalEvaluated} (excluding initial)`,
-      `; Total Actual Mutations: ${totalActualMutations}`,
+      `; Total Mutations: ${totalActualMutations}`,
       `;`,
-      `; QUOTA TARGETS:`,
-      `;   Permutation Target: ${a.mutationTracking.targetPermutations}`,
-      `;   Decision Target:    ${a.mutationTracking.targetDecisions}`,
+      `; NATURAL DISTRIBUTION:`,
+      `;   Permutation: ${a.mutationTracking.actualPermutation} mutations (${naturalPermutationRatio}%)`,
+      `;   Decision:    ${a.mutationTracking.actualDecision} mutations (${naturalDecisionRatio}%)`,
       `;`,
-      `; ACTUAL EXECUTED MUTATIONS:`,
-      `;   Permutation: ${a.mutationTracking.actualPermutation} (${actualPermutationRatio}%) [${permutationQuotaProgress}] ${permutationQuotaAchieved ? '✓' : '○'}`,
-      `;   Decision:    ${a.mutationTracking.actualDecision} (${actualDecisionRatio}%) [${decisionQuotaProgress}] ${decisionQuotaAchieved ? '✓' : '○'}`,
+      `; FALLBACK ANALYSIS:`,
+      `;   Original Intended Permutations: ${originalPermutations}`,
+      `;   Decision→Permutation Fallbacks: ${a.mutationTracking.decisionToPermutationFallbacks}`,
+      `;   Fallback Rate: ${fallbackRate}% of total mutations`,
       `;`,
-      `; QUOTA STATUS:`,
-      `;   Permutation Quota: ${permutationQuotaAchieved ? 'ACHIEVED' : 'IN PROGRESS'}`,
-      `;   Decision Quota:    ${decisionQuotaAchieved ? 'ACHIEVED' : 'IN PROGRESS'}`,
-      `;   Exclusive Mode:    ${a.mutationTracking.exclusiveMode ? 'ACTIVE' : 'INACTIVE'}`,
-      `;   Both Quotas Met:   ${bothQuotasAchieved ? 'YES' : 'NO'}`,
+      `; SUCCESS RATES (mutations kept):`,
+      `;   Permutation Success: ${a.mutationTracking.permutationKept}/${a.mutationTracking.actualPermutation} (${permutationSuccessRate}%)`,
+      `;   Decision Success:    ${a.mutationTracking.decisionKept}/${a.mutationTracking.actualDecision} (${decisionSuccessRate}%)`,
       `;`,
-      `; RATIO ANALYSIS:`,
-      `;   Target vs Actual: ${targetPermutationRatio}% → ${actualPermutationRatio}% (${deviationSign}${ratioDeviation}% deviation)`,
-      `;   Fallback Impact: ${a.mutationTracking.decisionToPermutationFallbacks} decisions became permutations (${fallbackImpactOnRatio}% of total)`,
-      `;   Original Permutations: ${originalPermutations} (before fallbacks)`,
-      `;`,
-      `; MUTATION SUCCESS RATES (kept/not reverted):`,
-      `;   Permutation success: ${a.mutationTracking.permutationKept}/${a.mutationTracking.actualPermutation} (${permutationSuccessRate}%)`,
-      `;   Decision success:    ${a.mutationTracking.decisionKept}/${a.mutationTracking.actualDecision} (${decisionSuccessRate}%)`,
-      `;`,
-      `; PRECISE ACTUAL RATIO: ${actualPermutationRatio}% Permutation / ${actualDecisionRatio}% Decision`
+      `; KEY FINDING: Natural P/D ratio = ${naturalPermutationRatio}%/${naturalDecisionRatio}% for this implementation`,
+      `; Time-series data: ${a.mutationTracking.mutationSequence.length} mutations recorded with timestamps`
     );
   }
 
-  return [...baseStats, ...originalStats, ...enhancedStats];
+  return [...baseStats, ...originalStats, ...naturalDistributionStats];
 }
 export function logMutation({
   choice,

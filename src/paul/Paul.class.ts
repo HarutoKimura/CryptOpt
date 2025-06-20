@@ -55,6 +55,9 @@ export class Paul {
     }
 
     instruction.decisionsHot.push(decisionKey);
+    
+    // HOT DECISION LOGGING - Track when decisions become hot
+    console.log(`🔥 HOT: ${instruction.name.join(',').padEnd(12)} | ${instruction.operation.padEnd(8)} | ${decisionKey} | chose: ${decision[0]} from [${decision[1].join(',')}]`);
 
     const idx = decision[0];
     const possibilitiesOfThatSavedDecision = decision[1] as unknown as T[];

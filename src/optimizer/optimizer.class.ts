@@ -95,144 +95,57 @@ export class Optimizer {
     decision: 0,
   };
   
-  // Simplified tracking - only actual mutations that were executed
+  // Natural mutation distribution tracking - no forced ratios
   private mutationTracking = {
-    // Actual mutations executed (this is what really matters)
+    // Actual mutations executed
     actualPermutation: 0,
     actualDecision: 0,
     
-    // Fallback tracking - how many times decision failed and became permutation
+    // Fallback tracking - when decisions can't find hot decisions
     decisionToPermutationFallbacks: 0,
     
     // Success tracking - mutations that were kept (not reverted)
     permutationKept: 0,
     decisionKept: 0,
     
-    // Revert tracking (same as existing for compatibility)
+    // Revert tracking
     permutationReverted: 0,
     decisionReverted: 0,
     
-    // Success-based quota system (NEW)
-    targetSuccessfulPermutations: 0,
-    targetSuccessfulDecisions: 0,
-    successfulPermutationQuotaReached: false,
-    successfulDecisionQuotaReached: false,
-    successBasedExclusiveMode: false,
-    successBasedExclusiveModeType: null as CHOICE | null,
-    
-    // Execution-based quota system (EXISTING - for comparison)
-    targetPermutations: 0,
-    targetDecisions: 0,
-    permutationQuotaReached: false,
-    decisionQuotaReached: false,
-    exclusiveMode: false,
-    exclusiveModeType: null as CHOICE | null,
+    // Time-series tracking - mutation sequence over time
+    mutationSequence: [] as Array<{
+      evaluation: number,
+      intended: CHOICE,
+      actual: CHOICE,
+      fellback: boolean,
+      kept: boolean
+    }>,
   };
 
   private revertFunction = (): void => {
     /**intentionally blank */
   };
   
-  /** Initialize mutation quotas based on total evaluations and scheduleRatio */
-  private initializeMutationQuotas(): void {
-    const totalMutations = this.args.evals - 1; // Subtract 1 for initial evaluation
-    
-    if (this.args.quotaMode === "execution") {
-      // Execution-based quotas (original system)
-      this.mutationTracking.targetPermutations = Math.round(totalMutations * this.args.scheduleRatio / 100);
-      this.mutationTracking.targetDecisions = totalMutations - this.mutationTracking.targetPermutations;
-      
-      Logger.log(`Execution-based quotas initialized: P=${this.mutationTracking.targetPermutations}, D=${this.mutationTracking.targetDecisions}`);
-    } else {
-      // Success-based quotas (new system)
-      // We need to estimate how many successful mutations we'll have
-      // Based on typical success rates, let's assume ~20% overall success rate
-      const estimatedSuccessfulMutations = Math.round(totalMutations * 0.2);
-      this.mutationTracking.targetSuccessfulPermutations = Math.round(estimatedSuccessfulMutations * this.args.scheduleRatio / 100);
-      this.mutationTracking.targetSuccessfulDecisions = estimatedSuccessfulMutations - this.mutationTracking.targetSuccessfulPermutations;
-      
-      Logger.log(`Success-based quotas initialized: P=${this.mutationTracking.targetSuccessfulPermutations}, D=${this.mutationTracking.targetSuccessfulDecisions} (estimated from ${estimatedSuccessfulMutations} total successful)`);
-    }
-  }
+
   
   /** you usually don't want to mess with @param random.
    * mutate should not be called from outside with @param random=false*/
-  private mutate(random = true): void {
-    let intendedChoice: CHOICE = choice; // Initialize with current choice
+  private mutate(random = true, currentEvalNum?: number): void {
+    let intendedChoice: CHOICE;
     
     if (random) {
-      if (this.args.quotaMode === "execution") {
-        // Execution-based quota system
-        // Check if we've reached quotas and need to switch to exclusive mode
-        if (!this.mutationTracking.permutationQuotaReached && 
-            this.mutationTracking.actualPermutation >= this.mutationTracking.targetPermutations) {
-          this.mutationTracking.permutationQuotaReached = true;
-          this.mutationTracking.exclusiveMode = true;
-          this.mutationTracking.exclusiveModeType = CHOICE.DECISION;
-          Logger.log(`Permutation quota reached (${this.mutationTracking.actualPermutation}/${this.mutationTracking.targetPermutations}). Switching to decision-only mode.`);
-        }
-        
-        if (!this.mutationTracking.decisionQuotaReached && 
-            this.mutationTracking.actualDecision >= this.mutationTracking.targetDecisions) {
-          this.mutationTracking.decisionQuotaReached = true;
-          this.mutationTracking.exclusiveMode = true;
-          this.mutationTracking.exclusiveModeType = CHOICE.PERMUTE;
-          Logger.log(`Decision quota reached (${this.mutationTracking.actualDecision}/${this.mutationTracking.targetDecisions}). Switching to permutation-only mode.`);
-        }
-        
-        // Determine choice based on execution quota system
-        if (this.mutationTracking.exclusiveMode && this.mutationTracking.exclusiveModeType) {
-          // One quota is reached, use only the other type
-          intendedChoice = this.mutationTracking.exclusiveModeType;
-          choice = intendedChoice;
-        } else {
-          // Normal random selection based on scheduleRatio
-      const randomValue = Paul.chooseBetween(100); // random integer [0, 99]
-      if (randomValue < this.args.scheduleRatio) {
-            intendedChoice = CHOICE.PERMUTE; // Schedule mutation
-          } else {
-            intendedChoice = CHOICE.DECISION; // Template mutation
-          }
-          choice = intendedChoice;
-        }
-      } else {
-        // Success-based quota system
-        // Check if we've reached success quotas and need to switch to exclusive mode
-        if (!this.mutationTracking.successfulPermutationQuotaReached && 
-            this.mutationTracking.permutationKept >= this.mutationTracking.targetSuccessfulPermutations) {
-          this.mutationTracking.successfulPermutationQuotaReached = true;
-          this.mutationTracking.successBasedExclusiveMode = true;
-          this.mutationTracking.successBasedExclusiveModeType = CHOICE.DECISION;
-          Logger.log(`Successful permutation quota reached (${this.mutationTracking.permutationKept}/${this.mutationTracking.targetSuccessfulPermutations}). Switching to decision-only mode.`);
-        }
-        
-        if (!this.mutationTracking.successfulDecisionQuotaReached && 
-            this.mutationTracking.decisionKept >= this.mutationTracking.targetSuccessfulDecisions) {
-          this.mutationTracking.successfulDecisionQuotaReached = true;
-          this.mutationTracking.successBasedExclusiveMode = true;
-          this.mutationTracking.successBasedExclusiveModeType = CHOICE.PERMUTE;
-          Logger.log(`Successful decision quota reached (${this.mutationTracking.decisionKept}/${this.mutationTracking.targetSuccessfulDecisions}). Switching to permutation-only mode.`);
-        }
-        
-        // Determine choice based on success quota system
-        if (this.mutationTracking.successBasedExclusiveMode && this.mutationTracking.successBasedExclusiveModeType) {
-          // One success quota is reached, use only the other type
-          intendedChoice = this.mutationTracking.successBasedExclusiveModeType;
-          choice = intendedChoice;
-        } else {
-          // Normal random selection based on scheduleRatio
-          const randomValue = Paul.chooseBetween(100); // random integer [0, 99]
-          if (randomValue < this.args.scheduleRatio) {
-            intendedChoice = CHOICE.PERMUTE; // Schedule mutation
-          } else {
-            intendedChoice = CHOICE.DECISION; // Template mutation
-          }
-          choice = intendedChoice;
-        }
-      }
+      // Natural random selection - no forced ratios, just 50/50 chance
+      intendedChoice = Paul.pick([CHOICE.PERMUTE, CHOICE.DECISION]);
+      choice = intendedChoice;
+    } else {
+      // For fallback cases, intendedChoice should already be set
+      intendedChoice = choice;
     }
     
     Logger.log("Mutationalita");
+    let actualChoice = choice;
+    let fellback = false;
+    
     switch (choice) {
       case CHOICE.PERMUTE: {
         Model.mutatePermutation();
@@ -255,11 +168,17 @@ export class Optimizer {
           // Track fallback: intended decision became permutation
           if (random && intendedChoice === CHOICE.DECISION) {
             this.mutationTracking.decisionToPermutationFallbacks++;
+            fellback = true;
+            console.log(`\n🔄 FALLBACK #${this.mutationTracking.decisionToPermutationFallbacks}: Decision → Permutation`);
+            console.log(`   Evaluation: ${currentEvalNum ?? this.mutationTracking.actualPermutation + this.mutationTracking.actualDecision + 1}`);
+            console.log(`   Reason: No hot decisions available for mutation`);
+            console.log(`   Action: Falling back to permutation mutation\n`);
           }
           
           // Fall back to schedule mutation
           choice = CHOICE.PERMUTE;
-          this.mutate(false);
+          actualChoice = CHOICE.PERMUTE;
+          this.mutate(false, currentEvalNum);
           return;
         }
         
@@ -272,16 +191,25 @@ export class Optimizer {
           this.mutationTracking.decisionReverted++;
           Model.revertLastMutation();
         };
+        break;
       }
+    }
+    
+    // Record mutation in time-series if evaluation number is provided
+    if (currentEvalNum) {
+      this.mutationTracking.mutationSequence.push({
+        evaluation: currentEvalNum,
+        intended: intendedChoice,
+        actual: actualChoice,
+        fellback: fellback,
+        kept: false // Will be updated later when we know if it was kept
+      });
     }
   }
 
   public optimise() {
     return new Promise<number>((resolve) => {
-      Logger.log("starting optimisation");
-      
-      // Initialize mutation quotas based on total evaluations and scheduleRatio
-      this.initializeMutationQuotas();
+      Logger.log("starting optimisation - natural mutation distribution study");
       
       printStartInfo({
         ...this.args,
@@ -303,7 +231,7 @@ export class Optimizer {
       const intervalHandle = setInterval(() => {
         if (numEvals > 0) {
           // not first eval, thus we want to mutate.
-          this.mutate();
+          this.mutate(true, numEvals);
         }
 
         Logger.log("assembling");
@@ -440,6 +368,14 @@ export class Optimizer {
               this.mutationTracking.decisionKept++;
             }
             
+            // Update time-series tracking for kept mutations
+            if (this.mutationTracking.mutationSequence.length > 0) {
+              const lastMutation = this.mutationTracking.mutationSequence[this.mutationTracking.mutationSequence.length - 1];
+              if (lastMutation.evaluation === numEvals) {
+                lastMutation.kept = true;
+              }
+            }
+            
             currentNameOfTheFunctionThatHasTheMutation = toggleFUNCTIONS(
               currentNameOfTheFunctionThatHasTheMutation,
             );
@@ -490,7 +426,7 @@ export class Optimizer {
               writeout,
             });
             
-            // Add enhanced tracking summary to status line when writing out
+            // Add natural distribution tracking summary to status line when writing out
             if (writeout) {
               const totalActual = this.mutationTracking.actualPermutation + this.mutationTracking.actualDecision;
               const actualPermutationRatio = totalActual > 0 ? (this.mutationTracking.actualPermutation / totalActual * 100).toFixed(1) : "0.0";
@@ -498,11 +434,7 @@ export class Optimizer {
               const fallbackImpact = totalActual > 0 ? 
                 (this.mutationTracking.decisionToPermutationFallbacks / totalActual * 100).toFixed(1) : "0.0";
               
-              const quotaStatus = this.mutationTracking.exclusiveMode ? " [QUOTA MODE]" : "";
-              const permutationProgress = `${this.mutationTracking.actualPermutation}/${this.mutationTracking.targetPermutations}`;
-              const decisionProgress = `${this.mutationTracking.actualDecision}/${this.mutationTracking.targetDecisions}`;
-              
-              process.stdout.write(`\n[MUTATION TRACKING] Actual: P=${actualPermutationRatio}% D=${actualDecisionRatio}% | Progress: P=${permutationProgress} D=${decisionProgress} | Fallbacks: ${fallbackImpact}%${quotaStatus}`);
+              process.stdout.write(`\n[NATURAL DISTRIBUTION] P=${actualPermutationRatio}% D=${actualDecisionRatio}% | Total: ${totalActual} | Fallbacks: ${fallbackImpact}%`);
             }
             process.stdout.write(statusline);
 
@@ -537,7 +469,6 @@ export class Optimizer {
               memoryConstraints: this.args.memoryConstraints,
               cyclegoal: this.args.cyclegoal,
               mutationTracking: this.mutationTracking,
-              scheduleRatio: this.args.scheduleRatio,
             });
             Logger.log(statistics);
 
@@ -577,6 +508,35 @@ export class Optimizer {
               }
             }
             Logger.log("done with that current price of assembly code.");
+            
+            // FINAL NATURAL DISTRIBUTION SUMMARY
+            const totalActual = this.mutationTracking.actualPermutation + this.mutationTracking.actualDecision;
+            if (totalActual > 0) {
+              const naturalPermutationRatio = (this.mutationTracking.actualPermutation / totalActual * 100).toFixed(1);
+              const naturalDecisionRatio = (this.mutationTracking.actualDecision / totalActual * 100).toFixed(1);
+              const fallbackRate = (this.mutationTracking.decisionToPermutationFallbacks / totalActual * 100).toFixed(1);
+              
+              // Validation: total evaluations should match
+              const expectedTotal = this.args.evals - 1; // minus initial evaluation
+              if (totalActual !== expectedTotal) {
+                console.warn(`⚠️  COUNTING MISMATCH: Expected ${expectedTotal} mutations, got ${totalActual}`);
+              }
+              
+              console.log(`\n📊 NATURAL MUTATION DISTRIBUTION RESULTS:`);
+              console.log(`   Implementation: ${this.symbolname}`);
+              console.log(`   Evaluations: ${totalActual} mutations`);
+              console.log(`   Natural Ratio: ${naturalPermutationRatio}% Permutation / ${naturalDecisionRatio}% Decision`);
+              console.log(`   Fallbacks: ${this.mutationTracking.decisionToPermutationFallbacks}/${totalActual} (${fallbackRate}%)`);
+              console.log(`   Success Rates: P=${(this.mutationTracking.permutationKept/this.mutationTracking.actualPermutation*100).toFixed(1)}% D=${(this.mutationTracking.decisionKept/this.mutationTracking.actualDecision*100).toFixed(1)}%`);
+              console.log(`   Intended Permutations: ${this.mutationTracking.actualPermutation - this.mutationTracking.decisionToPermutationFallbacks}`);
+              console.log(`   Fallback-induced Permutations: ${this.mutationTracking.decisionToPermutationFallbacks}`);
+              if (this.mutationTracking.decisionToPermutationFallbacks > 0) {
+                console.log(`   💡 Fallbacks occurred when no operations had "hot" decisions available for mutation`);
+              }
+              console.log(`   🎯 KEY FINDING: This implementation naturally prefers ${naturalPermutationRatio}% permutation mutations`);
+              console.log(``);
+            }
+            
             this.cleanLibcheckfunctions();
             const v = this.measuresuite.destroy();
             Logger.log(`Wonderful. Done with my work. Destroyed measuresuite (${v}). Time for lunch.`);

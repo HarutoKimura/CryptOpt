@@ -358,6 +358,40 @@ export class Model {
 
     if (candidateIndexes.length === 0) {
       Logger.log("DECISION Mutation has been requested, but there was no hot decisions.");
+      
+      // DETAILED FALLBACK DEBUGGING - Log all operations and their decision states
+      console.log("\n=== FALLBACK DEBUGGING: No Hot Decisions Found ===");
+      console.log(`Total operations in model: ${Model._nodes.length}`);
+      console.log(`Current instruction index: ${Model._currentInstIdx}`);
+      
+      // Log each operation with its decision state
+      Model._nodes.forEach((node, idx) => {
+        const decisionKeys = Object.keys(node.decisions || {});
+        const hotDecisions = node.decisionsHot || [];
+        const hasDecisions = decisionKeys.length > 0;
+        const hasHotDecisions = hotDecisions.length > 0;
+        
+        console.log(`[${idx.toString().padStart(3)}] ${node.name.join(',').padEnd(12)} | ` +
+                   `op: ${node.operation.padEnd(12)} | ` +
+                   `decisions: ${hasDecisions ? decisionKeys.join(',') : 'none'} | ` +
+                   `hot: ${hasHotDecisions ? hotDecisions.join(',') : 'none'}`);
+        
+        // If this operation has decisions but no hot decisions, log why
+        if (hasDecisions && !hasHotDecisions) {
+          console.log(`    └─ Available decisions: ${JSON.stringify(node.decisions)}`);
+        }
+      });
+      
+      // Summary statistics
+      const totalWithDecisions = Model._nodes.filter(n => Object.keys(n.decisions || {}).length > 0).length;
+      const totalWithHotDecisions = Model._nodes.filter(n => (n.decisionsHot || []).length > 0).length;
+      
+      console.log(`\nSummary:`);
+      console.log(`- Operations with decisions: ${totalWithDecisions}/${Model._nodes.length}`);
+      console.log(`- Operations with hot decisions: ${totalWithHotDecisions}/${Model._nodes.length}`);
+      console.log(`- Fallback reason: All decision-capable operations are currently 'cold'`);
+      console.log("=== END FALLBACK DEBUGGING ===\n");
+      
       return false;
     }
 
