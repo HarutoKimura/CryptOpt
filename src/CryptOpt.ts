@@ -15,9 +15,9 @@
  */
 
 import { exec } from "child_process";
-import { existsSync, readdirSync, readFileSync } from "fs";
+import { existsSync, readdirSync, readFileSync, rmSync, writeFileSync } from "fs";
 import { hostname } from "os";
-import { resolve } from "path";
+import { join, resolve } from "path";
 
 import {
   cy,
@@ -31,6 +31,7 @@ import {
   SI,
   writeString,
 } from "@/helper";
+import globals from "@/helper/globals";
 import { registerExitHooks } from "@/helper/process";
 import { Model } from "@/model";
 import { Optimizer } from "@/optimizer";
@@ -109,7 +110,7 @@ if (!verbose) {
 const symbolname = new Optimizer(parsedArgs).getSymbolname(true);
 registerExitHooks({ ...parsedArgs, symbolname });
 
-type RunResult = { statefile: string; ratio: number; convergence: string[] };
+type RunResult = { statefile: string; ratio: number; convergence: string[]; optimizer?: Optimizer };
 
 async function allBets(evals: number, bets: number): Promise<RunResult[]> {
   const runRes = [] as RunResult[];
@@ -160,7 +161,7 @@ async function run(args: OptimizerArgs): Promise<RunResult> {
   const [statefile] = generateResultFilename({ ...args, symbolname: optimizer.getSymbolname() });
   Model.persist(statefile, parsedArgs);
   const { ratio, convergence } = Model.getState();
-  return { statefile, ratio, convergence };
+  return { statefile, ratio, convergence, optimizer };
 }
 
 let runResults: RunResult[];
@@ -184,12 +185,95 @@ if (single) {
     evals: parsedArgs.evals - allocatedToPopulation,
     readState: bestRun.statefile,
   };
+  
+  // Create new optimizer for run phase (it will set phase to 'run' automatically)
   const lastRun = await run(fullArgs);
   runResults.push(lastRun);
 }
 
 // OPTIMIZATION DONE.
 // NOW Analyse and write files for graphing.
+
+// Export all metrics to JSON file - use same logic as generateResultFilename
+const [metricsFilename] = generateResultFilename({ ...parsedArgs, symbolname }, ["_metrics.json"]);
+
+// Read bet data from shared file if it exists
+let betDataFromFile: any[] = [];
+const sharedBetFilePath = `/tmp/cryptopt_bet_data_${symbolname}.json`;
+try {
+  if (existsSync(sharedBetFilePath)) {
+    const betFileContent = readFileSync(sharedBetFilePath, 'utf8');
+    betDataFromFile = JSON.parse(betFileContent);
+    Logger.log(`Read ${betDataFromFile.length} bet phases from ${sharedBetFilePath}`);
+  }
+} catch (error) {
+  Logger.log(`Failed to read bet data file: ${error}`);
+}
+
+// Include bet results summary for now
+const betResultsSummary = runResults.slice(0, -1).map((result, index) => ({
+  betIndex: index + 1,
+  seed: result.statefile.match(/seed(\d+)/) ? result.statefile.match(/seed(\d+)/)?.[1] : 'unknown',
+  finalRatio: result.ratio,
+  convergenceLength: result.convergence.length,
+}));
+
+const metricsData = {
+  timestamp: new Date().toISOString(),
+  symbolname: symbolname,
+  args: parsedArgs,
+  mutationOrder: globals.mutationOrder,
+  phaseStats: globals.phaseStats,
+  randomInputsPerMutation: Array.from(globals.randomInputsPerMutation.entries()),
+  totalRandomInputsConsumed: globals.totalRandomInputsConsumed,
+  
+  // Detailed explanation of randomInputsPerMutation
+  randomInputsExplanation: {
+    description: "Each array entry shows [evaluationNumber, totalRandomInputsUsed] for that mutation",
+    calculation: "randomInputsUsed = batchSize × numBatches", 
+    purpose: "Each mutation requires multiple measurements with different random inputs for statistical validity",
+    variability: "Values vary because batchSize adapts based on cyclegoal and performance"
+  },
+  
+  // Bet phase information (enhanced with detailed data from shared file)
+  betResultsSummary: betResultsSummary,
+  betPhaseDetails: betDataFromFile,
+  existingMetrics: {
+    convergence: globals.convergence,
+    mutationLog: globals.mutationLog,
+    currentRatio: globals.currentRatio,
+  },
+  // Add mutation tracking summary
+  mutationSummary: {
+    totalMutations: globals.mutationOrder.length,
+    betPhaseMutations: globals.mutationOrder.filter((m: any) => m.phase === 'bet').length,
+    runPhaseMutations: globals.mutationOrder.filter((m: any) => m.phase === 'run').length,
+    permutationCount: globals.mutationOrder.filter((m: any) => m.type === 'Permutation').length,
+    decisionCount: globals.mutationOrder.filter((m: any) => m.type === 'Decision').length,
+    averageDeltaScore: globals.mutationOrder.length > 0 ? globals.mutationOrder.reduce((sum: number, m: any) => sum + m.deltaScore, 0) / globals.mutationOrder.length : 0,
+  },
+  
+  // Summary of phases
+  phaseSummary: {
+    betPhases: globals.phaseStats.filter((p: any) => p.phaseType === 'bet').length,
+    runPhases: globals.phaseStats.filter((p: any) => p.phaseType === 'run').length,
+    totalPhases: globals.phaseStats.length,
+    betsExecuted: runResults.length - 1, // Subtract final run
+  },
+};
+
+writeFileSync(metricsFilename, JSON.stringify(metricsData, null, 2));
+Logger.log(`Metrics written to ${metricsFilename}`);
+
+// Clean up shared bet data file
+try {
+  if (existsSync(sharedBetFilePath)) {
+    rmSync(sharedBetFilePath);
+    Logger.log(`Cleaned up shared bet data file: ${sharedBetFilePath}`);
+  }
+} catch (error) {
+  Logger.log(`Failed to clean up bet data file: ${error}`);
+}
 
 const times: CryptoptGlobals["time"] = { validate: 0, generateCryptopt: 0, generateFiat: 0 };
 

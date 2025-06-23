@@ -26,5 +26,11 @@ const globals: CryptoptGlobals = {
     generateCryptopt: 0,
   },
   mutationLog: [],
+  
+  // New fields for enhanced logging
+  mutationOrder: [],
+  phaseStats: [],
+  randomInputsPerMutation: new Map(),
+  totalRandomInputsConsumed: 0,
 };
 export default globals;

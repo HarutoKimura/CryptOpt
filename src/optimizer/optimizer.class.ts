@@ -15,7 +15,7 @@
  */
 
 import { execSync } from "child_process";
-import { appendFileSync, existsSync, rmSync } from "fs";
+import { appendFileSync, existsSync, readFileSync, rmSync, writeFileSync } from "fs";
 import { Measuresuite } from "measuresuite";
 import { tmpdir } from "os";
 import { join, resolve as pathResolve } from "path";
@@ -50,6 +50,13 @@ export class Optimizer {
   private measuresuite: Measuresuite;
   private libcheckfunctionDirectory: string; // aka. /tmp/CryptOpt.cache/yolo123
   private symbolname: string;
+  private currentPhase: 'bet' | 'run';
+  private phaseStartEval: number;
+  private previousScore: number = 0;
+  private mutationIndexWithinPhase: number = 0;
+  private currentBetIndex: number = 0;
+  private phaseStartRandomInputs: number = 0;
+  
   public getSymbolname(deleteCache = false): string {
     if (deleteCache) {
       this.cleanLibcheckfunctions();
@@ -72,6 +79,22 @@ export class Optimizer {
     globals.mutationLog = [
       "evaluation,choice,kept,PdetailsBackForwardChosenstepsWaled,DdetailsKindNumhotNumall",
     ];
+    
+    // Initialize phase tracking
+    // Determine phase based on log comment and read state
+    const isBetPhase = args.logComment.includes('/') && !args.readState;
+    this.currentPhase = isBetPhase ? 'bet' : 'run';
+    this.currentBetIndex = isBetPhase ? parseInt(args.logComment.split('/')[0].split(' ').pop() || '0') : 0;
+    this.phaseStartEval = 0;
+    this.mutationIndexWithinPhase = 0;
+    
+    // Initialize new global tracking
+    globals.mutationOrder = [];
+    globals.phaseStats = [];
+    globals.randomInputsPerMutation = new Map();
+    globals.totalRandomInputsConsumed = 0;
+    this.phaseStartRandomInputs = 0;
+    
     // load a saved state if necessary
     if (args.readState) {
       Model.import(args.readState);
@@ -271,6 +294,7 @@ export class Optimizer {
           const now_measure = Date.now();
 
           let analyseResult: AnalyseResult | undefined;
+          let randomInputsForThisMutation = 0;
           try {
             Logger.log("let the measurements begin!");
             if (this.args.verbose) {
@@ -289,6 +313,11 @@ export class Optimizer {
               this.asmStrings[FUNCTIONS.F_B],
             ]);
             Logger.log("well done guys. The results are in!");
+            
+            // Track random inputs used for this mutation
+            randomInputsForThisMutation = batchSize * numBatches;
+            globals.randomInputsPerMutation.set(numEvals, randomInputsForThisMutation);
+            globals.totalRandomInputsConsumed += randomInputsForThisMutation;
 
 
             if (results) {
@@ -350,6 +379,21 @@ export class Optimizer {
 
           Logger.log(currentFunctionIsA() ? "New".padEnd(10) : "New".padStart(10));
 
+          // Calculate performance delta
+          const currentScore = currentFunctionIsA() ? meanrawA : meanrawB;
+          const deltaScore = this.previousScore === 0 ? 0 : currentScore - this.previousScore;
+          
+          // Track mutation order
+          const mutationType = choice === CHOICE.PERMUTE ? 'Permutation' : 'Decision';
+          globals.mutationOrder.push({
+            phase: this.currentPhase,
+            index: this.mutationIndexWithinPhase++,
+            type: mutationType,
+            deltaScore: deltaScore,
+            evalNumber: numEvals,
+            randomInputsUsed: randomInputsForThisMutation
+          });
+
           let kept: boolean;
 
           if (
@@ -379,6 +423,9 @@ export class Optimizer {
             currentNameOfTheFunctionThatHasTheMutation = toggleFUNCTIONS(
               currentNameOfTheFunctionThatHasTheMutation,
             );
+            
+            // Update previous score for next delta calculation
+            this.previousScore = currentScore;
           } else {
             // revert
             kept = false;
@@ -537,6 +584,14 @@ export class Optimizer {
               console.log(``);
             }
             
+            // Capture final phase stats
+            this.capturePhaseStats(this.currentBetIndex);
+            
+            // Save bet phase data to shared file if this is a bet phase
+            if (this.currentPhase === 'bet') {
+              this.saveBetPhaseData();
+            }
+            
             this.cleanLibcheckfunctions();
             const v = this.measuresuite.destroy();
             Logger.log(`Wonderful. Done with my work. Destroyed measuresuite (${v}). Time for lunch.`);
@@ -550,6 +605,94 @@ export class Optimizer {
         }
       }, 0);
     });
+  }
+
+  public capturePhaseStats(betIndex?: number): void {
+    const endEval = globals.mutationOrder.length;
+    const phaseMutations = globals.mutationOrder.slice(this.phaseStartEval);
+    
+    globals.phaseStats.push({
+      phaseType: this.currentPhase,
+      betIndex: betIndex,
+      seed: String(this.args.seed),
+      startEvaluation: this.phaseStartEval + 1, // +1 because first eval is not a mutation
+      endEvaluation: endEval,
+      mutations: {
+        permutation: this.mutationTracking.actualPermutation,
+        decision: this.mutationTracking.actualDecision,
+        permutationKept: this.mutationTracking.permutationKept,
+        decisionKept: this.mutationTracking.decisionKept,
+        decisionToPermutationFallbacks: this.mutationTracking.decisionToPermutationFallbacks,
+      },
+      randomInputsConsumed: globals.totalRandomInputsConsumed - this.phaseStartRandomInputs,
+      convergence: [...globals.convergence],
+      finalRatio: globals.currentRatio,
+      mutationDetails: [...phaseMutations],
+    });
+  }
+  
+  public setPhase(phase: 'bet' | 'run', betIndex?: number): void {
+    // Capture stats for the previous phase if it had any mutations
+    if (globals.mutationOrder.length > this.phaseStartEval) {
+      this.capturePhaseStats(this.currentBetIndex);
+    }
+    
+    this.currentPhase = phase;
+    this.currentBetIndex = betIndex || 0;
+    this.phaseStartEval = globals.mutationOrder.length;
+    this.mutationIndexWithinPhase = 0;
+    this.phaseStartRandomInputs = globals.totalRandomInputsConsumed;
+    
+    // Reset mutation tracking for new phase
+    this.mutationTracking.actualPermutation = 0;
+    this.mutationTracking.actualDecision = 0;
+    this.mutationTracking.decisionToPermutationFallbacks = 0;
+    this.mutationTracking.permutationKept = 0;
+    this.mutationTracking.decisionKept = 0;
+    this.mutationTracking.permutationReverted = 0;
+    this.mutationTracking.decisionReverted = 0;
+    this.mutationTracking.mutationSequence = [];
+  }
+
+  private saveBetPhaseData(): void {
+    try {
+      const betData = {
+        betIndex: this.currentBetIndex,
+        seed: String(this.args.seed),
+        phaseStats: globals.phaseStats,
+        mutationOrder: globals.mutationOrder,
+        randomInputsPerMutation: Array.from(globals.randomInputsPerMutation.entries()),
+        totalRandomInputsConsumed: globals.totalRandomInputsConsumed,
+        convergence: globals.convergence,
+        finalRatio: globals.currentRatio,
+        timestamp: Date.now(),
+      };
+
+      // Create shared file path in temp directory
+      const sharedFilePath = `/tmp/cryptopt_bet_data_${this.getSymbolname()}.json`;
+      
+      // Read existing data or create new array
+      let allBetData: any[] = [];
+      try {
+        if (existsSync(sharedFilePath)) {
+          const existingData = readFileSync(sharedFilePath, 'utf8');
+          allBetData = JSON.parse(existingData);
+        }
+      } catch (e) {
+        // If file doesn't exist or is corrupted, start fresh
+        allBetData = [];
+      }
+      
+      // Add this bet's data
+      allBetData.push(betData);
+      
+      // Write back to shared file
+      writeFileSync(sharedFilePath, JSON.stringify(allBetData, null, 2));
+      
+      Logger.log(`Saved bet ${this.currentBetIndex} data to ${sharedFilePath}`);
+    } catch (error) {
+      Logger.log(`Failed to save bet data: ${error}`);
+    }
   }
 
   private cleanLibcheckfunctions() {
