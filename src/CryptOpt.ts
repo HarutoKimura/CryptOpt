@@ -227,14 +227,6 @@ const metricsData = {
   randomInputsPerMutation: Array.from(globals.randomInputsPerMutation.entries()),
   totalRandomInputsConsumed: globals.totalRandomInputsConsumed,
   
-  // Detailed explanation of randomInputsPerMutation
-  randomInputsExplanation: {
-    description: "Each array entry shows [evaluationNumber, totalRandomInputsUsed] for that mutation",
-    calculation: "randomInputsUsed = batchSize × numBatches", 
-    purpose: "Each mutation requires multiple measurements with different random inputs for statistical validity",
-    variability: "Values vary because batchSize adapts based on cyclegoal and performance"
-  },
-  
   // Bet phase information (enhanced with detailed data from shared file)
   betResultsSummary: betResultsSummary,
   betPhaseDetails: betDataFromFile,

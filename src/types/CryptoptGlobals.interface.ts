@@ -20,7 +20,6 @@ export interface MutationOrderEntry {
   type: 'Permutation' | 'Decision';
   deltaScore: number; // Signed performance delta vs. previous state
   evalNumber: number;
-  randomInputsUsed?: number;
 }
 
 export interface PhaseStats {

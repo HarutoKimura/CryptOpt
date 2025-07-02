@@ -390,8 +390,7 @@ export class Optimizer {
             index: this.mutationIndexWithinPhase++,
             type: mutationType,
             deltaScore: deltaScore,
-            evalNumber: numEvals,
-            randomInputsUsed: randomInputsForThisMutation
+            evalNumber: numEvals
           });
 
           let kept: boolean;
