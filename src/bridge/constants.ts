@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { CURVE_T, METHOD_T } from "./fiat-bridge";
+import { CURVE_T as FIAT_CURVE_T, METHOD_T } from "./fiat-bridge";
+import { CURVE_T as RUST_CURVE_T } from "./rust-bridge/constants";
+
+// Create unified type that includes both fiat and rust bridge curves
+export type CURVE_T = FIAT_CURVE_T | RUST_CURVE_T;
 
 export const BRIDGES = ["fiat", "jasmin", "bitcoin-core", "manual", "llvm-bitcoin-core", "rust"] as const;
 export type BRIDGES_T = (typeof BRIDGES)[number];
@@ -102,6 +106,10 @@ export const KNOWN_SYMBOLS: {
   rust_fiat_sm2_square: { bridge: "rust", method: "square", curve: "sm2"},
   // rust_bls12_381_q_mul: {bridge: "rust", method: "mul", curve: "bls12_381_q"},
   // rust_bls12_381_q_square: {bridge: "rust", method: "square", curve: "bls12_381_q"},
+
+  // OpenSSL curve25519 functions
+  open_ssl_curve25519_fe51_mul: { bridge: "rust", method: "mul", curve: "openssl_curve25519"},
+  open_ssl_curve25519_fe51_square: { bridge: "rust", method: "square", curve: "openssl_curve25519"},
 
   c_fiat_curve25519_carry_mul: { bridge: "rust", method: "mul", curve: "curve25519"},
   c_fiat_curve25519_carry_square: { bridge: "rust", method: "square", curve: "curve25519"},

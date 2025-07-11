@@ -19,6 +19,7 @@ export const RUST_AVAILABLE_CURVES = [
   "curve25519",
   "curve25519_solinas",
   "curve25519_dalek",
+  "openssl_curve25519",
   "p224",
   "p256",
   "p384",
@@ -422,6 +423,29 @@ export const RUST_SYMBOLS: Record<
       },
     },
   },
+
+  openssl_curve25519: {
+    mul: {
+      rust: {
+        fnName: "open_ssl_curve25519_fe51_mul",
+        jsonFile: "open_ssl_curve25519_fe51_mul_ssa.json",
+      },
+      c: {
+        fnName: "open_ssl_curve25519_fe51_mul",
+        jsonFile: "open_ssl_curve25519_fe51_mul_ssa.json",
+      },
+    },
+    square: {
+      rust: {
+        fnName: "open_ssl_curve25519_fe51_square",
+        jsonFile: "open_ssl_curve25519_fe51_square_ssa.json",
+      },
+      c: {
+        fnName: "open_ssl_curve25519_fe51_square",
+        jsonFile: "open_ssl_curve25519_fe51_square_ssa.json",
+      }
+    }
+  },
 };
 
 /**
@@ -592,6 +616,16 @@ export const RUST_CURVE_DETAILS: Record<
       "0xffffffffffffffff",
       "0xffffffffffffffff",
       "0xffffffffffffffff",
+    ],
+  },
+  openssl_curve25519: {
+    argwidth: 5,
+    bounds: [
+      "0x18000000000000",
+      "0x18000000000000",
+      "0x18000000000000",
+      "0x18000000000000",
+      "0x18000000000000",
     ],
   },
 };

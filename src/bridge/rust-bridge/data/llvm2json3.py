@@ -9,7 +9,8 @@ def parse_llvm_ir(file_path):
 
     # regex to capture function definition including complex names and arguments up to 'unnamed_addr #0'
     # pattern = r'define (\w+) @([^\s]+)\((.*?)\) unnamed_addr #0'
-    pattern = r'define(?:\s+\w+)?\s+(\w+)\s+@([^\s]+)\((.*?)\)(?:\s+unnamed_addr)?\s+#0'
+    # pattern = r'define(?:\s+\w+)?\s+(\w+)\s+@([^\s]+)\((.*?)\)(?:\s+unnamed_addr)?\s+#0'
+    pattern = r'define(?:\s+\w+)?\s+(\w+)\s+@([^\s]+)\((.*?)\)(?:\s+\w*unnamed_addr)?\s+#0'
     # pattern = r'define\s+i64\s+@(sext_transformer)\s*\(\s*(i1\s+%x)\s*\)\s*#0'
     match = re.search(pattern, llvm_ir, re.DOTALL)
     if not match:

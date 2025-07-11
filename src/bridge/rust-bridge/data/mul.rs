@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 
+// Copy from https://github.com/dalek-cryptography/curve25519-dalek/blob/main/src/scalar/mod.rs
 // Use std instead of core.
 use std::fmt::Debug;
 use std::ops::{Mul};

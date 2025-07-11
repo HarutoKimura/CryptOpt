@@ -1,4 +1,5 @@
 #![allow(dead_code)]
+// Copy from https://github.com/dalek-cryptography/curve25519-dalek/blob/main/src/scalar/mod.rs
 // -*- mode: rust; -*-
 //
 // This file is part of curve25519-dalek.

@@ -1,0 +1,35 @@
+================================================================================
+CRYPTOPT MUTATION ANALYSIS REPORT - *** CORRECTED ***
+Generated: 2025-06-27 15:53:40
+File: /home/harutok/CryptOpt/results/fiat/fiat_curve25519_carry_square/seed0001750654287698_metrics.json
+================================================================================
+
+🚨 CRITICAL CORRECTION:
+   Previous analysis had WRONG sign interpretation!
+   ✅ CORRECT: Negative Δ = BETTER performance (fewer cycles)
+   ❌ WRONG:   Positive Δ = WORSE performance (more cycles)
+
+📊 EXPERIMENT OVERVIEW:
+   Symbol: fiat_curve25519_carry_square
+   Total Evaluations: 100,000
+   Total Mutations: 79,999
+   Natural Distribution: 49.9% Permutation / 50.1% Decision
+
+🎯 CORRECTED PERFORMANCE ANALYSIS:
+   Metric                             Permutation        Decision        Gap
+   ------------------------------ --------------- --------------- ----------
+   Success Rate (Actually Kept)             19.6%           22.0%       2.4%
+   IMPROVEMENT Rate (Δ<0)                   32.4%           33.0%       0.5%
+   Made WORSE Rate (Δ>0)                    67.1%           66.6%      -0.5%
+   Mean Δ (cycles)                          243.4           214.8      -28.6
+
+💡 KEY INSIGHTS (CORRECTED):
+   1. Decision mutations are 0.5% more likely to improve performance
+   2. Most mutations (~67%) actually HURT performance
+   3. Only ~32% of mutations actually help
+   4. Success rates (~20%) are reasonable given this context
+
+❌ WHAT WAS WRONG IN PREVIOUS ANALYSIS:
+   • Counted positive Δ as 'improvements' (~67%)
+   • Created false 'paradox' of high improvement but low success
+   • Truth: Most mutations made performance WORSE

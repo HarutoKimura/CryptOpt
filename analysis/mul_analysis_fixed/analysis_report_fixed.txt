@@ -1,0 +1,25 @@
+================================================================================
+CRYPTOPT MUTATION ANALYSIS REPORT (FIXED)
+Generated: 2025-06-27 12:46:26
+File: /home/harutok/CryptOpt/results/fiat/fiat_curve25519_carry_mul/seed0001750989811105_metrics.json
+================================================================================
+
+📊 EXPERIMENT OVERVIEW:
+   Symbol: fiat_curve25519_carry_mul
+   Total Evaluations: 100,000
+   Total Mutations: 79,999
+   Natural Distribution: 50.3% Permutation / 49.7% Decision
+
+⚠️  SUCCESS RATE CLARIFICATION:
+   Positive Delta Rate ≠ Success Rate
+   - Positive Delta: Mutation improved the current function
+   - Success (Kept): Mutation was actually accepted by optimizer
+   - Many mutations improve performance but are still rejected!
+
+🎯 PERFORMANCE COMPARISON:
+   Metric                        Permutation        Decision
+   ------------------------- --------------- ---------------
+   ACTUAL Success Rate                 20.4%           32.1%
+   Positive Delta Rate                 80.7%           70.5%
+   Mean Delta (cycles)                 190.6           137.8
+   Median Delta                        108.0            46.0

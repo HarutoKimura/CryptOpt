@@ -1,0 +1,71 @@
+================================================================================
+CRYPTOPT MUTATION ANALYSIS REPORT - *** CORRECTED ***
+Generated: 2025-06-27 12:16:31 (Updated with correct delta interpretation)
+File: /home/harutok/CryptOpt/results/fiat/fiat_curve25519_carry_square/seed0001750654287698_metrics.json
+================================================================================
+
+🚨 CRITICAL CORRECTION APPLIED:
+   ✅ CORRECT: Positive Δ = MORE cycles = WORSE performance
+   ✅ CORRECT: Negative Δ = FEWER cycles = BETTER performance
+   ❌ Previous "success rates" were actually "made worse rates"
+
+📊 EXPERIMENT OVERVIEW:
+   Symbol: fiat_curve25519_carry_square
+   Total Evaluations: 100,000
+   Total Mutations: 79,999
+   Bet Phases: 10
+   Natural Distribution: 49.9% Permutation / 50.1% Decision
+
+🎯 CORRECTED PERFORMANCE COMPARISON:
+   Metric                   Permutation        Decision      Difference
+   -------------------- --------------- --------------- ---------------
+   Count                         39,907          40,092            -185
+   Mean Δ (cycles)                +243.4          +214.8           +28.6
+   Median Δ                        +96.0           +88.0            +8.0
+   Std Dev                       1325.1          1266.9            58.2
+   ACTUAL Success Rate             19.6%           22.0%           +2.4%
+   IMPROVEMENT Rate (Δ<0)          32.4%           33.0%           +0.5%
+   Made WORSE Rate (Δ>0)           67.1%           66.6%           -0.5%
+
+⏱️  CORRECTED TEMPORAL PATTERNS:
+   Early (0-25%):
+     Permutation: 9,967 mutations, mean Δ = +214.4 (WORSE), made worse = 66.3%
+     Decision:    10,032 mutations, mean Δ = +199.6 (WORSE), made worse = 65.8%
+     → Decision mutations 0.5% less likely to hurt performance in early stage
+     
+   Mid (25-75%):
+     Permutation: 19,996 mutations, mean Δ = +259.7 (WORSE), made worse = 67.2%
+     Decision:    20,004 mutations, mean Δ = +222.5 (WORSE), made worse = 66.4%
+     → Decision mutations 0.8% less likely to hurt performance in mid stage
+     
+   Late (75-100%):
+     Permutation: 9,944 mutations, mean Δ = +239.6 (WORSE), made worse = 67.9%
+     Decision:    10,056 mutations, mean Δ = +214.5 (WORSE), made worse = 67.8%
+     → Performance gap narrows in late stage (0.1% difference)
+
+💡 CORRECTED KEY INSIGHTS:
+   ✅ Decision mutations are consistently BETTER across most stages
+   ✅ Decision mutations are 28.6 cycles LESS harmful on average
+   ✅ Permutation mutations hurt performance 67.1% vs Decision 66.6%
+   ✅ Most mutations (~67%) actually DEGRADE performance - this is normal!
+   ✅ Success rates (~20%) are reasonable given this challenging reality
+   ✅ Square operations show smaller performance gaps than multiplication
+
+🔍 TEMPORAL EVOLUTION INSIGHTS:
+   • Permutation harm varies: 214.4 → 259.7 → 239.6 cycles (peak in mid-stage)
+   • Decision harm varies: 199.6 → 222.5 → 214.5 cycles (similar pattern)
+   • Both types show increased harm during mid-stage optimization
+   • Performance gaps are much smaller than in multiplication operations
+
+❌ WHAT WAS WRONG IN ORIGINAL REPORT:
+   • "Success Rate (%) 67.1% vs 66.6%" → Actually "Made Worse Rate"
+   • "mean Δ = better improvement" → Actually "mean Δ = worse degradation"
+   • Temporal "success" values → Actually "made worse" percentages
+   • Suggested Permutations were better → Actually they're slightly worse
+
+✅ CORRECTED CONCLUSION:
+   Decision mutations are slightly superior to Permutation mutations:
+   - Higher actual success rates (22.0% vs 19.6%)
+   - Lower degradation when they fail (+214.8 vs +243.4 cycles)
+   - Slightly more likely to improve performance (33.0% vs 32.4%)
+   - Smaller performance gaps suggest square operations are easier to optimize

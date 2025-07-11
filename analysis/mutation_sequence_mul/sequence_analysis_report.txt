@@ -1,0 +1,25 @@
+================================================================================
+CRYPTOPT MUTATION SEQUENCE ANALYSIS
+Generated: 2025-06-27 16:33:24
+Symbol: fiat_curve25519_carry_mul
+================================================================================
+
+📊 SEQUENCE OVERVIEW:
+   Total Mutations: 79,999
+   Permutation Count: 39,824 (49.8%)
+   Decision Count: 40,175 (50.2%)
+
+🎯 PERFORMANCE COMPARISON:
+   Metric                        Permutation        Decision       Advantage
+   ------------------------- --------------- --------------- ---------------
+   Improvement Rate                    19.0%           29.3%        Decision
+   Mean Delta (cycles)                 151.1           113.4        Decision
+
+🔄 SEQUENCE PATTERNS:
+   Average Consecutive Permutations: 2.0 (max: 15, min: 1)
+   Average Consecutive Decisions: 2.0 (max: 18, min: 1)
+   Total Runs: 40058
+
+📝 SEQUENCE SAMPLE (first 100 mutations):
+   DPPPPDPPDDDPDDDDPPPDPPPPDPDPDDDPDDPPDDPPPDPPPPDPPPPDDDDDPPDPDPPDDPDDPDDDDDDPPPPPPPPDDDPDDDPPPPDDPPPD
+   ... (showing first 100 of 79999 total)
