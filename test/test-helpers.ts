@@ -54,6 +54,7 @@ export function getTestArgs(filename: string): OptimizerArgs {
     memoryConstraints: "none",
     mutationMode: "both",
     scheduleRatio: 50,
+    quotaMode: "execution",
   };
 }
 

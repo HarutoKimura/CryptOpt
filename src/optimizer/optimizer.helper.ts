@@ -96,6 +96,7 @@ export function genStatistics(a: {
   framePointer: string;
   memoryConstraints: string;
   cyclegoal: number;
+  scheduleRatio: number;
   mutationTracking?: {
     actualPermutation: number;
     actualDecision: number;
@@ -122,6 +123,7 @@ export function genStatistics(a: {
     `; using counter; ${a.counter}`,
     `; framePointer ${a.framePointer}`,
     `; memoryConstraints ${a.memoryConstraints}`,
+    `; target mutation ratio P:${a.scheduleRatio}% D:${100-a.scheduleRatio}%`,
     `; time needed: ${a.elapsed} ms on ${a.evals} evaluations.`,
     `; Time spent for assembling and measuring (initial batch_size=${a.batchSize}, initial num_batches=${a.numBatches}): ${a.acc} ms`,
     `; number of used evaluations: ${a.evals}`,
@@ -208,9 +210,10 @@ export function printStartInfo({
   counter,
   framePointer,
   memoryConstraints,
+  scheduleRatio,
 }: Pick<
   OptimizerArgs,
-  "resultDir" | "bridge" | "seed" | "evals" | "cyclegoal" | "proof" | "framePointer" | "memoryConstraints"
+  "resultDir" | "bridge" | "seed" | "evals" | "cyclegoal" | "proof" | "framePointer" | "memoryConstraints" | "scheduleRatio"
 > & {
   symbolname: string;
   counter: string;
@@ -231,6 +234,7 @@ export function printStartInfo({
       `using counter>>${cy}${counter}${re}<<`,
       `framePointer=>>${cy}${framePointer}${re}<<`,
       `memoryConstraints>>${cy}${memoryConstraints}${re}<<`,
+      `mutation ratio>>${cy}P:${scheduleRatio}% D:${100-scheduleRatio}%${re}<<`,
       `starting @>>${cy}${new Date().toISOString()}${re}<<\n`,
     ].join(" "),
   );

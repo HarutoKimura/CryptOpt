@@ -157,8 +157,10 @@ export class Optimizer {
     let intendedChoice: CHOICE;
     
     if (random) {
-      // Natural random selection - no forced ratios, just 50/50 chance
-      intendedChoice = Paul.pick([CHOICE.PERMUTE, CHOICE.DECISION]);
+      // Use scheduleRatio to control Permutation vs Decision ratio
+      // scheduleRatio is 0-100, representing percentage of mutations that should be permutations
+      const randomValue = Paul.chooseBetween(100);
+      intendedChoice = randomValue < this.args.scheduleRatio ? CHOICE.PERMUTE : CHOICE.DECISION;
       choice = intendedChoice;
     } else {
       // For fallback cases, intendedChoice should already be set
@@ -238,6 +240,7 @@ export class Optimizer {
         ...this.args,
         symbolname: this.symbolname,
         counter: this.measuresuite.timer,
+        scheduleRatio: this.args.scheduleRatio,
       });
       let batchSize = 200;
       const numBatches = 31;
@@ -472,7 +475,7 @@ export class Optimizer {
               writeout,
             });
             
-            // Add natural distribution tracking summary to status line when writing out
+            // Add distribution tracking summary to status line when writing out
             if (writeout) {
               const totalActual = this.mutationTracking.actualPermutation + this.mutationTracking.actualDecision;
               const actualPermutationRatio = totalActual > 0 ? (this.mutationTracking.actualPermutation / totalActual * 100).toFixed(1) : "0.0";
@@ -480,7 +483,7 @@ export class Optimizer {
               const fallbackImpact = totalActual > 0 ? 
                 (this.mutationTracking.decisionToPermutationFallbacks / totalActual * 100).toFixed(1) : "0.0";
               
-              process.stdout.write(`\n[NATURAL DISTRIBUTION] P=${actualPermutationRatio}% D=${actualDecisionRatio}% | Total: ${totalActual} | Fallbacks: ${fallbackImpact}%`);
+              process.stdout.write(`\n[DISTRIBUTION Target:${this.args.scheduleRatio}%] P=${actualPermutationRatio}% D=${actualDecisionRatio}% | Total: ${totalActual} | Fallbacks: ${fallbackImpact}%`);
             }
             process.stdout.write(statusline);
 
@@ -514,6 +517,7 @@ export class Optimizer {
               framePointer: this.args.framePointer,
               memoryConstraints: this.args.memoryConstraints,
               cyclegoal: this.args.cyclegoal,
+              scheduleRatio: this.args.scheduleRatio,
               mutationTracking: this.mutationTracking,
             });
             Logger.log(statistics);
@@ -555,11 +559,11 @@ export class Optimizer {
             }
             Logger.log("done with that current price of assembly code.");
             
-            // FINAL NATURAL DISTRIBUTION SUMMARY
+            // FINAL DISTRIBUTION SUMMARY
             const totalActual = this.mutationTracking.actualPermutation + this.mutationTracking.actualDecision;
             if (totalActual > 0) {
-              const naturalPermutationRatio = (this.mutationTracking.actualPermutation / totalActual * 100).toFixed(1);
-              const naturalDecisionRatio = (this.mutationTracking.actualDecision / totalActual * 100).toFixed(1);
+              const actualPermutationRatio = (this.mutationTracking.actualPermutation / totalActual * 100).toFixed(1);
+              const actualDecisionRatio = (this.mutationTracking.actualDecision / totalActual * 100).toFixed(1);
               const fallbackRate = (this.mutationTracking.decisionToPermutationFallbacks / totalActual * 100).toFixed(1);
               
               // Validation: total evaluations should match
@@ -568,10 +572,11 @@ export class Optimizer {
                 console.warn(`⚠️  COUNTING MISMATCH: Expected ${expectedTotal} mutations, got ${totalActual}`);
               }
               
-              console.log(`\n📊 NATURAL MUTATION DISTRIBUTION RESULTS:`);
+              console.log(`\n📊 MUTATION DISTRIBUTION RESULTS:`);
               console.log(`   Implementation: ${this.symbolname}`);
               console.log(`   Evaluations: ${totalActual} mutations`);
-              console.log(`   Natural Ratio: ${naturalPermutationRatio}% Permutation / ${naturalDecisionRatio}% Decision`);
+              console.log(`   Target Ratio: ${this.args.scheduleRatio}% Permutation / ${100 - this.args.scheduleRatio}% Decision`);
+              console.log(`   Actual Ratio: ${actualPermutationRatio}% Permutation / ${actualDecisionRatio}% Decision`);
               console.log(`   Fallbacks: ${this.mutationTracking.decisionToPermutationFallbacks}/${totalActual} (${fallbackRate}%)`);
               console.log(`   Success Rates: P=${(this.mutationTracking.permutationKept/this.mutationTracking.actualPermutation*100).toFixed(1)}% D=${(this.mutationTracking.decisionKept/this.mutationTracking.actualDecision*100).toFixed(1)}%`);
               console.log(`   Intended Permutations: ${this.mutationTracking.actualPermutation - this.mutationTracking.decisionToPermutationFallbacks}`);
@@ -579,7 +584,7 @@ export class Optimizer {
               if (this.mutationTracking.decisionToPermutationFallbacks > 0) {
                 console.log(`   💡 Fallbacks occurred when no operations had "hot" decisions available for mutation`);
               }
-              console.log(`   🎯 KEY FINDING: This implementation naturally prefers ${naturalPermutationRatio}% permutation mutations`);
+              console.log(`   🎯 KEY FINDING: With target ratio ${this.args.scheduleRatio}%, actual distribution was ${actualPermutationRatio}% permutation mutations`);
               console.log(``);
             }
             

@@ -1,0 +1,20 @@
+================================================================================
+MUTATION SEQUENCE ANALYSIS REPORT
+Symbol: fiat_curve25519_carry_mul
+================================================================================
+
+SUMMARY:
+  Total mutations: 7999
+  Permutation: 4775 (59.7%)
+  Decision: 3224 (40.3%)
+
+PERMUTATION MUTATIONS:
+  Improvements: 730/4775 (15.3%)
+  Mean delta: 278.30 cycles
+
+DECISION MUTATIONS:
+  Improvements: 895/3224 (27.8%)
+  Mean delta: 95.88 cycles
+
+SEQUENCE PATTERN (first 200 mutations):
+  PPDPDDPPPPPPPPDDPPPPDPDPPPPDDPDDPPDPDPDPPPDPDPDDDDDDPPPDPPDPPPPPDDPDDPPDDPPDPPDDPPPDDPPPPPDPPDPPPDDPPDDDDPPPPDPDPDPPDDDDDPPPPPDPDDDDPDDPPPDDPDPPDDPDDDPDDPDDPPDPDDDDPPDPDPDDDPDPPDDPDPPPDPPPDPDPDPDPPPPD

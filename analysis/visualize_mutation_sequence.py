@@ -252,7 +252,7 @@ def create_sequence_statistics(data, output_dir):
     # Save report
     report_file = output_dir / 'sequence_analysis_report.txt'
     with open(report_file, 'w') as f:
-        f.write('\n'.join(report_lines))
+        f.write('\n'.join(report_lhttps://vscode-remote+ssh-002dremote-002bsapporo.vscode-resource.vscode-cdn.net/home/harutok/CryptOpt/analysis/mutation_sequence_mul/mutation_sequence_analysis.png?version%3D1752207264480ines))
     
     print(f"📄 Sequence analysis report saved to: {report_file}")
 
