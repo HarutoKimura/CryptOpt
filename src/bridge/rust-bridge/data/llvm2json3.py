@@ -122,8 +122,8 @@ def parse_llvm_ir(file_path):
             continue
 
         # # Check for negative add pattern -> change to sub
-        # if negative_add_check(line):
-        #     line = change_negative_add_to_sub(line)
+        if negative_add_check(line):
+            line = change_negative_add_to_sub(line)
 
         # if 'lshr' in line:
         #     print('okay we are here shift')

@@ -59,22 +59,22 @@ export const RUST_SYMBOLS: Record<
   bls12_381_p: {
     mul: {
       rust: {
-        fnName: "bls12_mul",
-        jsonFile: "bls12_mul_updated.json",
+        fnName: "mul",
+        jsonFile: "bls12_381_fp_mul.json",
       },
       c: {
-        fnName: "bls12_mul",
-        jsonFile: "bls12_mul_updated.json",
+        fnName: "mul",
+        jsonFile: "bls12_381_fp_mul.json",
       },
     },
     square: {
       rust: {
-        fnName: "bls12_square",
-        jsonFile: "bls12_square.json",
+        fnName: "square",
+        jsonFile: "bls12_381_fp_square.json",
       },
       c: {
-        fnName: "bls12_square",
-      jsonFile: "bls12_square.json",
+        fnName: "square",
+      jsonFile: "bls12_381_fp_square.json",
       },
     },
   },

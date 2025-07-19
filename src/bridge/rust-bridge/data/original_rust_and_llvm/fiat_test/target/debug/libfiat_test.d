@@ -1,1 +1,0 @@
-/home/harutok/CryptOpt/src/bridge/rust-bridge/data/original_rust_and_llvm/fiat_test/target/debug/libfiat_test.rlib: /home/harutok/CryptOpt/src/bridge/rust-bridge/data/original_rust_and_llvm/fiat_test/src/curve25519_64_mul.rs /home/harutok/CryptOpt/src/bridge/rust-bridge/data/original_rust_and_llvm/fiat_test/src/lib.rs

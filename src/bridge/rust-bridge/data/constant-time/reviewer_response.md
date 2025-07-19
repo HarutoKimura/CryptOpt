@@ -80,7 +80,7 @@ Beyond static analysis, we recommend future integration with external validation
 ### 3.1 External Constant-Time Testing Tools (Future Work)
 ```bash
 # dudect (statistical timing analysis) - not currently integrated
-# https://github.com/oreparaz/dudect
+# c
 
 # ct-verif (formal verification) - not currently integrated  
 # https://github.com/imdea-software/verifying-constant-time

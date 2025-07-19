@@ -1,0 +1,29 @@
+# Makefile for compiling BLS12-381 Fp operations to LLVM-IR
+
+RUSTC = rustc
+RUSTFLAGS = --crate-type=lib --emit=llvm-ir -C opt-level=1 -C symbol-mangling-version=v0
+
+# Source files
+MUL_SRC = bls12_381_fp_mul.rs
+SQUARE_SRC = bls12_381_fp_square.rs
+
+# Output LLVM-IR files
+MUL_IR = bls12_381_fp_mul.ll
+SQUARE_IR = bls12_381_fp_square.ll
+
+# Default target
+all: $(MUL_IR) $(SQUARE_IR)
+
+# Rule to compile multiplication to LLVM-IR
+$(MUL_IR): $(MUL_SRC)
+	$(RUSTC) $(RUSTFLAGS) $< -o $@
+
+# Rule to compile square to LLVM-IR
+$(SQUARE_IR): $(SQUARE_SRC)
+	$(RUSTC) $(RUSTFLAGS) $< -o $@
+
+# Clean target
+clean:
+	rm -f $(MUL_IR) $(SQUARE_IR)
+
+.PHONY: all clean
