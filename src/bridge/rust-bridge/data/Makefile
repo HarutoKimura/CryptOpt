@@ -1,6 +1,8 @@
 CC?=gcc
 LLC?=llc
 CLANG?=clang
+RUSTC?=rustc
+PYTHON?=python3
 tmp=./pre-
 
 #Specify the target file name
@@ -8,6 +10,11 @@ tmp=./pre-
 TARGET_NAME?=rust_fiat_curve25519_carry_mul
 TEST_TARGET_NAME?=sext_transformer
 LANGUAGE?=rust
+
+# Variables passed from RustBridge
+CURVE?=
+METHOD?=
+JSON?=
 
 #Specify the demangled target file name
 DEMANGLED_TARGET_NAME=demangled_$(TARGET_NAME)
@@ -39,7 +46,73 @@ check_c_env:
 	@command -v $(CC) >/dev/null 2>&1 || { echo >&2 "C compiler not found. Please install GCC."; exit 1; }
 	@echo "C environment verified"
 
-# Choose compilation command based on language
+# Extract base name from JSON filename (remove .json extension)
+BASE_NAME = $(basename $(JSON))
+
+# Pattern rules for generating JSON from source files
+%.json: %.rs
+	@echo "Generating JSON from Rust source: $< -> $@"
+	@echo "Step 1: Compiling Rust to LLVM IR"
+	$(RUSTC) --crate-type=lib --emit=llvm-ir -C opt-level=3 -C symbol-mangling-version=v0 $< -o $*.ll
+	@echo "Step 2: Converting LLVM IR to JSON"
+	$(PYTHON) llvm2json3.py $*.ll $@
+	@echo "Successfully generated $@"
+
+%.json: %.c
+	@echo "Generating JSON from C source: $< -> $@"
+	@echo "Step 1: Compiling C to LLVM IR"
+	$(CLANG) -S -emit-llvm -O1 -o $*.ll $<
+	@echo "Step 2: Converting LLVM IR to JSON"
+	$(PYTHON) llvm2json3.py $*.ll $@
+	@echo "Successfully generated $@"
+
+# Some JSON files have "_updated" suffix, but source files don't
+# This rule handles the mapping
+%_updated.json: %.rs
+	@echo "Generating updated JSON from Rust source: $< -> $@"
+	@echo "Step 1: Compiling Rust to LLVM IR"
+	$(RUSTC) --crate-type=lib --emit=llvm-ir -C opt-level=3 -C symbol-mangling-version=v0 $< -o $*.ll
+	@echo "Step 2: Converting LLVM IR to JSON"
+	$(PYTHON) llvm2json3.py $*.ll $@
+	@echo "Successfully generated $@"
+
+%_updated.json: %.c
+	@echo "Generating updated JSON from C source: $< -> $@"
+	@echo "Step 1: Compiling C to LLVM IR"
+	$(CLANG) -S -emit-llvm -O1 -o $*.ll $<
+	@echo "Step 2: Converting LLVM IR to JSON"
+	$(PYTHON) llvm2json3.py $*.ll $@
+	@echo "Successfully generated $@"
+
+# Some C files have "_ssa" suffix in JSON but not in source
+%_ssa.json: %.c
+	@echo "Generating SSA JSON from C source: $< -> $@"
+	@echo "Step 1: Compiling C to LLVM IR"
+	$(CLANG) -S -emit-llvm -O1 -o $*_ssa.ll $<
+	@echo "Step 2: Converting LLVM IR to JSON"
+	$(PYTHON) llvm2json3.py $*_ssa.ll $@
+	@echo "Successfully generated $@"
+
+# Rule to generate specific JSON file when requested by RustBridge
+$(JSON):
+	@echo "Generating $(JSON) for curve=$(CURVE) method=$(METHOD) language=$(LANGUAGE)"
+	@# Try to find the source file
+	@if [ -f "$(BASE_NAME).$(LANGUAGE)" ]; then \
+		echo "Found source file: $(BASE_NAME).$(LANGUAGE)"; \
+		$(MAKE) -f Makefile $(JSON); \
+	elif [ -f "$(patsubst %_updated,%,$(BASE_NAME)).$(LANGUAGE)" ]; then \
+		echo "Found source file: $(patsubst %_updated,%,$(BASE_NAME)).$(LANGUAGE)"; \
+		$(MAKE) -f Makefile $(JSON); \
+	elif [ -f "$(patsubst %_ssa,%,$(BASE_NAME)).$(LANGUAGE)" ]; then \
+		echo "Found source file: $(patsubst %_ssa,%,$(BASE_NAME)).$(LANGUAGE)"; \
+		$(MAKE) -f Makefile $(JSON); \
+	else \
+		echo "Error: Could not find source file for $(JSON)"; \
+		echo "Looked for: $(BASE_NAME).$(LANGUAGE), $(patsubst %_updated,%,$(BASE_NAME)).$(LANGUAGE), $(patsubst %_ssa,%,$(BASE_NAME)).$(LANGUAGE)"; \
+		exit 1; \
+	fi
+
+# Choose compilation command based on language for .so files
 ifeq ($(LANGUAGE),rust)
 %.so:
 	@echo "Building $(TARGET_NAME).rs to $@"
@@ -82,3 +155,8 @@ endif
 distclean:
 	rm -f *.ll
 	rm -f $(tmp)$(TARGET_NAME).json, $(CLEAN_TARGET_NAME).ll, $(CLEAN_TARGET_NAME).o
+
+clean:
+	rm -f *.json *.ll *.so *.o
+
+.PHONY: all check_rust_env check_c_env distclean clean
