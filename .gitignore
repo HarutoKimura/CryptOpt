@@ -14,5 +14,6 @@ src/bridge/jasmin-bridge/data-libjade/
 .gdb_history
 test_results
 .txt
+.out
 
 

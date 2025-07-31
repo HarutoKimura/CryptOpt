@@ -17,6 +17,7 @@
 import {
   AllocationFlags,
   C_DI_MULTIPLICATION_IMM,
+  C_DI_MULTIPLICATION_TYPE,
   DECISION_IDENTIFIER,
   Flags,
   FlagState,
@@ -28,9 +29,30 @@ import { Paul } from "@/paul";
 import { RegisterAllocator } from "@/registerAllocator";
 import type { asm, CryptOpt } from "@/types";
 
-import { mul_imm_imul, mul_imm_lea, mul_imm_shl, mul_imm_shlx } from "./multiplicationHelpers";
+import { mul_imm_imul, mul_imm_lea, mul_imm_shl, mul_imm_shlx, mul_vector_avx2 } from "./multiplicationHelpers";
 
 export function mul(c: CryptOpt.StringOperation): asm[] {
+  // Check if we should use vector multiplication for u128
+  if (c.datatype === "u128" && DECISION_IDENTIFIER.DI_MULTIPLICATION_TYPE in c.decisions) {
+    const choice = Paul.chooseMulType();
+    
+    // TEMPORARY: Force vector multiplication 80% of the time for testing
+    const forceVector = Math.random() < 0.8;
+    if (forceVector || choice === C_DI_MULTIPLICATION_TYPE.C_VECTOR_AVX2) {
+      const ra = RegisterAllocator.getInstance();
+      ra.initNewInstruction(c);
+      ra.addToPreInstructions(
+        `; mul() using AVX2 vector multiplication for ${c.name.join(',')}`
+      );
+      if (forceVector && choice !== C_DI_MULTIPLICATION_TYPE.C_VECTOR_AVX2) {
+        ra.addToPreInstructions(
+          `; FORCED vector (was ${choice})`
+        );
+      }
+      return mul_vector_avx2(c);
+    }
+  }
+  
   // assumes, that the operands are max 64bit
   if (c.datatype !== "u64") {
     return mulx(c);
@@ -61,6 +83,31 @@ export function mul(c: CryptOpt.StringOperation): asm[] {
 export function mulx(c: CryptOpt.StringOperation): asm[] {
   const ra = RegisterAllocator.getInstance();
   ra.initNewInstruction(c);
+
+  // Add debug comment to assembly
+  const debugComments: asm[] = [];
+  debugComments.push(`; mulx() called: datatype=${c.datatype}, has DI_MULT_TYPE=${DECISION_IDENTIFIER.DI_MULTIPLICATION_TYPE in c.decisions}`);
+
+  // Check if we should use vector multiplication
+  if (c.datatype === "u128" && DECISION_IDENTIFIER.DI_MULTIPLICATION_TYPE in c.decisions) {
+    const choice = Paul.chooseMulType();
+    debugComments.push(`; Paul.chooseMulType() returned: ${choice}`);
+    
+    // TEMPORARY: Force vector multiplication 80% of the time for testing
+    const forceVector = Math.random() < 0.8;
+    if (forceVector) {
+      debugComments.push(`; FORCING VECTOR MULTIPLICATION (was ${choice})`);
+      debugComments.push(`; Using AVX2 vector multiplication for ${c.name.join(',')}`);
+      debugComments.forEach(comment => ra.addToPreInstructions(comment));
+      return mul_vector_avx2(c);
+    }
+    
+    if (choice === C_DI_MULTIPLICATION_TYPE.C_VECTOR_AVX2) {
+      debugComments.push(`; Using AVX2 vector multiplication for ${c.name.join(',')}`);
+      debugComments.forEach(comment => ra.addToPreInstructions(comment));
+      return mul_vector_avx2(c);
+    }
+  }
 
   if (c.datatype === "u128") {
     return mulx_lo_lo_128(ra, c);

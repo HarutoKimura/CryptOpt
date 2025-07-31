@@ -18,3 +18,5 @@ export * from "./imul";
 export * from "./lea";
 export * from "./shl";
 export * from "./shlx";
+export * from "./vector_mul";
+export * from "./vector_mul_avx2_real";

@@ -23,6 +23,7 @@ export enum DECISION_IDENTIFIER {
   DI_CHOOSE_IMM = "di_choose_imm", // in the case that there needs to be a immediate value to be loaded to a reg (think clear OF)
   DI_INSTRUCTION_AND = "di_choose_instr_and", // e.g. bzhi | and
   DI_MULTIPLICATION_IMM = "di_mult_imm", // if we multiply a value by a known immediate, we can choose different instrs. (*2 -> *2 | +itself | shl|| *5 lea [x+4*x])
+  DI_MULTIPLICATION_TYPE = "di_mult_type", // choose between scalar multiplication (mulx) or vector multiplication (vpmuludq)
   DI_SPILL_LOCATION = "di_spill_location", // e.g. mem or vec_reg
 }
 
@@ -54,4 +55,9 @@ export enum C_DI_MULTIPLICATION_IMM {
 export enum C_DI_SPILL_LOCATION {
   C_DI_MEM = "c_mem",
   C_DI_XMM_REG = "c_xmm_reg",
+}
+
+export enum C_DI_MULTIPLICATION_TYPE {
+  C_SCALAR_MULX = "c_scalar_mulx", // Use scalar mulx instruction
+  C_VECTOR_AVX2 = "c_vector_avx2", // Use AVX2 vector multiplication
 }

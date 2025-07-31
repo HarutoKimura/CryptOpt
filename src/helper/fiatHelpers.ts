@@ -22,6 +22,7 @@ import {
   C_DI_HANDLE_FLAGS_KK,
   C_DI_IMM,
   C_DI_INSTRUCTION_AND,
+  C_DI_MULTIPLICATION_TYPE,
   C_DI_SPILL_LOCATION,
   DECISION_IDENTIFIER,
   Flags,
@@ -148,6 +149,15 @@ function addDecisionProperty(arg: Fiat.Argument): CryptOpt.Argument {
 
   switch (result.operation) {
     case "*": {
+      // Add decision for multiplication type for u128 multiplication
+      if (result.datatype === "u128") {
+        result.decisions[DECISION_IDENTIFIER.DI_MULTIPLICATION_TYPE] = [
+          Paul.chooseBetween(2),
+          [C_DI_MULTIPLICATION_TYPE.C_SCALAR_MULX, C_DI_MULTIPLICATION_TYPE.C_VECTOR_AVX2],
+        ];
+      }
+      
+      // Handle immediate multiplication decisions
       const immFactor = arg.arguments[1];
       if (!isDynArgument(immFactor) && immFactor in IMM_MUL_DI_MAP) {
         const choices = IMM_MUL_DI_MAP[immFactor as CryptOpt.HexConstant];
@@ -156,6 +166,14 @@ function addDecisionProperty(arg: Fiat.Argument): CryptOpt.Argument {
           [...choices],
         ];
       }
+      break;
+    }
+    case "mulx": {
+      // Add decision for multiplication type (scalar vs vector)
+      result.decisions[DECISION_IDENTIFIER.DI_MULTIPLICATION_TYPE] = [
+        Paul.chooseBetween(2),
+        [C_DI_MULTIPLICATION_TYPE.C_SCALAR_MULX, C_DI_MULTIPLICATION_TYPE.C_VECTOR_AVX2],
+      ];
       break;
     }
     case "+":

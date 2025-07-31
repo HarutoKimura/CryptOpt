@@ -18,11 +18,13 @@ import {
   C_DI_HANDLE_FLAGS_KK,
   C_DI_INSTRUCTION_AND,
   C_DI_MULTIPLICATION_IMM,
+  C_DI_MULTIPLICATION_TYPE,
   C_DI_SPILL_LOCATION,
   DECISION_IDENTIFIER,
   Flags,
 } from "@/enums";
 import { delimbify, isNotNoU } from "@/helper/lamdas";
+import { parsedArgs } from "@/helper/argParse";
 import type { CryptOpt } from "@/types";
 
 import { BIAS } from "./Paul.enum";
@@ -58,6 +60,18 @@ export class Paul {
     
     // HOT DECISION LOGGING - Track when decisions become hot
     console.log(`🔥 HOT: ${instruction.name.join(',').padEnd(12)} | ${instruction.operation.padEnd(8)} | ${decisionKey} | chose: ${decision[0]} from [${decision[1].join(',')}]`);
+
+    // Special handling for multiplication type when force-vector is set
+    if (parsedArgs.forceVector && decisionKey === DECISION_IDENTIFIER.DI_MULTIPLICATION_TYPE) {
+      // Make a fresh random choice instead of using stored decision
+      const freshIdx = Paul.chooseBetween(arr.length);
+      console.log(`🎲 FORCE-VECTOR: Making fresh random choice for multiplication type: ${freshIdx} -> ${arr[freshIdx]}`);
+      // Update the decision in the instruction
+      if (instruction.decisions[decisionKey]) {
+        instruction.decisions[decisionKey][0] = freshIdx;
+      }
+      return arr[freshIdx];
+    }
 
     const idx = decision[0];
     const possibilitiesOfThatSavedDecision = decision[1] as unknown as T[];
@@ -138,6 +152,21 @@ export class Paul {
 
   public static chooseImm<T>(elements: T[]): T {
     return Paul.choose(elements, DECISION_IDENTIFIER.DI_CHOOSE_IMM);
+  }
+
+  public static chooseMulType(): C_DI_MULTIPLICATION_TYPE {
+    // Check if force-vector flag is set
+    if (parsedArgs.forceVector) {
+      console.log(`🎯 FORCE-VECTOR flag is set: using AVX2 vector multiplication`);
+      return C_DI_MULTIPLICATION_TYPE.C_VECTOR_AVX2;
+    }
+    
+    const result = Paul.choose(
+      [C_DI_MULTIPLICATION_TYPE.C_SCALAR_MULX, C_DI_MULTIPLICATION_TYPE.C_VECTOR_AVX2],
+      DECISION_IDENTIFIER.DI_MULTIPLICATION_TYPE,
+    );
+    
+    return result;
   }
 
   /**

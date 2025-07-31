@@ -52,4 +52,5 @@ export type ParsedArgsT = OptimizerArgs & {
   single: boolean;
   bets: number;
   betRatio: number;
+  forceVector: boolean;
 };
