@@ -1,4 +1,4 @@
-CC?=gcc
+guexsCC?=gcc
 LLC?=llc
 CLANG?=clang
 RUSTC?=rustc
@@ -53,7 +53,7 @@ BASE_NAME = $(basename $(JSON))
 %.json: %.rs
 	@echo "Generating JSON from Rust source: $< -> $@"
 	@echo "Step 1: Compiling Rust to LLVM IR"
-	$(RUSTC) --crate-type=lib --emit=llvm-ir -C opt-level=3 -C symbol-mangling-version=v0 $< -o $*.ll
+	$(RUSTC) --crate-type=lib --emit=llvm-ir -C opt-level=1 -C symbol-mangling-version=v0 $< -o $*.ll
 	@echo "Step 2: Converting LLVM IR to JSON"
 	$(PYTHON) llvm2json3.py $*.ll $@
 	@echo "Successfully generated $@"
@@ -84,11 +84,20 @@ BASE_NAME = $(basename $(JSON))
 	$(PYTHON) llvm2json3.py $*.ll $@
 	@echo "Successfully generated $@"
 
+# Special rule for OpenSSL P-448 files that need O3 optimization
+openssl_p448_%_ssa.json: openssl_p448_%.c
+	@echo "Generating SSA JSON from OpenSSL P-448 C source (O3): $< -> $@"
+	@echo "Step 1: Compiling C to LLVM IR with SSA form"
+	$(CLANG) -S $< -emit-llvm -O3 -o - | opt -S -enable-newgvn -passes='default<O3>' -print-after-all -o $*_ssa.ll
+	@echo "Step 2: Converting LLVM IR to JSON"
+	$(PYTHON) llvm2json3.py $*_ssa.ll $@
+	@echo "Successfully generated $@"
+
 # Some C files have "_ssa" suffix in JSON but not in source
 %_ssa.json: %.c
 	@echo "Generating SSA JSON from C source: $< -> $@"
-	@echo "Step 1: Compiling C to LLVM IR"
-	$(CLANG) -S -emit-llvm -O1 -o $*_ssa.ll $<
+	@echo "Step 1: Compiling C to LLVM IR with SSA form"
+	$(CLANG) -S $< -emit-llvm -O1 -o - | opt -S -enable-newgvn -passes='default<O1>' -print-after-all -o $*_ssa.ll
 	@echo "Step 2: Converting LLVM IR to JSON"
 	$(PYTHON) llvm2json3.py $*_ssa.ll $@
 	@echo "Successfully generated $@"

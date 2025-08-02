@@ -221,7 +221,7 @@ def parse_llvm_ir(file_path):
 
 
         #Pattern for operations that might have nuw/nsw mdofifiers
-        op_pattern = r'(x[\w.]+)\s*=\s*(\w+)\s*((?:nuw|nsw|ult|ugt|eq|ne)\s*(?:nuw|nsw|ns|ult|ugt|eq|ne)?)\s*(i\d+)\s*(.+)'
+        op_pattern = r'(x[\w.]+)\s*=\s*(\w+)\s*((?:nuw|nsw|ult|ugt|eq|ne|nneg)\s*(?:nuw|nsw|ns|ult|ugt|eq|ne|nneg)?)\s*(i\d+)\s*(.+)'
        
         op_match = re.match(op_pattern, line.strip())
         
@@ -230,7 +230,19 @@ def parse_llvm_ir(file_path):
 
             # print(f"name:{name}", f"operation:{operation}", f"modifier:{modifier}", f"datatype:{datatype}", f"args:{args}")
             # print('\n')
-
+            
+            # Special handling for zext operation
+            if operation == "zext":
+                # For zext, we need to extract the target datatype from the arguments
+                # The captured datatype is the source type, but we need the destination type
+                # Pattern: "x46 to i128" or "%46 to i128" -> extract "i128" as the datatype
+                zext_match = re.match(r'([x%]\d+)\s+to\s+(i\d+)', args.strip())
+                if zext_match:
+                    target_datatype = zext_match.group(2)
+                    # Update datatype to the target type
+                    datatype = target_datatype
+                    # args remains unchanged - it should stay as "x46 to i128"
+                
             entire_operations.append( {
                 'name': [name],
                 'operation': operation,
@@ -256,6 +268,19 @@ def parse_llvm_ir(file_path):
                 continue
             # Remove trailing comma from datatype if present
             datatype = datatype.rstrip(',')
+            
+            # Special handling for zext operation (same as above)
+            if operation == "zext":
+                # For zext, we need to extract the target datatype from the arguments
+                # The captured datatype is the source type, but we need the destination type
+                # Pattern: "x46 to i128" or "%46 to i128" -> extract "i128" as the datatype
+                if args:
+                    zext_match = re.match(r'([x%]\d+)\s+to\s+(i\d+)', args.strip())
+                    if zext_match:
+                        target_datatype = zext_match.group(2)
+                        # Update datatype to the target type
+                        datatype = target_datatype
+                        # args remains unchanged
 
             # if operation == "icmp":
             #     print("datatype:", datatype)

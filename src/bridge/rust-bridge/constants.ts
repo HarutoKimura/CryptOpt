@@ -20,6 +20,8 @@ export const RUST_AVAILABLE_CURVES = [
   "curve25519_solinas",
   "curve25519_dalek",
   "openssl_curve25519",
+  "openssl_p448",
+  "openssl_poly1305",
   "p224",
   "p256",
   "p384",
@@ -446,6 +448,52 @@ export const RUST_SYMBOLS: Record<
       }
     }
   },
+
+  openssl_p448: {
+    mul: {
+      rust: {
+        fnName: "openssl_p448_mul",
+        jsonFile: "openssl_p448_mul_ssa.json",
+      },
+      c: {
+        fnName: "openssl_p448_mul",
+        jsonFile: "openssl_p448_mul_ssa.json",
+      },
+    },
+    square: {
+      rust: {
+        fnName: "openssl_p448_square",
+        jsonFile: "openssl_p448_square_ssa.json",
+      },
+      c: {
+        fnName: "openssl_p448_square",
+        jsonFile: "openssl_p448_square_ssa.json",
+      }
+    }
+  },
+
+  openssl_poly1305: {
+    mul: {
+      rust: {
+        fnName: "poly1305_mul",
+        jsonFile: "openssl_poly1305_mul_array_ssa.json",
+      },
+      c: {
+        fnName: "poly1305_mul",
+        jsonFile: "openssl_poly1305_mul_array_ssa.json",
+      },
+    },
+    square: {
+      rust: {
+        fnName: "poly1305_mul",
+        jsonFile: "openssl_poly1305_mul_array_ssa.json",
+      },
+      c: {
+        fnName: "poly1305_mul",
+        jsonFile: "openssl_poly1305_mul_array_ssa.json",
+      }
+    }
+  },
 };
 
 /**
@@ -626,6 +674,27 @@ export const RUST_CURVE_DETAILS: Record<
       "0x18000000000000",
       "0x18000000000000",
       "0x18000000000000",
+    ],
+  },
+  openssl_p448: {
+    argwidth: 8,
+    bounds: [
+      "0x300000000000000",
+      "0x300000000000000",
+      "0x300000000000000",
+      "0x300000000000000",
+      "0x300000000000000",
+      "0x300000000000000",
+      "0x300000000000000",
+      "0x300000000000000",
+    ],
+  },
+  openssl_poly1305: {
+    argwidth: 3,
+    bounds: [
+      "0x3ffffffffffff",
+      "0x3ffffffffffff", 
+      "0x3ffffffffffff",
     ],
   },
 };
