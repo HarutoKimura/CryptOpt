@@ -94,10 +94,11 @@ export class RustBridge implements Bridge {
     // 4) run our "RustPreprocessor", turning that single raw block → "Fiat JSON"
     const fiat = new RustPreprocessor().preprocessRaw(found);
 
-    console.log(`preprocessed: ${JSON.stringify(fiat)}`);
+    console.log(`Fiat-like IR: ${JSON.stringify(fiat)}`);
 
     // 5) run the "Fiat → CryptOpt" pass
     const cryptOpt = preprocessFunction(fiat);
+    console.log(`cryptOpt IR: ${JSON.stringify(cryptOpt)}`);
     return cryptOpt;
   }
 
