@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-import { mkdirSync } from "fs";
+import { mkdirSync, writeFileSync, existsSync, unlinkSync } from "fs";
 import { Measuresuite } from "measuresuite";
-import { resolve } from "path";
+import { resolve, join } from "path";
+import { execSync } from "child_process";
 
 import { BitcoinCoreBridge, METHOD_T as BITCOIN_CORE_METHOD_T } from "@/bridge/bitcoin-core-bridge";
 import { CURVE_DETAILS, CURVE_T, FiatBridge, METHOD_T } from "@/bridge/fiat-bridge";
@@ -26,6 +27,7 @@ import { Model } from "@/model";
 import { OptimizerArgs } from "@/types";
 import { llvm_BitcoinCoreBridge } from "@/bridge/llvm-bitcoin-core-bridge";
 import { RustBridge, METHOD_T as RUST_METHOD_T, CURVE_T as RUST_CURVE_T, LANGUAGE_T} from "@/bridge/rust-bridge";
+import { env } from "@/helper";
 
 
 type needComms = Pick<OptimizerArgs, "bridge" | "seed" | "memoryConstraints" | "language">;
@@ -240,4 +242,67 @@ export function init(tmpDir: string, args: any): { symbolname: string; measuresu
       throw new Error("Bridge is specified, but not valid.");
   }
   return createMS(r, sharedObjectFilename);
+}
+
+/**
+ * Compiles NASM assembly code to a shared object (.so) file
+ * @param asmCode - The NASM assembly code as a string
+ * @param outputPath - Path where the .so file should be created
+ * @param symbolName - The symbol name used in the assembly
+ * @returns Path to the created .so file
+ */
+export function compileNasmToSharedObject(
+  asmCode: string,
+  outputPath: string,
+  symbolName: string
+): string {
+  const asmFile = `${outputPath}.asm`;
+  const objFile = `${outputPath}.o`;
+  const soFile = `${outputPath}.so`;
+
+  try {
+    // Check if the assembly already has NASM directives
+    const hasNasmDirectives = asmCode.includes('SECTION') || asmCode.includes('GLOBAL');
+    
+    let formattedAsm: string;
+    if (hasNasmDirectives) {
+      // Assembly already has proper NASM format
+      formattedAsm = asmCode;
+    } else {
+      // Wrap the raw assembly with NASM directives
+      // CryptOpt generates raw x86-64 assembly without NASM headers
+      formattedAsm = `SECTION .text
+GLOBAL ${symbolName}
+${symbolName}:
+${asmCode}`;
+    }
+
+    // Write formatted assembly code to file
+    writeFileSync(asmFile, formattedAsm);
+
+    // Assemble to object file
+    const nasmCmd = `nasm -f elf64 -o ${objFile} ${asmFile}`;
+    execSync(nasmCmd, { stdio: 'pipe' });
+
+    // Link to shared object using the same compiler as the baseline
+    // This ensures fair comparison (both use same compiler)
+    const cc = env.CC; // Uses gcc by default, or clang if CC=clang is set
+    const linkCmd = `${cc} -shared -fPIC -o ${soFile} ${objFile}`;
+    execSync(linkCmd, { stdio: 'pipe' });
+
+    // Clean up intermediate files
+    if (existsSync(asmFile)) unlinkSync(asmFile);
+    if (existsSync(objFile)) unlinkSync(objFile);
+
+    return soFile;
+  } catch (error) {
+    // Clean up on error
+    if (existsSync(asmFile)) unlinkSync(asmFile);
+    if (existsSync(objFile)) unlinkSync(objFile);
+    if (existsSync(soFile)) unlinkSync(soFile);
+    
+    // Log the error for debugging
+    console.error(`Failed to compile NASM to shared object: ${error}`);
+    throw new Error(`Failed to compile NASM to shared object: ${error}`);
+  }
 }

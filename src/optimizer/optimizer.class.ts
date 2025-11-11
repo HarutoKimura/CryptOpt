@@ -16,7 +16,7 @@
 
 import { execSync } from "child_process";
 import { appendFileSync, existsSync, readFileSync, rmSync, writeFileSync } from "fs";
-import { Measuresuite } from "measuresuite";
+import { Measuresuite, native_ms } from "measuresuite";
 import { tmpdir } from "os";
 import { join, resolve as pathResolve } from "path";
 
@@ -42,7 +42,7 @@ import { RegisterAllocator } from "@/registerAllocator";
 import type { AnalyseResult, OptimizerArgs } from "@/types";
 
 import { genStatistics, genStatusLine, logMutation, printStartInfo } from "./optimizer.helper";
-import { init } from "./optimizer.helper.class";
+import { init, compileNasmToSharedObject } from "./optimizer.helper.class";
 
 let choice: CHOICE;
 
@@ -66,6 +66,11 @@ export class Optimizer {
 
   public constructor(private args: OptimizerArgs) {
     Paul.seed = args.seed;
+
+    // Debug: Check if fairComparison flag is set (use process.stdout since console.log may be disabled)
+    if (args.fairComparison) {
+      process.stdout.write("\n✓ Fair comparison mode ENABLED - will compile assembly to .so files\n");
+    }
 
     const randomString = sha1Hash(Math.ceil(Date.now() * Math.random())).toString(36);
     this.libcheckfunctionDirectory = join(tmpdir(), "CryptOpt.cache", randomString);
@@ -310,11 +315,80 @@ export class Optimizer {
                 this.asmStrings[FUNCTIONS.F_B],
               );
             }
-            // here we need the barriers
-            const results = this.measuresuite.measure(batchSize, numBatches, [
-              this.asmStrings[FUNCTIONS.F_A],
-              this.asmStrings[FUNCTIONS.F_B],
-            ]);
+            
+            // Prepare measurement based on fairComparison mode
+            let results;
+            if (this.args.fairComparison) {
+              Logger.log("Fair comparison mode: compiling assembly to .so files");
+
+              let soFileA: string | undefined;
+              let soFileB: string | undefined;
+
+              try {
+                // Compile both assembly strings to .so files
+                soFileA = compileNasmToSharedObject(
+                  this.asmStrings[FUNCTIONS.F_A],
+                  pathResolve(this.libcheckfunctionDirectory, `cryptopt_a_${numEvals}`),
+                  this.symbolname
+                );
+
+                soFileB = compileNasmToSharedObject(
+                  this.asmStrings[FUNCTIONS.F_B],
+                  pathResolve(this.libcheckfunctionDirectory, `cryptopt_b_${numEvals}`),
+                  this.symbolname
+                );
+
+                Logger.log(`Compiled .so files: ${soFileA}, ${soFileB}`);
+
+                // Load .so files directly using native_ms (bypass broken TypeScript wrapper)
+                // This gives us: [baseline.so, cryptoptA.so, cryptoptB.so]
+                native_ms.load_shared_object_file(soFileA, this.symbolname);
+                native_ms.load_shared_object_file(soFileB, this.symbolname);
+
+                Logger.log("Loaded .so files into measuresuite, starting measurement");
+
+                // Measure without passing functions (they're already loaded)
+                results = this.measuresuite.measure(batchSize, numBatches, []);
+
+                // Unload the two .so files we just loaded (keeps baseline loaded)
+                native_ms.unload_last(); // unload soFileB
+                native_ms.unload_last(); // unload soFileA
+
+                Logger.log("Unloaded temporary .so files, baseline remains loaded");
+              } catch (fairCompError) {
+                Logger.log(`Error in fair comparison mode: ${fairCompError}`);
+                // Fall back to regular measurement if fair comparison fails
+                Logger.log("Falling back to regular measurement mode");
+                results = this.measuresuite.measure(batchSize, numBatches, [
+                  this.asmStrings[FUNCTIONS.F_A],
+                  this.asmStrings[FUNCTIONS.F_B],
+                ]);
+              } finally {
+                // Clean up .so files after measurement
+                if (soFileA && existsSync(soFileA)) {
+                  try {
+                    rmSync(soFileA);
+                    Logger.log(`Cleaned up ${soFileA}`);
+                  } catch (e) {
+                    Logger.log(`Warning: Failed to clean up ${soFileA}: ${e}`);
+                  }
+                }
+                if (soFileB && existsSync(soFileB)) {
+                  try {
+                    rmSync(soFileB);
+                    Logger.log(`Cleaned up ${soFileB}`);
+                  } catch (e) {
+                    Logger.log(`Warning: Failed to clean up ${soFileB}: ${e}`);
+                  }
+                }
+              }
+            } else {
+              // Original measurement mode with assembly strings
+              results = this.measuresuite.measure(batchSize, numBatches, [
+                this.asmStrings[FUNCTIONS.F_A],
+                this.asmStrings[FUNCTIONS.F_B],
+              ]);
+            }
             Logger.log("well done guys. The results are in!");
             
             // Track random inputs used for this mutation

@@ -46,6 +46,7 @@ export type OptimizerArgs = {
   mutationMode: MUTATION_MODE_OPTIONS_T;
   scheduleRatio: number; // 0-100: percentage of mutations that should be schedule mutations
   quotaMode: "execution" | "success"; // Controls whether scheduleRatio applies to executed or successful mutations
+  fairComparison?: boolean; // Compile CryptOpt assembly to .so for fair comparison with baseline
 };
 export type ParsedArgsT = OptimizerArgs & {
   startFromBestJson: boolean;

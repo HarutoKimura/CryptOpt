@@ -215,6 +215,13 @@ export const parsedArgs = y
       "Controls what scheduleRatio applies to. 'execution' (default) controls the ratio of executed mutations. 'success' controls the ratio of successful (kept) mutations.",
     choices: ["execution", "success"],
   })
+  .option("fairComparison", {
+    alias: "fair-comparison",
+    default: false,
+    describe:
+      "If this is set, CryptOpt will compile its assembly to shared objects (.so) for fair comparison with baseline .so files. This provides more accurate performance measurements but adds compilation overhead.",
+    boolean: true,
+  })
   .check(({ evals, bridge, cFile, jsonFile, method, curve, language, scheduleRatio }) => {
     if (evals <= 0) {
       throw new Error("--evals must be >0");
