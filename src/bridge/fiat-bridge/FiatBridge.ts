@@ -96,6 +96,11 @@ export class FiatBridge implements Bridge {
       errorOut(ERRORS.fiatReadJSONFail);
     }
     const cryptOpt = preprocessFunction(fiat);
+    if (process.env.CRYPTOPT_LOG_IR === "1") {
+      Logger.log(
+        `cryptOpt IR for ${method}/${curve}: ${JSON.stringify(cryptOpt, undefined, 2)}`,
+      );
+    }
     return cryptOpt;
   }
 
