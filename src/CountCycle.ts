@@ -32,13 +32,18 @@
  *
  * The critical value is defined by taking the t-table index conf_005;
  *
+ * Fair comparison mechanism: Added support for --fair-comparison flag to enable
+ * measurement parity by compiling assembly to .so files, ensuring both baseline
+ * and optimized code are measured using the same loading mechanism.
+ *
  **/
 
 import fs from "fs";
-import { Measuresuite } from "measuresuite";
+import { Measuresuite, native_ms } from "measuresuite";
 import { tmpdir } from "os";
 import { basename, join } from "path";
 import * as Stats from "simple-statistics";
+import { execSync } from "child_process";
 
 import { KNOWN_SYMBOLS } from "@/bridge";
 import { analyseRow, CONF_IDX, ttable } from "@/helper";
@@ -59,7 +64,29 @@ main();
 //
 function main() {
   const shout = silence();
-  const [, , param_one, cFilename, jsonFilename] = process.argv;
+
+  // Parse command-line arguments
+  const args = process.argv.slice(2);
+  let param_one: string | undefined;
+  let cFilename: string | undefined;
+  let jsonFilename: string | undefined;
+  let fairComparison = false;
+
+  // Parse arguments
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--fair-comparison' || args[i] === '-f') {
+      fairComparison = true;
+      console.error(`DEBUG: Fair-comparison flag detected! Setting fairComparison = true`);
+    } else if (!param_one) {
+      param_one = args[i];
+    } else if (!cFilename) {
+      cFilename = args[i];
+    } else if (!jsonFilename) {
+      jsonFilename = args[i];
+    }
+  }
+
+  console.error(`DEBUG: After parsing - fairComparison = ${fairComparison}`);
 
   if (!param_one) {
     console.error("Must provide at least one asmFilename or symbolName as first parameter");
@@ -96,7 +123,7 @@ function main() {
         result = checkMean.toString();
       }
     } else {
-      const { asm, check } = doSampleAsm(ms, MAX_SAMLPESIZE, asmString, param_one);
+      const { asm, check } = doSampleAsm(ms, MAX_SAMLPESIZE, asmString, param_one, fairComparison, symbol, cacheDir);
       const checkMean = roboustMean(check);
       const asmMean = roboustMean(asm);
       if (checkMean !== -1 && asmMean !== -1) {
@@ -156,8 +183,8 @@ function createMS(
   cacheDir: string,
   symbol: string,
   seed: number,
-  jsonFilename: string,
-  cFilename: string,
+  jsonFilename: string | undefined,
+  cFilename: string | undefined,
 ): Measuresuite {
   if (symbol in KNOWN_SYMBOLS) {
     return init(cacheDir, {
@@ -197,37 +224,111 @@ function createCache(): string {
   return join(tmpdir(), "CryptOpt.CountCycle.cache", randomString);
 }
 
+function compileAsmToSo(asmString: string, outputPath: string, symbolName: string): string {
+  const asmFile = `${outputPath}.asm`;
+  const objFile = `${outputPath}.o`;
+  const soFile = `${outputPath}.so`;
+
+  try {
+    // Write assembly to file
+    fs.writeFileSync(asmFile, asmString);
+
+    // Assemble to object file using nasm
+    const nasmCmd = `nasm -f elf64 -o ${objFile} ${asmFile}`;
+    execSync(nasmCmd, { stdio: 'pipe' });
+
+    // Link to shared object using gcc/clang
+    const cc = process.env.CC || 'gcc';
+    const linkCmd = `${cc} -shared -fPIC -o ${soFile} ${objFile}`;
+    execSync(linkCmd, { stdio: 'pipe' });
+
+    // Clean up intermediate files
+    if (fs.existsSync(asmFile)) fs.unlinkSync(asmFile);
+    if (fs.existsSync(objFile)) fs.unlinkSync(objFile);
+
+    return soFile;
+  } catch (error) {
+    // Clean up on error
+    if (fs.existsSync(asmFile)) fs.unlinkSync(asmFile);
+    if (fs.existsSync(objFile)) fs.unlinkSync(objFile);
+    if (fs.existsSync(soFile)) fs.unlinkSync(soFile);
+    throw new Error(`Failed to compile assembly to .so: ${error}`);
+  }
+}
+
 function doSampleAsm(
   ms: Measuresuite,
   size: number,
   asmstring: string,
   asmfilename: string,
+  fairComparison: boolean,
+  symbol: string,
+  cacheDir: string,
 ): { asm: number[]; check: number[] } {
+  console.error(`DEBUG doSampleAsm: fairComparison = ${fairComparison}, symbol = ${symbol}`);
   const resultCycleMedians = { asm: [] as number[], check: [] as number[] };
 
-  for (let i = 0; i < size; i++) {
-    let result;
-    try {
-      result = ms.measure(BATCH_SIZE, NUMBER_OF_BATCHES, [asmstring]);
-      if (result?.stats.incorrect !== 0) {
-        console.error("No / Wrong result");
-        process.exit(-1);
-      }
-      // there is a bit of wierd thing going on.
-      // on the 12th gen, sometimes 0's are returned for some measurements.
-      if (result.cycles.some((rs) => rs.filter((d) => d > 0).length < NUMBER_OF_BATCHES)) {
-        // then we'll try again.
-        i--;
-        continue;
-      }
+  let soFile: string | undefined;
 
-      const medianA = analyseRow(result.cycles[1]).post.median;
-      resultCycleMedians.asm.push(medianA);
+  try {
+    if (fairComparison) {
+      console.error(`DEBUG: Entering fair-comparison branch, compiling to .so...`);
+      // Compile assembly to .so file for fair comparison
+      const outputPath = join(cacheDir, "cryptopt_asm");
+      soFile = compileAsmToSo(asmstring, outputPath, symbol);
+      console.error(`DEBUG: Compiled .so file at: ${soFile}`);
 
-      const medianC = analyseRow(result.cycles[0]).post.median;
-      resultCycleMedians.check.push(medianC);
-    } catch (e) {
-      console.error(`execution of measure (${asmfilename}) failed.`, result, e);
+      // Load the .so file into measuresuite
+      native_ms.load_shared_object_file(soFile, symbol);
+      console.error(`DEBUG: Loaded .so file into measuresuite`);
+    } else {
+      console.error(`DEBUG: NOT using fair-comparison (using AssemblyLine)`);
+    }
+
+    for (let i = 0; i < size; i++) {
+      let result;
+      try {
+        if (fairComparison) {
+          // Measure without passing assembly string (already loaded as .so)
+          // This measures: [baseline.so, cryptopt.so]
+          result = ms.measure(BATCH_SIZE, NUMBER_OF_BATCHES, []);
+        } else {
+          // Original method: pass assembly string
+          // This measures: [baseline, cryptopt_asm_string]
+          result = ms.measure(BATCH_SIZE, NUMBER_OF_BATCHES, [asmstring]);
+        }
+
+        if (result?.stats.incorrect !== 0) {
+          console.error("No / Wrong result");
+          process.exit(-1);
+        }
+        // there is a bit of wierd thing going on.
+        // on the 12th gen, sometimes 0's are returned for some measurements.
+        if (result.cycles.some((rs) => rs.filter((d) => d > 0).length < NUMBER_OF_BATCHES)) {
+          // then we'll try again.
+          i--;
+          continue;
+        }
+
+        // When using fair-comparison, we have 2 functions: [baseline, cryptopt]
+        // When not using it, we also have 2: [baseline, cryptopt]
+        // Index 0 is always baseline, index 1 is always the optimized assembly
+        const medianA = analyseRow(result.cycles[1]).post.median;
+        resultCycleMedians.asm.push(medianA);
+
+        const medianC = analyseRow(result.cycles[0]).post.median;
+        resultCycleMedians.check.push(medianC);
+      } catch (e) {
+        console.error(`execution of measure (${asmfilename}) failed.`, result, e);
+      }
+    }
+  } finally {
+    // Cleanup: unload .so and delete file
+    if (fairComparison && soFile) {
+      native_ms.unload_last(); // Unload the .so we loaded
+      if (fs.existsSync(soFile)) {
+        fs.unlinkSync(soFile);
+      }
     }
   }
 
