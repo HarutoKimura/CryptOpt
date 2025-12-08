@@ -61,8 +61,8 @@ export const RUST_SYMBOLS: Record<
   bls12_381_p: {
     mul: {
       rust: {
-        fnName: "mul",
-        jsonFile: "bls12_381_fp_mul.json",
+        fnName: "bls12_mul",
+        jsonFile: "bls12_mul_updated.json",
       },
       c: {
         fnName: "mul",
@@ -279,7 +279,7 @@ export const RUST_SYMBOLS: Record<
     square: {
       rust: {
         fnName: "rust_fiat_p448_solinas_carry_square",
-        jsonFile: "rust_fiat_p448_solinas_carry_square.json",
+        jsonFile: "rust_fiat_p448_solinas_carry_square_new.json",
       },
       c: {
         fnName: "c_fiat_p448_carry_square",
