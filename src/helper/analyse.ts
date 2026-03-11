@@ -59,6 +59,21 @@ export function analyseMeasureResult(
     errorOut(ERRORS.measureInsufficientData);
   }
 
+  // Debug: Check if any cycle array will become empty after cleaning (values > 0)
+  for (let i = 0; i < result.cycles.length; i++) {
+    const arr = result.cycles[i];
+    const validValues = arr.filter((v) => typeof v === "number" && v > 0);
+    if (validValues.length === 0) {
+      console.error(`\n=== DEBUG: Cycle array ${i} has NO valid values (> 0) ===`);
+      console.error(`Original array length: ${arr.length}`);
+      console.error(`First 20 values: ${arr.slice(0, 20)}`);
+      console.error(`Unique values: ${[...new Set(arr)].slice(0, 10)}`);
+      console.error(`All zeros: ${arr.every(v => v === 0)}`);
+      console.error(`All undefined: ${arr.every(v => v === undefined)}`);
+      console.error(`Full result: ${JSON.stringify(result, null, 2).slice(0, 2000)}`);
+    }
+  }
+
   const [cc, ca, cb] = result.cycles.map(analyseRow);
   const rawMedian: numTripel = [ca.pre.median, cb.pre.median, cc.pre.median]; // order is swampped now cc (the shared object file is the third element)
 

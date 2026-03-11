@@ -82,6 +82,9 @@ if (parsedArgs.resultDir == "") {
   parsedArgs.resultDir = resolve(process.cwd(), "results");
 }
 
+// Store original evals for folder naming (before it gets modified for phases)
+parsedArgs.totalEvals = parsedArgs.evals;
+
 // Resolve mutationMode and scheduleRatio conflicts
 // scheduleRatio takes priority, but mutationMode can override for backwards compatibility
 if (parsedArgs.mutationMode === "schedule-only" && parsedArgs.scheduleRatio === 50) {

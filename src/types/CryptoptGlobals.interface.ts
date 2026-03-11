@@ -17,9 +17,36 @@
 export interface MutationOrderEntry {
   phase: 'bet' | 'run';
   index: number;
-  type: 'Permutation' | 'Decision';
+  type: 'Permutation' | 'Decision' | 'Baseline';
   deltaScore: number; // Signed performance delta vs. previous state
   evalNumber: number;
+
+  // Performance tracking
+  performanceBefore: number; // Cycles before this mutation
+  performanceAfter: number;  // Cycles after this mutation
+  absoluteImprovement: number; // Improvement vs. baseline (negative = better)
+
+  // Mutation features (optional, only for actual mutations)
+  features?: {
+    // For Permutation mutations
+    permutation?: {
+      distance: number;        // How far instruction moved
+      minPosition: number;     // Backward dependency limit
+      maxPosition: number;     // Forward dependency limit
+      chosenPosition: number;  // Where instruction ended up
+      partnerPosition: number; // What it swapped with
+    };
+
+    // For Decision mutations
+    decision?: {
+      decisionType: string;    // e.g., "DI_CHOOSE_ARG", "DI_FLAG"
+      operationIndex: number;  // Which operation was mutated
+      hotDecisionsCount: number; // How many hot decisions available
+      totalOperations: number; // Total operations in model
+      oldChoice: number;       // Previous choice value
+      newChoice: number;       // New choice value
+    };
+  };
 }
 
 export interface PhaseStats {

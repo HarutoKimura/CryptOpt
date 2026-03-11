@@ -25,6 +25,7 @@ export type MUTATION_MODE_OPTIONS_T = typeof MUTATION_MODE_OPTIONS[number];
 
 export type OptimizerArgs = {
   evals: number;
+  totalEvals?: number; // Original evals value from command line (for folder naming)
   seed: number;
   curve: CURVE_T;
   method: METHOD_T;

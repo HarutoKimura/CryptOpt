@@ -415,6 +415,13 @@ export class Optimizer {
             //TODO increase numBatches, if the times have a big stddeviation
             //TODO change batchSize if the avg number is batchSize *= avg(times)/goal ; goal=10000 cycles
           } catch (e) {
+            // Log the actual exception for debugging
+            console.error("Exception during measurement:", e);
+            if (e instanceof Error) {
+              console.error("Error message:", e.message);
+              console.error("Stack trace:", e.stack);
+            }
+
             const isIncorrect = e instanceof Error && e.message.includes("tested_incorrect");
             const isInvalid = e instanceof Error && e.message.includes("could not be assembled");
             if (isInvalid || isIncorrect) {
@@ -447,6 +454,24 @@ export class Optimizer {
 
           const [meanrawA, meanrawB, meanrawCheck] = analyseResult.rawMedian; // meausrawCheck is the median of the check function (the shared object file)
 
+          // Initialize baseline on first measurement
+          if (numEvals == 1 && this.previousScore === 0) {
+            this.previousScore = meanrawCheck;
+
+            // Record baseline measurement
+            // DISABLED: This causes memory issues with large eval counts (200k+)
+            // globals.mutationOrder.push({
+            //   phase: this.currentPhase,
+            //   index: 0,
+            //   type: 'Baseline',
+            //   deltaScore: 0,
+            //   evalNumber: 0,
+            //   performanceBefore: 0,
+            //   performanceAfter: meanrawCheck,
+            //   absoluteImprovement: 0,
+            // });
+          }
+
           batchSize = Math.ceil((Number(this.args.cyclegoal) / meanrawCheck) * batchSize);
           // We want to limit for some corner cases.
           batchSize = Math.min(batchSize, 10000);
@@ -458,17 +483,39 @@ export class Optimizer {
 
           // Calculate performance delta
           const currentScore = currentFunctionIsA() ? meanrawA : meanrawB;
-          const deltaScore = this.previousScore === 0 ? 0 : currentScore - this.previousScore;
-          
-          // Track mutation order
+          const deltaScore = currentScore - this.previousScore;
+
+          // Get baseline for absolute improvement calculation
+          const baselineScore = globals.mutationOrder.length > 0 && globals.mutationOrder[0].type === 'Baseline'
+            ? globals.mutationOrder[0].performanceAfter
+            : meanrawCheck;
+
+          const absoluteImprovement = currentScore - baselineScore;
+
+          // Track mutation order with full details
           const mutationType = choice === CHOICE.PERMUTE ? 'Permutation' : 'Decision';
-          globals.mutationOrder.push({
-            phase: this.currentPhase,
-            index: this.mutationIndexWithinPhase++,
-            type: mutationType,
-            deltaScore: deltaScore,
-            evalNumber: numEvals
-          });
+
+          // Get mutation features if available
+          const features: any = {};
+          if (choice === CHOICE.PERMUTE && Model.lastPermutationFeatures) {
+            features.permutation = { ...Model.lastPermutationFeatures };
+          } else if (choice === CHOICE.DECISION && Model.lastDecisionFeatures) {
+            features.decision = { ...Model.lastDecisionFeatures };
+          }
+
+          // DISABLED: This causes memory issues with large eval counts (200k+)
+          // globals.mutationOrder.push({
+          //   phase: this.currentPhase,
+          //   index: this.mutationIndexWithinPhase++,
+          //   type: mutationType,
+          //   deltaScore: deltaScore,
+          //   evalNumber: numEvals,
+          //   performanceBefore: this.previousScore,
+          //   performanceAfter: currentScore,
+          //   absoluteImprovement: absoluteImprovement,
+          //   ...(Object.keys(features).length > 0 && { features }),
+          // });
+          this.mutationIndexWithinPhase++;
 
           let kept: boolean;
 
@@ -577,6 +624,12 @@ export class Optimizer {
             const elapsed = Date.now() - optimistaionStartDate;
             const paddedSeed = padSeed(Paul.initialSeed);
 
+            // Get baseline and final performance
+            // Use meanrawCheck as baseline (unoptimized CHECK function performance)
+            // This matches the baseline used in metrics.json
+            const baselinePerformance = meanrawCheck;
+            const finalPerformance = Math.min(meanrawA, meanrawB);
+
             const statistics = genStatistics({
               paddedSeed,
               ratioString,
@@ -593,6 +646,9 @@ export class Optimizer {
               cyclegoal: this.args.cyclegoal,
               scheduleRatio: this.args.scheduleRatio,
               mutationTracking: this.mutationTracking,
+              mutationOrder: globals.mutationOrder,
+              baselinePerformance: baselinePerformance,
+              finalPerformance: finalPerformance,
             });
             Logger.log(statistics);
 
@@ -615,6 +671,180 @@ export class Optimizer {
 
             // writing the CSV
             writeString(mutationsCsvFile, globals.mutationLog.join("\n"));
+
+            // Export comprehensive JSON metrics
+            const [jsonFile] = generateResultFilename(
+              { ...this.args, symbolname: this.symbolname },
+              [`_ratio${ratioString.replace(".", "")}_metrics.json`],
+            );
+
+            const comprehensiveMetrics = {
+              metadata: {
+                seed: Paul.initialSeed,
+                curve: this.args.curve,
+                method: this.args.method,
+                symbolname: this.symbolname,
+                timestamp: Date.now(),
+                phase: this.currentPhase,
+                betIndex: this.currentBetIndex,
+                scheduleRatio: this.args.scheduleRatio,
+                evals: this.args.evals,
+                cyclegoal: this.args.cyclegoal,
+              },
+              finalPerformance: {
+                ratio: parseFloat(ratioString),
+                cycles: Math.min(meanrawA, meanrawB),
+                baselineCycles: meanrawCheck,
+                improvement: ((meanrawCheck / Math.min(meanrawA, meanrawB)) - 1) * 100,  // Percentage improvement
+              },
+              mutationTracking: {
+                ...this.mutationTracking,
+                // Remove mutationSequence from here as it's redundant with mutationOrder
+                mutationSequence: undefined,
+              },
+              mutationOrder: globals.mutationOrder,
+              phaseStats: globals.phaseStats,
+              convergence: globals.convergence,
+              randomInputs: {
+                perMutation: Array.from(globals.randomInputsPerMutation.entries()).map(([evalNum, count]) => ({
+                  evalNumber: evalNum,
+                  randomInputsUsed: count,
+                })),
+                total: globals.totalRandomInputsConsumed,
+              },
+              performance: {
+                totalTime: elapsed,
+                measurementTime: accumulatedTimeSpentByMeasuring,
+                measurementRatio: accumulatedTimeSpentByMeasuring / elapsed,
+              },
+            };
+
+            writeString(jsonFile, JSON.stringify(comprehensiveMetrics, null, 2));
+            console.log(`\n📊 Exported comprehensive metrics to: ${jsonFile}`);
+
+            // Export clean analysis JSON for easy visualization (only for final run phase)
+            if (this.currentPhase === 'run') {
+              const [analysisFile] = generateResultFilename(
+                { ...this.args, symbolname: this.symbolname },
+                [`_final_analysis.json`],
+              );
+
+            // Build clean analysis structure
+            const permMutations = globals.mutationOrder.filter(m => m.type === 'Permutation' && m.features?.permutation);
+            const decMutations = globals.mutationOrder.filter(m => m.type === 'Decision' && m.features?.decision);
+            const allMutations = globals.mutationOrder.filter(m => m.type !== 'Baseline');
+
+            // Decision type breakdown
+            const decisionTypeBreakdown: { [key: string]: { count: number; avgDelta: number; successRate: number } } = {};
+            if (decMutations.length > 0) {
+              const byType: { [key: string]: any[] } = {};
+              decMutations.forEach(m => {
+                const type = m.features!.decision!.decisionType;
+                if (!byType[type]) byType[type] = [];
+                byType[type].push(m);
+              });
+              Object.entries(byType).forEach(([type, mutations]) => {
+                const avgDelta = mutations.reduce((sum, m) => sum + m.deltaScore, 0) / mutations.length;
+                const kept = mutations.filter(m => m.deltaScore <= 0).length;
+                decisionTypeBreakdown[type] = {
+                  count: mutations.length,
+                  avgDelta: parseFloat(avgDelta.toFixed(2)),
+                  successRate: parseFloat(((kept / mutations.length) * 100).toFixed(1)),
+                };
+              });
+            }
+
+            // Permutation distance breakdown
+            const permutationDistanceBreakdown = {
+              short: { count: 0, avgDelta: 0, successRate: 0 },
+              medium: { count: 0, avgDelta: 0, successRate: 0 },
+              long: { count: 0, avgDelta: 0, successRate: 0 },
+            };
+            if (permMutations.length > 0) {
+              const shortMoves = permMutations.filter(m => Math.abs(m.features!.permutation!.distance) < 5);
+              const mediumMoves = permMutations.filter(m => Math.abs(m.features!.permutation!.distance) >= 5 && Math.abs(m.features!.permutation!.distance) < 15);
+              const longMoves = permMutations.filter(m => Math.abs(m.features!.permutation!.distance) >= 15);
+
+              const calcStats = (moves: typeof permMutations) => {
+                if (moves.length === 0) return { count: 0, avgDelta: 0, successRate: 0 };
+                const avgDelta = moves.reduce((sum, m) => sum + m.deltaScore, 0) / moves.length;
+                const kept = moves.filter(m => m.deltaScore <= 0).length;
+                return {
+                  count: moves.length,
+                  avgDelta: parseFloat(avgDelta.toFixed(2)),
+                  successRate: parseFloat(((kept / moves.length) * 100).toFixed(1)),
+                };
+              };
+              permutationDistanceBreakdown.short = calcStats(shortMoves);
+              permutationDistanceBreakdown.medium = calcStats(mediumMoves);
+              permutationDistanceBreakdown.long = calcStats(longMoves);
+            }
+
+            // Delta score distribution
+            const improvements = allMutations.filter(m => m.deltaScore < 0);
+            const degradations = allMutations.filter(m => m.deltaScore > 0);
+
+            // Convergence data (sampled every 100 mutations)
+            const convergenceData = allMutations
+              .filter((_, i) => i % 100 === 0 || i === allMutations.length - 1)
+              .map(m => ({
+                evalNumber: m.evalNumber,
+                performance: m.performanceAfter,
+              }));
+
+            const analysisData = {
+              metadata: {
+                seed: Paul.initialSeed,
+                curve: this.args.curve,
+                method: this.args.method,
+                symbolname: this.symbolname,
+                scheduleRatio: this.args.scheduleRatio,
+                totalEvals: this.args.totalEvals || this.args.evals,
+                timestamp: new Date().toISOString(),
+              },
+              performance: {
+                baseline: baselinePerformance,
+                final: finalPerformance,
+                improvementPercent: parseFloat(((baselinePerformance - finalPerformance) / baselinePerformance * 100).toFixed(2)),
+                improvementCycles: parseFloat((baselinePerformance - finalPerformance).toFixed(2)),
+              },
+              distribution: {
+                totalMutations: allMutations.length,
+                permutation: {
+                  count: this.mutationTracking.actualPermutation,
+                  percent: parseFloat((this.mutationTracking.actualPermutation / allMutations.length * 100).toFixed(1)),
+                  kept: this.mutationTracking.permutationKept,
+                  successRate: parseFloat((this.mutationTracking.permutationKept / Math.max(1, this.mutationTracking.actualPermutation) * 100).toFixed(1)),
+                },
+                decision: {
+                  count: this.mutationTracking.actualDecision,
+                  percent: parseFloat((this.mutationTracking.actualDecision / allMutations.length * 100).toFixed(1)),
+                  kept: this.mutationTracking.decisionKept,
+                  successRate: parseFloat((this.mutationTracking.decisionKept / Math.max(1, this.mutationTracking.actualDecision) * 100).toFixed(1)),
+                },
+                fallbacks: this.mutationTracking.decisionToPermutationFallbacks,
+              },
+              decisionTypes: decisionTypeBreakdown,
+              permutationDistances: permutationDistanceBreakdown,
+              deltaDistribution: {
+                improvements: {
+                  count: improvements.length,
+                  avgDelta: improvements.length > 0 ? parseFloat((improvements.reduce((a, b) => a + b.deltaScore, 0) / improvements.length).toFixed(2)) : 0,
+                  best: improvements.length > 0 ? parseFloat(Math.min(...improvements.map(m => m.deltaScore)).toFixed(2)) : 0,
+                },
+                degradations: {
+                  count: degradations.length,
+                  avgDelta: degradations.length > 0 ? parseFloat((degradations.reduce((a, b) => a + b.deltaScore, 0) / degradations.length).toFixed(2)) : 0,
+                  worst: degradations.length > 0 ? parseFloat(Math.max(...degradations.map(m => m.deltaScore)).toFixed(2)) : 0,
+                },
+                overallSuccessRate: parseFloat((improvements.length / allMutations.length * 100).toFixed(1)),
+              },
+              convergence: convergenceData,
+            };
+
+              writeString(analysisFile, JSON.stringify(analysisData, null, 2));
+              console.log(`\n📈 Exported final analysis to: ${analysisFile}`);
+            }
 
             if (shouldProof(this.args)) {
               // and proof correct

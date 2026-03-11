@@ -25,7 +25,7 @@ export type BRIDGES_T = (typeof BRIDGES)[number];
 
 // currently used only in src/CountCycle
 export const KNOWN_SYMBOLS: {
-  [symbol: string]: { bridge: "fiat" | "bitcoin-core" | "llvm-bitcoin-core" | "rust"; method: METHOD_T; curve: CURVE_T};
+  [symbol: string]: { bridge: "fiat" | "bitcoin-core" | "llvm-bitcoin-core" | "rust"; method: METHOD_T; curve: CURVE_T; language?: "rust" | "c"};
 } = {
   // fiat generated bls curves
   fiat_bls12_381_p_mul: { bridge: "fiat", method: "mul", curve: "bls12_381_p" },
@@ -101,16 +101,41 @@ export const KNOWN_SYMBOLS: {
   rust_fiat_secp256k1_dettman_mul: { bridge: "rust", method: "mul", curve: "secp256k1_dettman"}, //done
   rust_fiat_secp256k1_dettman_square: { bridge: "rust", method: "square", curve: "secp256k1_dettman"},
 
-  // new curve after CryptOpt publication
-  rust_fiat_sm2_mul: { bridge: "rust", method: "mul", curve: "sm2"},
-  rust_fiat_sm2_square: { bridge: "rust", method: "square", curve: "sm2"},
+  // // new curve after CryptOpt publication
+  // rust_fiat_sm2_mul: { bridge: "rust", method: "mul", curve: "sm2"},
+  // rust_fiat_sm2_square: { bridge: "rust", method: "square", curve: "sm2"},
   // rust_bls12_381_q_mul: {bridge: "rust", method: "mul", curve: "bls12_381_q"},
   // rust_bls12_381_q_square: {bridge: "rust", method: "square", curve: "bls12_381_q"},
 
-  // OpenSSL curve25519 functions
-  open_ssl_curve25519_fe51_mul: { bridge: "rust", method: "mul", curve: "openssl_curve25519"},
-  open_ssl_curve25519_fe51_square: { bridge: "rust", method: "square", curve: "openssl_curve25519"},
+  // OpenSSL curve25519 functions (C implementation)
+  open_ssl_curve25519_fe51_mul: { bridge: "rust", method: "mul", curve: "openssl_curve25519", language: "c"},
+  open_ssl_curve25519_fe51_square: { bridge: "rust", method: "square", curve: "openssl_curve25519", language: "c"},
 
-  c_fiat_curve25519_carry_mul: { bridge: "rust", method: "mul", curve: "curve25519"},
-  c_fiat_curve25519_carry_square: { bridge: "rust", method: "square", curve: "curve25519"},
+  // C-generated curve25519
+  c_fiat_curve25519_carry_mul: { bridge: "rust", method: "mul", curve: "curve25519", language: "c" },
+  c_fiat_curve25519_carry_square: { bridge: "rust", method: "square", curve: "curve25519", language: "c" },
+
+  // C-generated p448
+  c_fiat_p448_carry_mul: { bridge: "rust", method: "mul", curve: "p448_solinas", language: "c" },
+  c_fiat_p448_carry_square: { bridge: "rust", method: "square", curve: "p448_solinas", language: "c" },
+
+  // C-generated poly1305
+  c_fiat_poly1305_carry_mul: { bridge: "rust", method: "mul", curve: "poly1305", language: "c" },
+  c_fiat_poly1305_carry_square: { bridge: "rust", method: "square", curve: "poly1305", language: "c" },
+
+  // C-generated secp256k1_dettman
+  c_fiat_secp256k1_dettman_mul: { bridge: "rust", method: "mul", curve: "secp256k1_dettman", language: "c" },
+  c_fiat_secp256k1_dettman_square: { bridge: "rust", method: "square", curve: "secp256k1_dettman", language: "c" },
+
+  // OpenSSL p448 (C implementation)
+  openssl_p448_mul: { bridge: "rust", method: "mul", curve: "openssl_p448", language: "c" },
+  openssl_p448_square: { bridge: "rust", method: "square", curve: "openssl_p448", language: "c" },
+
+  // rust-ec secp256k1
+  rust_ec_secp256k1_mul_inner: { bridge: "rust", method: "mul", curve: "secp256k1_ec" },
+  rust_ec_secp256k1_square: { bridge: "rust", method: "square", curve: "secp256k1_ec" },
+
+  // curve25519_dalek (uses generic "mul" and "square" names)
+  mul: { bridge: "rust", method: "mul", curve: "curve25519_dalek" },
+  square: { bridge: "rust", method: "square", curve: "curve25519_dalek" },
 };

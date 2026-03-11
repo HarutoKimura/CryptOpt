@@ -113,6 +113,9 @@ export function genStatistics(a: {
       kept: boolean;
     }>;
   };
+  mutationOrder?: any[];
+  baselinePerformance?: number;
+  finalPerformance?: number;
 }): string[] {
   const baseStats = [
     `; cpu ${cpus()[0].model}`,
@@ -182,7 +185,122 @@ export function genStatistics(a: {
     );
   }
 
-  return [...baseStats, ...originalStats, ...naturalDistributionStats];
+  // Detailed mutation feature analysis
+  const detailedFeatureStats: string[] = [];
+  if (a.mutationOrder && a.mutationOrder.length > 0) {
+    const permMutations = a.mutationOrder.filter(m => m.type === 'Permutation' && m.features?.permutation);
+    const decMutations = a.mutationOrder.filter(m => m.type === 'Decision' && m.features?.decision);
+
+    detailedFeatureStats.push(
+      `;`,
+      `; === DETAILED MUTATION FEATURE ANALYSIS ===`,
+      `;`
+    );
+
+    // Performance summary
+    if (a.baselinePerformance && a.finalPerformance) {
+      const totalImprovement = ((a.baselinePerformance - a.finalPerformance) / a.baselinePerformance * 100).toFixed(2);
+      detailedFeatureStats.push(
+        `; PERFORMANCE SUMMARY:`,
+        `;   Baseline: ${a.baselinePerformance.toFixed(2)} cycles`,
+        `;   Final:    ${a.finalPerformance.toFixed(2)} cycles`,
+        `;   Total Improvement: ${totalImprovement}% (${(a.baselinePerformance - a.finalPerformance).toFixed(2)} cycles)`,
+        `;`
+      );
+    }
+
+    // Permutation feature analysis
+    if (permMutations.length > 0) {
+      const distances = permMutations.map(m => m.features.permutation.distance);
+      const avgDistance = (distances.reduce((a, b) => a + b, 0) / distances.length).toFixed(2);
+      const maxDistance = Math.max(...distances.map(Math.abs));
+      const minDistance = Math.min(...distances.map(Math.abs));
+
+      const shortMoves = permMutations.filter(m => Math.abs(m.features.permutation.distance) < 5);
+      const mediumMoves = permMutations.filter(m => Math.abs(m.features.permutation.distance) >= 5 && Math.abs(m.features.permutation.distance) < 15);
+      const longMoves = permMutations.filter(m => Math.abs(m.features.permutation.distance) >= 15);
+
+      // Calculate avg delta for each category
+      const avgDeltaShort = shortMoves.length > 0 ? (shortMoves.reduce((sum, m) => sum + m.deltaScore, 0) / shortMoves.length).toFixed(2) : "N/A";
+      const avgDeltaMedium = mediumMoves.length > 0 ? (mediumMoves.reduce((sum, m) => sum + m.deltaScore, 0) / mediumMoves.length).toFixed(2) : "N/A";
+      const avgDeltaLong = longMoves.length > 0 ? (longMoves.reduce((sum, m) => sum + m.deltaScore, 0) / longMoves.length).toFixed(2) : "N/A";
+
+      detailedFeatureStats.push(
+        `; PERMUTATION FEATURES (${permMutations.length} mutations):`,
+        `;   Distance Statistics:`,
+        `;     Average: ${avgDistance} positions`,
+        `;     Range: ${minDistance} to ${maxDistance} positions`,
+        `;   Distance Distribution:`,
+        `;     Short moves  (<5):   ${shortMoves.length} mutations, avg Δ=${avgDeltaShort} cycles`,
+        `;     Medium moves (5-15): ${mediumMoves.length} mutations, avg Δ=${avgDeltaMedium} cycles`,
+        `;     Long moves   (>15):  ${longMoves.length} mutations, avg Δ=${avgDeltaLong} cycles`,
+        `;`
+      );
+    }
+
+    // Decision feature analysis
+    if (decMutations.length > 0) {
+      // Group by decision type
+      const byType: { [key: string]: any[] } = {};
+      decMutations.forEach(m => {
+        const type = m.features.decision.decisionType;
+        if (!byType[type]) byType[type] = [];
+        byType[type].push(m);
+      });
+
+      detailedFeatureStats.push(
+        `; DECISION FEATURES (${decMutations.length} mutations):`,
+        `;   Decision Types:`,
+      );
+
+      Object.entries(byType)
+        .sort(([, a], [, b]) => b.length - a.length)  // Sort by frequency
+        .forEach(([type, mutations]) => {
+          const avgDelta = (mutations.reduce((sum, m) => sum + m.deltaScore, 0) / mutations.length).toFixed(2);
+          const kept = mutations.filter(m => {
+            // Check if this mutation was kept by looking at the next mutation
+            const nextIdx = a.mutationOrder!.findIndex(x => x === m) + 1;
+            return nextIdx < a.mutationOrder!.length ? m.deltaScore <= 0 : true;
+          }).length;
+          const successRate = ((kept / mutations.length) * 100).toFixed(1);
+
+          detailedFeatureStats.push(
+            `;     ${type.padEnd(20)}: ${mutations.length.toString().padStart(3)} mutations, avg Δ=${avgDelta.padStart(7)} cycles, success=${successRate}%`
+          );
+        });
+
+      detailedFeatureStats.push(`;`);
+    }
+
+    // Delta score distribution
+    const allMutations = a.mutationOrder.filter(m => m.type !== 'Baseline');
+    if (allMutations.length > 0) {
+      const deltas = allMutations.map(m => m.deltaScore);
+      const improvements = deltas.filter(d => d < 0);
+      const degradations = deltas.filter(d => d > 0);
+
+      const avgImprovement = improvements.length > 0 ? (improvements.reduce((a, b) => a + b, 0) / improvements.length).toFixed(2) : "N/A";
+      const avgDegradation = degradations.length > 0 ? (degradations.reduce((a, b) => a + b, 0) / degradations.length).toFixed(2) : "N/A";
+      const bestImprovement = improvements.length > 0 ? Math.min(...improvements).toFixed(2) : "N/A";
+      const worstDegradation = degradations.length > 0 ? Math.max(...degradations).toFixed(2) : "N/A";
+
+      detailedFeatureStats.push(
+        `; DELTA SCORE DISTRIBUTION:`,
+        `;   Improvements: ${improvements.length} mutations (avg: ${avgImprovement} cycles, best: ${bestImprovement} cycles)`,
+        `;   Degradations: ${degradations.length} mutations (avg: ${avgDegradation} cycles, worst: ${worstDegradation} cycles)`,
+        `;   Success Rate: ${((improvements.length / allMutations.length) * 100).toFixed(1)}%`,
+        `;`
+      );
+    }
+
+    detailedFeatureStats.push(
+      `; Note: Detailed mutation-by-mutation data available in companion JSON file`,
+      `; JSON contains: performanceBefore/After, absoluteImprovement, and full feature details`,
+      `;`
+    );
+  }
+
+  return [...baseStats, ...originalStats, ...naturalDistributionStats, ...detailedFeatureStats];
 }
 export function logMutation({
   choice,

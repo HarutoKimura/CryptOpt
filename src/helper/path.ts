@@ -28,15 +28,29 @@ export function generateResultFilename(
     bridge,
     seed,
     symbolname,
-  }: Pick<OptimizerArgs, "resultDir" | "bridge" | "seed"> & {
+    totalEvals,
+    scheduleRatio,
+  }: Pick<OptimizerArgs, "resultDir" | "bridge" | "seed" | "totalEvals"> & {
     symbolname: string;
+    scheduleRatio?: number;
   },
   suff = [".json"],
 ): string[] {
-  const path =
+  // Build path: resultDir/bridge/symbolname/evals_X/p_X_d_Y
+  let path =
     resultDir && resultDir !== ""
       ? resolve(resultDir, bridge, symbolname)
       : resolve(`${process.cwd()}/results`, bridge, symbolname);
+
+  // Add evals subfolder if provided (uses original totalEvals, not phase-specific evals)
+  if (totalEvals) {
+    path = resolve(path, `evals_${totalEvals}`);
+  }
+
+  // Add ratio subfolder if scheduleRatio is provided
+  if (scheduleRatio !== undefined) {
+    path = resolve(path, `p_${scheduleRatio}_d_${100 - scheduleRatio}`);
+  }
 
   if (!existsSync(path)) {
     Logger.log(`${path} does not exist. Trying to create it.`);

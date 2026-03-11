@@ -58,6 +58,24 @@ export class Model {
   private static _instance: null | Model = null;
   public static permutationStats = "";
   public static decisionStats = "";
+  
+  // Structured mutation features for detailed tracking
+  public static lastPermutationFeatures: {
+    distance: number;
+    minPosition: number;
+    maxPosition: number;
+    chosenPosition: number;
+    partnerPosition: number;
+  } | null = null;
+
+  public static lastDecisionFeatures: {
+    decisionType: string;
+    operationIndex: number;
+    hotDecisionsCount: number;
+    totalOperations: number;
+    oldChoice: number;
+    newChoice: number;
+  } | null = null;
   public static hardDependencies = new Set<string>();
 
   public static getInstance(): Model {
@@ -342,6 +360,15 @@ export class Model {
         .map((a) => a.toString().padStart(4))
         .join("/") +
       "]";
+
+    // Store structured features for detailed tracking
+    Model.lastPermutationFeatures = {
+      distance: partner - chosen,
+      minPosition: min,
+      maxPosition: max,
+      chosenPosition: chosen,
+      partnerPosition: partner,
+    };
   }
 
   public static mutateDecision(): boolean {
@@ -435,8 +462,21 @@ export class Model {
 
     // and set new choice
     Logger.log(`mutated DECISION ${candidate.name.join("--")}[${key}]:${dec[0]} to: ${choice}`);
+
+    const oldChoice = dec[0];
+
     // TS hack with the ??; we woulnt be here if the decisionss at _key are undefined
     (candidate.decisions[key] ?? [0])[0] = choice;
+
+    // Store structured features for detailed tracking
+    Model.lastDecisionFeatures = {
+      decisionType: DI_ABBRV[key],
+      operationIndex: candidateIdx,
+      hotDecisionsCount: candidateIndexes.length,
+      totalOperations: Model._nodes.length,
+      oldChoice: oldChoice,
+      newChoice: choice,
+    };
 
     return true;
   }
