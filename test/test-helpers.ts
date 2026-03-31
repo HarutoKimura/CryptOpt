@@ -55,6 +55,7 @@ export function getTestArgs(filename: string): OptimizerArgs {
     mutationMode: "both",
     scheduleRatio: 50,
     quotaMode: "execution",
+    adaptiveStrategy: "none",
   };
 }
 

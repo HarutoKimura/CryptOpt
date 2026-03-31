@@ -41,6 +41,7 @@ import { Paul, sha1Hash } from "@/paul";
 import { RegisterAllocator } from "@/registerAllocator";
 import type { AnalyseResult, OptimizerArgs } from "@/types";
 
+import { createAdaptiveStrategy, type AdaptiveStrategy } from "./adaptive-strategy";
 import { genStatistics, genStatusLine, logMutation, printStartInfo } from "./optimizer.helper";
 import { init, compileNasmToSharedObject } from "./optimizer.helper.class";
 
@@ -56,6 +57,7 @@ export class Optimizer {
   private mutationIndexWithinPhase: number = 0;
   private currentBetIndex: number = 0;
   private phaseStartRandomInputs: number = 0;
+  private adaptiveStrategy: AdaptiveStrategy | null = null;
   
   public getSymbolname(deleteCache = false): string {
     if (deleteCache) {
@@ -99,6 +101,11 @@ export class Optimizer {
     globals.randomInputsPerMutation = new Map();
     globals.totalRandomInputsConsumed = 0;
     this.phaseStartRandomInputs = 0;
+
+    this.adaptiveStrategy = createAdaptiveStrategy(args.adaptiveStrategy);
+    if (this.adaptiveStrategy) {
+      process.stdout.write(`\nAdaptive strategy: ${args.adaptiveStrategy} (scheduleRatio ignored)\n`);
+    }
     
     // load a saved state if necessary
     if (args.readState) {
@@ -162,10 +169,12 @@ export class Optimizer {
     let intendedChoice: CHOICE;
     
     if (random) {
-      // Use scheduleRatio to control Permutation vs Decision ratio
-      // scheduleRatio is 0-100, representing percentage of mutations that should be permutations
-      const randomValue = Paul.chooseBetween(100);
-      intendedChoice = randomValue < this.args.scheduleRatio ? CHOICE.PERMUTE : CHOICE.DECISION;
+      if (this.adaptiveStrategy) {
+        intendedChoice = this.adaptiveStrategy.selectArm();
+      } else {
+        const randomValue = Paul.chooseBetween(100);
+        intendedChoice = randomValue < this.args.scheduleRatio ? CHOICE.PERMUTE : CHOICE.DECISION;
+      }
       choice = intendedChoice;
     } else {
       // For fallback cases, intendedChoice should already be set
@@ -554,6 +563,11 @@ export class Optimizer {
             kept = false;
             this.revertFunction();
           }
+
+          if (this.adaptiveStrategy) {
+            this.adaptiveStrategy.update(choice, kept ? 1.0 : 0.0);
+          }
+
           const indexGood = Number(meanrawA > meanrawB);
           const indexBad = 1 - indexGood;
           globals.currentRatio = meanrawCheck / Math.min(meanrawB, meanrawA);
@@ -596,15 +610,20 @@ export class Optimizer {
               writeout,
             });
             
-            // Add distribution tracking summary to status line when writing out
             if (writeout) {
               const totalActual = this.mutationTracking.actualPermutation + this.mutationTracking.actualDecision;
               const actualPermutationRatio = totalActual > 0 ? (this.mutationTracking.actualPermutation / totalActual * 100).toFixed(1) : "0.0";
               const actualDecisionRatio = totalActual > 0 ? (this.mutationTracking.actualDecision / totalActual * 100).toFixed(1) : "0.0";
               const fallbackImpact = totalActual > 0 ? 
                 (this.mutationTracking.decisionToPermutationFallbacks / totalActual * 100).toFixed(1) : "0.0";
-              
-              process.stdout.write(`\n[DISTRIBUTION Target:${this.args.scheduleRatio}%] P=${actualPermutationRatio}% D=${actualDecisionRatio}% | Total: ${totalActual} | Fallbacks: ${fallbackImpact}%`);
+
+              if (this.adaptiveStrategy) {
+                const pProb = (this.adaptiveStrategy.getPermutationProbability() * 100).toFixed(1);
+                process.stdout.write(`\n[ADAPTIVE ${this.args.adaptiveStrategy} P-prob:${pProb}%] P=${actualPermutationRatio}% D=${actualDecisionRatio}% | Total: ${totalActual} | Fallbacks: ${fallbackImpact}%`);
+                this.adaptiveStrategy.snapshot(numEvals);
+              } else {
+                process.stdout.write(`\n[DISTRIBUTION Target:${this.args.scheduleRatio}%] P=${actualPermutationRatio}% D=${actualDecisionRatio}% | Total: ${totalActual} | Fallbacks: ${fallbackImpact}%`);
+              }
             }
             process.stdout.write(statusline);
 
@@ -688,6 +707,7 @@ export class Optimizer {
                 phase: this.currentPhase,
                 betIndex: this.currentBetIndex,
                 scheduleRatio: this.args.scheduleRatio,
+                adaptiveStrategy: this.args.adaptiveStrategy,
                 evals: this.args.evals,
                 cyclegoal: this.args.cyclegoal,
               },
@@ -712,6 +732,12 @@ export class Optimizer {
                 })),
                 total: globals.totalRandomInputsConsumed,
               },
+              adaptive: this.adaptiveStrategy ? {
+                strategy: this.args.adaptiveStrategy,
+                finalPermutationProbability: this.adaptiveStrategy.getPermutationProbability(),
+                finalArmStats: this.adaptiveStrategy.getStats(),
+                history: this.adaptiveStrategy.getHistory(),
+              } : null,
               performance: {
                 totalTime: elapsed,
                 measurementTime: accumulatedTimeSpentByMeasuring,
@@ -720,7 +746,7 @@ export class Optimizer {
             };
 
             writeString(jsonFile, JSON.stringify(comprehensiveMetrics, null, 2));
-            console.log(`\n📊 Exported comprehensive metrics to: ${jsonFile}`);
+            console.log(`\nExported comprehensive metrics to: ${jsonFile}`);
 
             // Export clean analysis JSON for easy visualization (only for final run phase)
             if (this.currentPhase === 'run') {
@@ -799,6 +825,7 @@ export class Optimizer {
                 method: this.args.method,
                 symbolname: this.symbolname,
                 scheduleRatio: this.args.scheduleRatio,
+                adaptiveStrategy: this.args.adaptiveStrategy,
                 totalEvals: this.args.totalEvals || this.args.evals,
                 timestamp: new Date().toISOString(),
               },
@@ -876,19 +903,21 @@ export class Optimizer {
                 console.warn(`⚠️  COUNTING MISMATCH: Expected ${expectedTotal} mutations, got ${totalActual}`);
               }
               
-              console.log(`\n📊 MUTATION DISTRIBUTION RESULTS:`);
+              console.log(`\nMUTATION DISTRIBUTION RESULTS:`);
               console.log(`   Implementation: ${this.symbolname}`);
               console.log(`   Evaluations: ${totalActual} mutations`);
-              console.log(`   Target Ratio: ${this.args.scheduleRatio}% Permutation / ${100 - this.args.scheduleRatio}% Decision`);
+              if (this.adaptiveStrategy) {
+                const pProb = (this.adaptiveStrategy.getPermutationProbability() * 100).toFixed(1);
+                const stats = this.adaptiveStrategy.getStats();
+                console.log(`   Strategy: ${this.args.adaptiveStrategy}`);
+                console.log(`   Final P-probability: ${pProb}%`);
+                console.log(`   Arm stats: P(pulls=${stats.permutation.pulls}, succ=${stats.permutation.successes}) D(pulls=${stats.decision.pulls}, succ=${stats.decision.successes})`);
+              } else {
+                console.log(`   Target Ratio: ${this.args.scheduleRatio}% Permutation / ${100 - this.args.scheduleRatio}% Decision`);
+              }
               console.log(`   Actual Ratio: ${actualPermutationRatio}% Permutation / ${actualDecisionRatio}% Decision`);
               console.log(`   Fallbacks: ${this.mutationTracking.decisionToPermutationFallbacks}/${totalActual} (${fallbackRate}%)`);
               console.log(`   Success Rates: P=${(this.mutationTracking.permutationKept/this.mutationTracking.actualPermutation*100).toFixed(1)}% D=${(this.mutationTracking.decisionKept/this.mutationTracking.actualDecision*100).toFixed(1)}%`);
-              console.log(`   Intended Permutations: ${this.mutationTracking.actualPermutation - this.mutationTracking.decisionToPermutationFallbacks}`);
-              console.log(`   Fallback-induced Permutations: ${this.mutationTracking.decisionToPermutationFallbacks}`);
-              if (this.mutationTracking.decisionToPermutationFallbacks > 0) {
-                console.log(`   💡 Fallbacks occurred when no operations had "hot" decisions available for mutation`);
-              }
-              console.log(`   🎯 KEY FINDING: With target ratio ${this.args.scheduleRatio}%, actual distribution was ${actualPermutationRatio}% permutation mutations`);
               console.log(``);
             }
             

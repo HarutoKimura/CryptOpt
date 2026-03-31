@@ -19,6 +19,7 @@ import { METHOD_T } from "@/bridge/bitcoin-core-bridge";
 import { CURVE_T } from "@/bridge/fiat-bridge";
 import { LANGUAGE_T } from "@/bridge/rust-bridge";
 import { FRAME_POINTER_OPTIONS_T, MEMORY_CONSTRAINTS_OPTIONS_T } from "@/types";
+import type { AdaptiveStrategyType } from "@/optimizer/adaptive-strategy";
 
 export const MUTATION_MODE_OPTIONS = ["both", "schedule-only", "template-only"] as const;
 export type MUTATION_MODE_OPTIONS_T = typeof MUTATION_MODE_OPTIONS[number];
@@ -48,6 +49,7 @@ export type OptimizerArgs = {
   scheduleRatio: number; // 0-100: percentage of mutations that should be schedule mutations
   quotaMode: "execution" | "success"; // Controls whether scheduleRatio applies to executed or successful mutations
   fairComparison?: boolean; // Compile CryptOpt assembly to .so for fair comparison with baseline
+  adaptiveStrategy: AdaptiveStrategyType; // Two-armed bandit strategy; overrides scheduleRatio when not "none"
 };
 export type ParsedArgsT = OptimizerArgs & {
   startFromBestJson: boolean;

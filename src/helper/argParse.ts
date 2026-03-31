@@ -222,6 +222,14 @@ export const parsedArgs = y
       "If this is set, CryptOpt will compile its assembly to shared objects (.so) for fair comparison with baseline .so files. This provides more accurate performance measurements but adds compilation overhead.",
     boolean: true,
   })
+  .option("adaptiveStrategy", {
+    alias: "adaptive-strategy",
+    default: "none",
+    string: true,
+    describe:
+      "Adaptive mutation selection strategy (two-armed bandit). Overrides scheduleRatio when not 'none'. Options: ucb1, epsilon-greedy, thompson-sampling.",
+    choices: ["none", "ucb1", "epsilon-greedy", "thompson-sampling"],
+  })
   .check(({ evals, bridge, cFile, jsonFile, method, curve, language, scheduleRatio }) => {
     if (evals <= 0) {
       throw new Error("--evals must be >0");
